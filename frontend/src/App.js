@@ -1,13 +1,10 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import './HomepageLayout';
-import HomepageLayout from './HomepageLayout';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import EventsPage from "./pages/EventsPage";
 
 function App() {
-  return (
-   <HomepageLayout/>
-  );
+  return <EventsPage />;
 }
 
 export default App;
