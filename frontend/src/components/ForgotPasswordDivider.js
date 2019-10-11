@@ -9,24 +9,25 @@ import {
   Header
 } from "semantic-ui-react";
 
-const LoginDivider = () => (
+const ForgotPasswordDivider = () => (
   <Segment placeholder>
     <Grid columns={2} relaxed="very" stackable>
       <Grid.Column verticalAlign="middle">
-        <Header style={{ margin: "1.5em auto" }}>Sign in</Header>
+        <Header style={{ margin: "1.5em auto" }}>Reset Password</Header>
+        <p
+          style={{
+            maxWidth: "210px",
+            margin: "0 auto 1.5em auto",
+            display: "inline-flex"
+          }}
+        >
+          Please key in your email so that we can send you a link to reset your
+          password.
+        </p>
         <Form>
           <Form.Input icon="user" iconPosition="left" placeholder="Email" />
-          <Form.Input
-            icon="lock"
-            iconPosition="left"
-            placeholder="Password"
-            type="password"
-          />
-          <div style={{ margin: "1em auto" }}>
-            <a href={""}>Forgot password?</a>
-          </div>
           <Button
-            content="Login"
+            content="Submit"
             primary
             style={{ minWidth: "210px", margin: "1em auto" }}
           />
@@ -36,6 +37,7 @@ const LoginDivider = () => (
         <Image
           src="https://react.semantic-ui.com/images/wireframe/image.png"
           fluid
+          size="large"
         />
       </Grid.Column>
     </Grid>
@@ -44,4 +46,4 @@ const LoginDivider = () => (
   </Segment>
 );
 
-export default LoginDivider;
+export default ForgotPasswordDivider;

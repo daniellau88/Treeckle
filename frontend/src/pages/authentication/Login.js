@@ -1,14 +1,6 @@
 import React from "react";
-import LoginDivider from "./components/LoginDivider";
-import {
-  Button,
-  Form,
-  Grid,
-  Header,
-  Image,
-  Message,
-  Segment
-} from "semantic-ui-react";
+import LoginDivider from "../../components/LoginDivider";
+import { Grid } from "semantic-ui-react";
 
 const LoginForm = () => (
   <Grid style={{ height: "100vh" }} textAlign="center" verticalAlign="middle">
