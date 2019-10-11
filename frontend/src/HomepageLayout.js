@@ -15,6 +15,7 @@ import {
   Sidebar,
   Visibility,
 } from 'semantic-ui-react'
+import EventCard from './components/EventCard'
 
 // Heads up!
 // We using React Static to prerender our docs with server side rendering, this is a quite simple solution.
@@ -238,6 +239,7 @@ const HomepageLayout = () => (
         <Grid.Row>
           <Grid.Column textAlign='center'>
             <Button size='huge'>Check Them Out</Button>
+            <EventCard name="Investment :)"/>
           </Grid.Column>
         </Grid.Row>
       </Grid>
