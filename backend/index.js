@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 
 const keys = require('./config/keys');
 
+const authRoutes = require('./routes/auth-routes');
+
 const app = express();
 const path = require('path');
 const port = 3000;
@@ -20,6 +22,9 @@ mongoose.connect(
         console.log("Connected to mongoDB");
     }
 );
+
+//Routes
+app.use('/auth', authRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname,'../frontend/build/index.html')));
 
