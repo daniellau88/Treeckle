@@ -32,7 +32,10 @@ class NavigationBar extends React.Component {
     ];
 
     return (
-      <Menu fixed="top" borderless size="huge">
+      <div>
+        <Menu  size="huge" ></Menu>
+        <br/>
+        <Menu  fixed="top" borderless size="huge">
         <Menu.Item header>
           <Image size="mini" src={tree} style={{ marginRight: "1.5rem" }} />
           Treekle
@@ -91,6 +94,7 @@ class NavigationBar extends React.Component {
           />
         </Menu.Menu>
       </Menu>
+      </div>
     );
   }
 }
