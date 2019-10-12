@@ -1,4 +1,5 @@
 import React from "react";
+import logo from "../images/treekle_startup.png";
 import {
   Button,
   Divider,
@@ -33,10 +34,7 @@ const LoginDivider = () => (
         </Form>
       </Grid.Column>
       <Grid.Column verticalAlign="middle">
-        <Image
-          src="https://react.semantic-ui.com/images/wireframe/image.png"
-          fluid
-        />
+        <Image src={logo} fluid />
       </Grid.Column>
     </Grid>
 
