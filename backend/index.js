@@ -3,11 +3,17 @@ const mongoose = require('mongoose');
 
 const keys = require('./config/keys');
 
+const passport = require("passport");
+const passportSetup = require("./config/passport-setup");
+
 const authRoutes = require('./routes/auth-routes');
 
 const app = express();
 const path = require('path');
 const port = 3000;
+
+//Initialize
+app.use(passport.initialize());
 
 //Connect to DB
 mongoose.connect(
