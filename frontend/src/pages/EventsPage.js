@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Card, Icon, Image } from "semantic-ui-react";
-import EventCard from "../components/EventCard";
+import CarousellCards from '../components/CarousellCards'
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const EventsPage = props => {
-  const [modal, setModal] = useState(false);
 
   const eventOne = {
     title: "Investment",
@@ -17,14 +17,8 @@ const EventsPage = props => {
   return (
     <main className="events-page">
       <div className="placeholder">
-        This is the events page.
-        <EventCard event={eventOne} />
-        <EventCard event={eventOne} />
-        <EventCard event={eventOne} />
-        <EventCard event={eventOne} />
-        <EventCard event={eventOne} />
-        <EventCard event={eventOne} />
-        
+        <CarousellCards/>
+        This is the events page.       
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Card, Icon, Image, Button, Header, Modal, Grid, Label } from 'semantic-ui-react'
-import { tsPropertySignature } from '@babel/types';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const EventCard = (props) => {
 
