@@ -4,7 +4,7 @@ import { withRouter } from "react-router";
 import NavigationBar from "../components/NavigationBar";
 import Dashboard from "./Dashboard";
 import EventsPage from "./EventsPage";
-import RoomsBookingPage from "./RoomsBookingPage";
+import VenueBookingPage from "./VenueBookingPage";
 import ProfilePage from "./ProfilePage";
 
 class MainPage extends React.Component {
@@ -21,7 +21,7 @@ class MainPage extends React.Component {
         <Switch>
           <Route path="/dashboard" component={Dashboard}></Route>
           <Route path="/events" component={EventsPage}></Route>
-          <Route path="/bookings" component={RoomsBookingPage}></Route>
+          <Route path="/bookings" component={VenueBookingPage}></Route>
           <Route path="/profile" component={ProfilePage}></Route>
         </Switch>
       </main>
