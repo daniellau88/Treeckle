@@ -33,7 +33,7 @@ class NavigationBar extends React.Component {
 
     return (
       <div>
-        <Menu size="massive" >
+        <Menu size="huge" >
         <Dropdown
               trigger={<Image size="mini" src={avatar} avatar />}
               options={options}
