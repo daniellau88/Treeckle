@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../images/treekle_startup.png";
+import logo from "../images/treeckle_startup.png";
 import {
   Button,
   Divider,

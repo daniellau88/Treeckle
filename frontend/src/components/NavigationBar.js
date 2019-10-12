@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../images/treekle_logo.png";
+import logo from "../images/treeckle_logo.png";
 import avatar from "../images/avatar.png";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 
@@ -33,57 +33,37 @@ class NavigationBar extends React.Component {
 
     return (
       <div>
-        <Menu size="huge" >
-        <Dropdown
-              trigger={<Image size="mini" src={avatar} avatar />}
-              options={options}
-              className="link item"
-              icon={null}
-              direction="left"
-              floating
-            />
-        </Menu>
+        <Menu size="huge"></Menu>
+        <br />
         <Menu fixed="top" borderless size="huge">
           <Menu.Item header>
             <Image size="mini" src={logo} style={{ marginRight: "0.5rem" }} />
-            <span
-              style={{
-                fontFamily:
-                  "Lato, Montserrat,-apple-system, BlinkMacSystemFont, sans-serif"
-              }}
-            >
-              Treeckle
-            </span>
+            Treeckle
           </Menu.Item>
-          <div style={{ margin: "auto 25vw", display: "inline-flex" }}>
-            <Menu.Item
-              style={{ margin: "auto 1vw" }}
-              as={Link}
-              to="/dashboard"
-              name="dashboard"
-              active={activeItem === "dashboard"}
-              content="Dashboard"
-              onClick={this.handleItemClick}
-            />
-            <Menu.Item
-              style={{ margin: "auto 2vw" }}
-              as={Link}
-              to="/events"
-              name="events"
-              active={activeItem === "events"}
-              content="Events"
-              onClick={this.handleItemClick}
-            />
-            <Menu.Item
-              style={{ margin: "auto 2vw", padding: "0" }}
-              as={Link}
-              to="/bookings"
-              name="bookings"
-              active={activeItem === "bookings"}
-              content="Bookings"
-              onClick={this.handleItemClick}
-            />
-          </div>
+          <Menu.Item
+            as={Link}
+            to="/dashboard"
+            name="dashboard"
+            active={activeItem === "dashboard"}
+            content="Dashboard"
+            onClick={this.handleItemClick}
+          />
+          <Menu.Item
+            as={Link}
+            to="/events"
+            name="events"
+            active={activeItem === "events"}
+            content="Events"
+            onClick={this.handleItemClick}
+          />
+          <Menu.Item
+            as={Link}
+            to="/bookings"
+            name="bookings"
+            active={activeItem === "bookings"}
+            content="Bookings"
+            onClick={this.handleItemClick}
+          />
           <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
             <Dropdown
               icon={
@@ -116,7 +96,6 @@ class NavigationBar extends React.Component {
               floating
             />
           </Menu.Menu>
-         
         </Menu>
       </div>
     );

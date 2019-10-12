@@ -1,4 +1,5 @@
 import React from "react";
+import CardExampleGroups from "../components/CollapsedEventView";
 
 class ProfilePage extends React.Component {
   constructor(props) {
