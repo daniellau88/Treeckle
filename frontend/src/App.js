@@ -1,14 +1,13 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter as Router } from "react-router-dom";
-import MainPage from "./pages/MainPage";
+import { Routes } from './routes'; // where we are going to specify our routes
 
 function App() {
   return (
     <Router>
-      <MainPage />
-    </Router>
+      <Routes />
+    </Router> 
   );
 }
 
