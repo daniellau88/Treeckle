@@ -5,11 +5,13 @@ const CollapsedEventView = props => {
   const curr = props.event;
 
   return (
-    <Card style={{ minWidth: "40vw" }}>
+    <Card
+      style={{ minWidth: "80vw", borderRadius: "1.25rem", overflow: "hidden" }}
+    >
       <Card.Content
         style={{
           display: "inline-flex",
-          minWidth: "40vh",
+          minWidth: "80vw",
           justifyContent: "space-between"
         }}
       >
@@ -17,7 +19,7 @@ const CollapsedEventView = props => {
           floated="left"
           //size="mini"
           src={curr.image}
-          style={{ margin: "0.5em 0.5em 0.5em 0.5em", width: "15%" }}
+          style={{ margin: "0.5em 0.5em 0.5em 0.5em", width: "5%" }}
         />
         <div style={{ display: "flex-box", margin: "auto 1em" }}>
           <Card.Header>{curr.title}</Card.Header>

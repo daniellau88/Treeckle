@@ -19,8 +19,8 @@ const EventCard = props => {
   const curr = props.event;
 
   return (
-    <Container text="true">
-      <Card>
+    <Container text="true" style={{ padding: "5px 5px 5px 5px" }}>
+      <Card style={{ borderRadius: "1.25rem", overflow: "hidden" }}>
         <Modal
           trigger={
             <Image
