@@ -5,17 +5,6 @@ import { Grid, Icon, Button } from 'semantic-ui-react'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-function SampleNextArrow(props) {
-    const { className, style, onClick } = props;
-    console.log(className);
-    return (
-        <div
-            className={className}
-            style={{ ...style, display: "block", background: "grey" }}
-            onClick={onClick}
-        />
-    );
-}
 
 const CarousellCards = (props) => {
 
@@ -23,6 +12,10 @@ const CarousellCards = (props) => {
 
     const previous = () => {
         slider.slickPrev();
+    }
+
+    const next = () => {
+        slider.slickNext();
     }
 
     const eventOne = {
@@ -66,8 +59,7 @@ const CarousellCards = (props) => {
                     slidesToScroll: 1
                 }
             }
-        ],
-        nextArrow: <SampleNextArrow />
+        ]
     };
 
     return (
@@ -76,7 +68,7 @@ const CarousellCards = (props) => {
             <Grid >
                 <Grid.Row>
                     <Grid.Column width={1}>
-                        <Icon onClick={previous} name='arrow left' size='huge' />
+                        <Icon onClick={previous} name='angle left' size='huge' />
                     </Grid.Column>
                     <Grid.Column width={14}>
                         <Slider ref={slider => setSlider(slider)} {...settings}>
@@ -101,6 +93,7 @@ const CarousellCards = (props) => {
                         </Slider>
                     </Grid.Column>
                     <Grid.Column width={1}>
+                        <Icon onClick={next} name='angle right' size='huge' />
                     </Grid.Column>
                 </Grid.Row>
 
