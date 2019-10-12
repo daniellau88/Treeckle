@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, Icon, Image, Button, Header, Modal, Grid, Label } from 'semantic-ui-react'
+import { Card, Icon, Image, Button, Header, Modal, Grid, Label, Container } from 'semantic-ui-react'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -11,7 +11,8 @@ const EventCard = (props) => {
 
     return (
 
-        <Card>
+        <Container text="true">
+            <Card>
 
             <Modal trigger={<Image onClick={() => setModal(true)} src={curr.image} wrapped ui={false} />} size="small" >
 
@@ -57,7 +58,8 @@ const EventCard = (props) => {
                     {curr.location}
                 </Card.Description>
             </Card.Content>
-        </Card>
+            </Card>
+        </Container>
     );
 };
 
