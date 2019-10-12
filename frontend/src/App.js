@@ -1,14 +1,13 @@
 import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
-<<<<<<< HEAD
 import { BrowserRouter as Router } from "react-router-dom";
-import Navigation from "./Navigation";
+import MainPage from "./pages/MainPage";
 
 function App() {
   return (
     <Router>
-      <Navigation />
+      <MainPage />
     </Router>
   );
 }
