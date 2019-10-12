@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, Icon, Image, Button, Header, Modal } from 'semantic-ui-react'
+import { Card, Icon, Image, Button, Header, Modal, Grid, Label } from 'semantic-ui-react'
 import { tsPropertySignature } from '@babel/types';
 
 const EventCard = (props) => {
@@ -11,19 +11,39 @@ const EventCard = (props) => {
     return (
 
         <Card>
-            
-            <Modal trigger={<Image onClick={() => setModal(true)} src={curr.image} wrapped ui={false} />} basic>
+
+            <Modal trigger={<Image onClick={() => setModal(true)} src={curr.image} wrapped ui={false} />} size="small" >
+
                 <Modal.Content image>
-                    <Image wrapped size='medium' src={curr.image} />
-                    <Modal.Description>
-                        <Header>{curr.title}</Header>
-                        <p>
-                            {curr.desc}
-                        </p>
-                        <h5>
-                            {curr.location}
-                        </h5>
-                    </Modal.Description>
+                    <Grid>
+                        <Grid.Row>
+                            <Grid.Column width={8}>
+                                <Image wrapped size='medium' src={curr.image} />
+                            </Grid.Column>
+                            <Grid.Column width={8}>
+
+                                <Header>{curr.title}</Header>
+                                <p>
+                                    {curr.desc}
+                                </p>
+                                <h5>
+                                    {curr.location} | {curr.date}
+                                </h5>
+                                <Button fluid="true" as='div' labelPosition='right'>
+                                    <Button attached="bottom" color='red' fluid="true">
+                                        <Icon name='heart' />
+                                        Sign up
+                                    </Button>
+                                    <Label as='a' basic color='red' pointing='left'>
+                                        128
+                                    </Label>
+                                </Button>
+                            </Grid.Column>
+                        </Grid.Row>
+
+                    </Grid>
+
+
 
                 </Modal.Content>
             </Modal>
