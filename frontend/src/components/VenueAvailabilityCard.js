@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Button, Container } from "semantic-ui-react";
 
-class SelectVenueCard extends React.Component {
+class VenueAvailabilityCard extends React.Component {
   constructor(props) {
     super(props);
 
@@ -18,7 +18,7 @@ class SelectVenueCard extends React.Component {
     const { activeButton } = this.state;
 
     return (
-      <Card raised>
+      <Card>
         <Card.Content>
           <Card.Header textAlign="center">Select a venue</Card.Header>
         </Card.Content>
@@ -59,4 +59,4 @@ class SelectVenueCard extends React.Component {
   }
 }
 
-export default SelectVenueCard;
+export default VenueAvailabilityCard;
