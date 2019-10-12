@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import tree from "../images/tree.png";
 import avatar from "../images/avatar.png";
-import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
+import { Image, Menu, Dropdown, Icon, Label } from "semantic-ui-react";
 
 class NavigationBar extends React.Component {
   constructor(props) {
@@ -68,6 +68,7 @@ class NavigationBar extends React.Component {
             }
             direction="left"
             floating
+            labeled
             className="link item"
           >
             <Dropdown.Menu>

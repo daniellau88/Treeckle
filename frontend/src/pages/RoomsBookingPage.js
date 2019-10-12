@@ -1,4 +1,5 @@
 import React from "react";
+import BookingForm from "../components/BookingForm";
 
 class RoomsBookingPage extends React.Component {
   constructor(props) {
@@ -9,9 +10,9 @@ class RoomsBookingPage extends React.Component {
 
   render() {
     return (
-      <main className="rooms-booking-page">
-        <div className="placeholder">This is the rooms booking page.</div>
-      </main>
+      <div className="rooms-booking-page">
+        <BookingForm header="Select a facility" />
+      </div>
     );
   }
 }
