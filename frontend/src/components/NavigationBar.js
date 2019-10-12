@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../images/treekle_logo.png";
+import logo from "../images/treeckle_logo.png";
 import avatar from "../images/avatar.png";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 
