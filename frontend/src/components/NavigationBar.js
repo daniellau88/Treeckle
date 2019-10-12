@@ -33,7 +33,16 @@ class NavigationBar extends React.Component {
 
     return (
       <div>
-        <Menu size="huge"></Menu>
+        <Menu size="massive" >
+        <Dropdown
+              trigger={<Image size="mini" src={avatar} avatar />}
+              options={options}
+              className="link item"
+              icon={null}
+              direction="left"
+              floating
+            />
+        </Menu>
         <Menu fixed="top" borderless size="huge">
           <Menu.Item header>
             <Image size="mini" src={logo} style={{ marginRight: "0.5rem" }} />
@@ -106,55 +115,8 @@ class NavigationBar extends React.Component {
               direction="left"
               floating
             />
-            <Menu.Item
-              as={Link}
-              to="/events"
-              name="events"
-              active={activeItem === "events"}
-              content="Events"
-              onClick={this.handleItemClick}
-            />
-            <Menu.Item
-              as={Link}
-              to="/bookings"
-              name="bookings"
-              active={activeItem === "bookings"}
-              content="Bookings"
-              onClick={this.handleItemClick}
-            />
           </Menu.Menu>
-          <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
-            <Dropdown
-              icon={
-                <Icon
-                  name="bell outline"
-                  size="large"
-                  style={{ margin: "0" }}
-                />
-              }
-              direction="left"
-              floating
-              className="link item"
-            >
-              <Dropdown.Menu>
-                <Dropdown.Item>Notification 1</Dropdown.Item>
-                <Dropdown.Item>Notification 2</Dropdown.Item>
-                <Dropdown.Item>Notification 3</Dropdown.Item>
-                <Dropdown.Item>Notification 4</Dropdown.Item>
-                <Dropdown.Item>Notification 5</Dropdown.Item>
-                <Dropdown.Item>Notification 6</Dropdown.Item>
-                <Dropdown.Item>Notification 7</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-            <Dropdown
-              trigger={<Image size="mini" src={avatar} avatar />}
-              options={options}
-              className="link item"
-              icon={null}
-              direction="left"
-              floating
-            />
-          </Menu.Menu>
+         
         </Menu>
       </div>
     );
