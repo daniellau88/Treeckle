@@ -6,7 +6,7 @@ import LoginForm from "./pages/authentication/Login";
 import ForgotPasswordForm from "./pages/authentication/ForgotPassword";
 
 function App() {
-  return <ForgotPasswordForm />;
+  return <EventsPage />;
 }
 
 export default App;
