@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import tree from "../images/tree.png";
+import logo from "../images/treekle_logo.png";
 import avatar from "../images/avatar.png";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 
@@ -37,33 +37,45 @@ class NavigationBar extends React.Component {
         <br/>
         <Menu  fixed="top" borderless size="huge">
         <Menu.Item header>
-          <Image size="mini" src={tree} style={{ marginRight: "1.5rem" }} />
-          Treekle
+          <Image size="mini" src={logo} style={{ marginRight: "0.5rem" }} />
+          <span
+            style={{
+              fontFamily:
+                "Lato, Montserrat,-apple-system, BlinkMacSystemFont, sans-serif"
+            }}
+          >
+            Treekle
+          </span>
         </Menu.Item>
-        <Menu.Item
-          as={Link}
-          to="/dashboard"
-          name="dashboard"
-          active={activeItem === "dashboard"}
-          content="Dashboard"
-          onClick={this.handleItemClick}
-        />
-        <Menu.Item
-          as={Link}
-          to="/events"
-          name="events"
-          active={activeItem === "events"}
-          content="Events"
-          onClick={this.handleItemClick}
-        />
-        <Menu.Item
-          as={Link}
-          to="/bookings"
-          name="bookings"
-          active={activeItem === "bookings"}
-          content="Bookings"
-          onClick={this.handleItemClick}
-        />
+        <div style={{ margin: "auto 25vw", display: "inline-flex" }}>
+          <Menu.Item
+            style={{ margin: "auto 1vw" }}
+            as={Link}
+            to="/dashboard"
+            name="dashboard"
+            active={activeItem === "dashboard"}
+            content="Dashboard"
+            onClick={this.handleItemClick}
+          />
+          <Menu.Item
+            style={{ margin: "auto 2vw" }}
+            as={Link}
+            to="/events"
+            name="events"
+            active={activeItem === "events"}
+            content="Events"
+            onClick={this.handleItemClick}
+          />
+          <Menu.Item
+            style={{ margin: "auto 2vw", padding: "0" }}
+            as={Link}
+            to="/bookings"
+            name="bookings"
+            active={activeItem === "bookings"}
+            content="Bookings"
+            onClick={this.handleItemClick}
+          />
+        </div>
         <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
           <Dropdown
             icon={
