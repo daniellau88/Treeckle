@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const roomBookingSchema = new schema({
+    roomId: {
+        type: schema.Types.ObjectId,
+        required: true,
+        unique: true 
+    },
     description: {
         type: String,
         required: true,

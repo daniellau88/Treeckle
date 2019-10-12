@@ -3,15 +3,12 @@ const keys = require('../config/keys');
 const path = require('path');
 const imageThumbnail = require('image-thumbnail');
 
-const requireJWT = (req, res, next) => {
-    passport.authenticate('jwt', { session: false });
-}
-
 const signJWT = (req, res) => {
     const user = req.user;
     jwt.sign(
         {
-            userId: user._id
+            userId: user._id,
+            permissionLevel: user.permissionLevel
         },
         keys.JWT.secretKey,
         {
@@ -31,6 +28,7 @@ const signJWT = (req, res) => {
 
             res.status(200).send({
                 name: user.name,
+                permissionLevel: user.permissionLevel,
                 token: token,
                 profilePic: profilePic
             });
@@ -38,4 +36,4 @@ const signJWT = (req, res) => {
     });
 }
 
-module.exports = {signJWT, requireJWT};
+module.exports = {signJWT};

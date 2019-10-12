@@ -7,6 +7,7 @@ const passport = require("passport");
 const passportSetup = require("./config/passport-setup");
 
 const authRoutes = require('./routes/auth-routes');
+const apiRoutes = require('./routes/api-routes');
 
 const app = express();
 const path = require('path');
@@ -31,6 +32,7 @@ mongoose.connect(
 
 //Routes
 app.use('/auth', authRoutes);
+app.use('/api', apiRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname,'../frontend/build/index.html')));
 

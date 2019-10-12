@@ -7,6 +7,11 @@ const roomSchema = {
         required: true,
         unique: true
     },
+    category: {
+        type: String,
+        required: true,
+        unique: false
+    },
     recommendedCapacity: {
         type: Number,
         required: true,

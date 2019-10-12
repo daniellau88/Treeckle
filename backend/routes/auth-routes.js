@@ -44,20 +44,10 @@ router.post("/newAccounts", jsonParser, [
 
 // Login as new user
 router.post('/accounts',
-    jsonParser, 
-    [
-        check('email').isEmail(),
-        check('password').isLength({ min: 8 })
-    ],
+    jsonParser,
     passport.authenticate('local', { session: false }),
     (req, res) => {
-        //Check for input errors
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array() });
-        } else {
-            authService.signJWT(req, res);
-        }
+        authService.signJWT(req, res);
     }
 );
 

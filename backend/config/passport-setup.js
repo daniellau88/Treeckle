@@ -15,7 +15,7 @@ passport.use(new JWTStrategy(
         algorithms: keys.JWT.algorithms
     },
     (payload, done) => {
-        done(null, payload.userId);
+        done(null, payload);
       }
     )
 );
