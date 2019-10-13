@@ -5,7 +5,7 @@ const roomBookingSchema = new schema({
     roomId: {
         type: schema.Types.ObjectId,
         required: true,
-        unique: true 
+        unique: false
     },
     description: {
         type: String,
@@ -17,12 +17,12 @@ const roomBookingSchema = new schema({
         required: true,
         unique: false
     },
-    startDate: {
+    start: {
         type: Date,
         required: true,
         unique: false
     },
-    endDate: {
+    end: {
         type: Date,
         required: true,
         unique: false

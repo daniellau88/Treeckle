@@ -36,4 +36,6 @@ const signJWT = (req, res) => {
     });
 }
 
+//Todo refreshing of tokens
+
 module.exports = {signJWT};
