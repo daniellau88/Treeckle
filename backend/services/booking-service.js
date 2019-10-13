@@ -12,7 +12,7 @@ const checkApprovedOverlaps = async (roomId, start, end) => {
             roomId: roomId, 
             start: {"$lte": end},
             end: {"$gte": start},
-        });
+        }).lean();
 
         resp.forEach((doc) => {
             returnObject.overlaps.push({

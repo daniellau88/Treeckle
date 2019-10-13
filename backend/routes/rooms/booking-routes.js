@@ -9,26 +9,25 @@ const jsonParser = bodyParser.json();
 
 //Resident and up: Get an array of all roomBookings' made by requesting user
 router.get('/', (req, res) => {
-    RoomBooking.find({ createdBy: req.user.userId }, (err, resp) => {
-        if (err) {
-            res.status(500).send("Database Error");
-        } else {
-            const sendToUser = [];
-            resp.forEach(doc => {
-                sendToUser.push({
-                    bookingId: doc._id,
-                    roomId: doc.roomId,
-                    description: doc.description,
-                    start: doc.start.getTime(),
-                    end: doc.end.getTime(),
-                    approved: doc.approved
-                });
+    RoomBooking.find({ createdBy: req.user.userId }).lean().then(resp => {
+        const sendToUser = [];
+        resp.forEach(request => {
+            sendToUser.push({
+                bookingId: request._id,
+                roomId: request.roomId,
+                description: request.description,
+                start: request.start.getTime(),
+                end: request.end.getTime(),
+                approved: request.approved
             });
-            res.send(sendToUser);
-        }
+        });
+        res.send(sendToUser);
+    }).catch(err => {
+        res.status(500).send("Database Error");
     });
 });
 
+//Admin: Get an array of all requests
 
 //Resident and up: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
 router.get('/:roomId/:start-:end', [
