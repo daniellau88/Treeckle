@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import SelectVenueCard from "../components/SelectVenueCard";
-import VenueAvailabilityCard from "../components/VenueAvailabilityCard";
-import BookVenueForm from "../components/BookVenueForm";
+import CreateBookingRequest from "../components/CreateBookingRequest";
 import { Container, Button, Icon, Card } from "semantic-ui-react";
 import ExistingBookings from "../components/ExistingBookings";
 
@@ -25,15 +23,7 @@ const VenueBookingPage = props => {
           <Button.Content hidden>Cancel booking creation</Button.Content>
         </Button>
       )}
-      {!creating ? (
-        <ExistingBookings />
-      ) : (
-        <Card.Group centered>
-          <SelectVenueCard />
-          <VenueAvailabilityCard />
-          <BookVenueForm />
-        </Card.Group>
-      )}
+      {!creating ? <ExistingBookings /> : <CreateBookingRequest />}
     </Container>
   );
 };

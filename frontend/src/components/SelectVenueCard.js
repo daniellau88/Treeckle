@@ -18,7 +18,7 @@ class SelectVenueCard extends React.Component {
     const { activeButton } = this.state;
 
     return (
-      <Card raised>
+      <Card raised style={{ margin: "0 0 1em 0" }}>
         <Card.Content>
           <Card.Header textAlign="center">Select a venue</Card.Header>
         </Card.Content>
