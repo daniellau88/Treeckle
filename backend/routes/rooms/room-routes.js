@@ -5,7 +5,7 @@ const Rooms = require('../../models/rooms-model');
 const mongoose = require('mongoose');
 const { param, body, sanitizeParam, validationResult } = require('express-validator');
 
-// Get an array of room names, recommended capacity and ids belonging to a particular category
+//Level 0: Get an array of room names, recommended capacity and ids belonging to a particular category
 router.get('/:category', passport.authenticate('jwt', { session: false }), [
     param('category').exists()
 ], (req, res) => {

@@ -13,12 +13,13 @@ router.get('/:start-:end', [
     param('end').exists().toInt()
     ], (req, res) => {
         //Check for input errors
+        const {roomId,start,end} = req.params;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
-        } else {
-            const {roomId,start,end} = req.params;
-            
+        } else if (start > end) {
+            res.status(422).send("ValueError: start > end");
+        } else {         
             RoomBooking.find({
                 approved: true, 
                 roomId: roomId, 
