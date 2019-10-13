@@ -32,7 +32,7 @@ mongoose.connect(
 
 //Routes
 app.use('/auth', authRoutes);
-app.use('/api', apiRoutes);
+app.use('/api', passport.authenticate('jwt', { session: false }), apiRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname,'../frontend/build/index.html')));
 
