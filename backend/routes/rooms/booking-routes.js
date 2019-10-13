@@ -1,17 +1,19 @@
 const router = require('express').Router({ mergeParams: true});
 const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/roomBooking-model');
+const mongoose = require('mongoose');
 const { checkApprovedOverlaps } = require('../../services/booking-service');
-const { param, body, validationResult } = require('express-validator');
+const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('express-validator');
 
 const jsonParser = bodyParser.json();
 
 //Level 0: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
-router.get('/:start-:end', [
+router.get('/:roomId/:start-:end', [
     param('roomId').exists(),
     param('start').exists().isInt().toInt(),
     param('end').exists().isInt().toInt()
-    ], async (req, res) => {
+    ], sanitizeParam('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
+     async (req, res) => {
         //Check for input errors
         const {roomId,start,end} = req.params;
         const errors = validationResult(req);
@@ -32,18 +34,19 @@ router.get('/:start-:end', [
 
 //Level 0: Create a new bookingRequest
 router.post('/', jsonParser, [
-    param('roomId').exists(),
+    body('roomId').exists(),
     body('description').exists(),
     body('start').exists().isInt(),
     body('end').exists().isInt(),
-    ], async (req, res) => {
+    ], sanitizeBody('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
+    async (req, res) => {
         //Check for input errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
         } else {
             //Check for overlaps
-            let responseObject = await checkApprovedOverlaps(req.params.roomId, req.body.start, req.body.end);
+            let responseObject = await checkApprovedOverlaps(req.body.roomId, req.body.start, req.body.end);
 
             if (responseObject.error === 1) {
                 res.status(500).send("Database Error");
@@ -51,7 +54,7 @@ router.post('/', jsonParser, [
                 res.status(400).send("Overlaps detected");
             } else {
                 const newBookingRequest = {
-                    roomId: req.params.roomId,
+                    roomId: req.body.roomId,
                     description: req.body.description,
                     createdBy: req.user.userId,
                     start: req.body.start,
