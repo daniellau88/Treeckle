@@ -28,7 +28,7 @@ const roomBookingSchema = new schema({
         unique: false
     },
     approved: {
-        type: Boolean,
+        type: Number,
         required: true,
         unique: false
     }

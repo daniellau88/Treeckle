@@ -13,7 +13,7 @@ const checkApprovedOverlaps = async (roomId, start, end) => {
     
     try {
         const resp = await RoomBooking.find({
-            approved: true, 
+            approved: 1, 
             roomId: roomId, 
             start: {"$lte": end},
             end: {"$gte": start},
@@ -57,6 +57,7 @@ router.get('/:start-:end', [
 
 //Level 0: Create a new bookingRequest
 router.post('/', jsonParser, [
+    param('roomId').exists(),
     body('description').exists(),
     body('start').exists().isInt(),
     body('end').exists().isInt(),
@@ -80,7 +81,7 @@ router.post('/', jsonParser, [
                     createdBy: req.user.userId,
                     start: req.body.start,
                     end: req.body.end,
-                    approved: false
+                    approved: 0
                 };
 
                 new RoomBooking(newBookingRequest).save()
@@ -88,7 +89,7 @@ router.post('/', jsonParser, [
                     if (error) {
                         res.status(500).send("Database Error");
                     } else {
-                        res.send(result);
+                        res.sendStatus(200);
                     };
                 });
             }
