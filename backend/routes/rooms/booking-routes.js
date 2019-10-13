@@ -8,8 +8,8 @@ const jsonParser = bodyParser.json();
 //Level 0: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
 router.get('/:start-:end', [
     param('roomId').exists(),
-    param('start').exists().toInt(),
-    param('end').exists().toInt()
+    param('start').exists().isInt().toInt(),
+    param('end').exists().isInt().toInt()
     ], (req, res) => {
         //Check for input errors
         const {roomId,start,end} = req.params;
@@ -17,7 +17,7 @@ router.get('/:start-:end', [
         if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
         } else if (start > end) {
-            res.status(422).send("ValueError: start > end");
+            res.status(422).json({ValueError: "start > end"});
         } else {         
             RoomBooking.find({
                 approved: true, 
@@ -26,7 +26,7 @@ router.get('/:start-:end', [
                 end: {"$gte": start},
             }, (err, resp) => {
                 if (err) {
-                    res.sendStatus(500);
+                    res.status(500).send("Database Error");
                 } else {
                     const response = [];
                     resp.forEach((doc) => {
