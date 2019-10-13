@@ -1,5 +1,4 @@
 const router = require('express').Router({ mergeParams: true});
-const passport = require("passport");
 const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/roomBooking-model');
 const { param, body, validationResult } = require('express-validator');
@@ -66,7 +65,6 @@ router.post('/', jsonParser, [
                 if (error) {
                     res.sendStatus(500);
                 } else {
-                    console.log(result)
                     res.send(result);
                 };
             });
