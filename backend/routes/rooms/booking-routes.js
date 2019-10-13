@@ -2,6 +2,7 @@ const router = require('express').Router({ mergeParams: true});
 const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/roomBooking-model');
 const mongoose = require('mongoose');
+const constants = require('../../config/constants');
 const { checkApprovedOverlaps } = require('../../services/booking-service');
 const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('express-validator');
 
@@ -9,7 +10,8 @@ const jsonParser = bodyParser.json();
 
 //Resident and up: Get an array of all roomBookings' made by requesting user
 router.get('/', (req, res) => {
-    RoomBooking.find({ createdBy: req.user.userId }).lean().then(resp => {
+    RoomBooking.find({ createdBy: req.user.userId }).lean()
+    .then(resp => {
         const sendToUser = [];
         resp.forEach(request => {
             sendToUser.push({
@@ -28,6 +30,39 @@ router.get('/', (req, res) => {
 });
 
 //Admin: Get an array of all requests
+router.get('/all/:status', [
+    param('status').exists().isInt().toInt()
+], (req, res) => {
+    //Check for input errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else if (![
+        constants.approvalStates.pending, 
+        constants.approvalStates.approved, 
+        constants.approvalStates.rejected
+    ].includes(req.params.status)) {
+        res.status(422).json({ "ValueError": "invalid state" });
+    } else {
+        RoomBooking.find({ approved: req.params.status }).lean()
+        .then(resp => {
+            const sendToAdmin = [];
+            resp.forEach(request => {
+                sendToAdmin.push({
+                    bookingId: request._id,
+                    roomId: request.roomId,
+                    description: request.description,
+                    start: request.start.getTime(),
+                    end: request.end.getTime(),
+                    approved: request.approved
+                });
+            });
+            res.send(sendToAdmin);
+        }).catch(err => {
+            res.status(500).send("Database Error");
+        });
+    }
+})
 
 //Resident and up: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
 router.get('/:roomId/:start-:end', [
@@ -81,7 +116,7 @@ router.post('/', jsonParser, [
                     createdBy: req.user.userId,
                     start: req.body.start,
                     end: req.body.end,
-                    approved: 0
+                    approved: constants.approvalStates.pending
                 };
 
                 new RoomBooking(newBookingRequest).save()
