@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/roomBooking-model');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
-const { checkApprovedOverlaps } = require('../../services/booking-service');
+const { checkApprovedOverlaps, checkPotentialOverlaps } = require('../../services/booking-service');
 const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('express-validator');
 
 const jsonParser = bodyParser.json();
@@ -64,7 +64,32 @@ router.get('/all/:status', [
             res.status(500).send("Database Error");
         });
     }
-})
+});
+
+//Admin: Get conflicts that approval can cause
+router.get('/conflicts/:id', [
+param('id').exists()
+], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
+async (req, res) => {
+    if (req.user.permissionLevel < constants.permissionLevels.Admin) {
+        res.status(401).send("Insufficient permissions")
+    } else {
+        const relevantReq = await RoomBooking.findOne({ _id:req.params.id }).lean();
+        if (!relevantReq) {
+            res.sendStatus(400);
+        } else {
+            const conflictDocs = await checkPotentialOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
+            if (conflictDocs.error === 1) {
+                res.status(500).send("Database Error");
+            } else {
+                const responseObject = conflictDocs.overlaps.filter((elem) => {
+                    return elem.reqId.toString() !== relevantReq._id.toString();
+                });
+                res.send(responseObject);
+            }
+        }
+    }
+});
 
 //Resident and up: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
 router.get('/:roomId/:start-:end', [
