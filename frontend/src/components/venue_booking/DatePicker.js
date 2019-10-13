@@ -1,6 +1,6 @@
 import React from "react";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
-import "../styles/DatePicker.scss";
+import "../../styles/DatePicker.scss";
 
 const DatePicker = props => {
   return (

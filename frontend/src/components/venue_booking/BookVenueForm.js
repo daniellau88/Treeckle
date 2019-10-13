@@ -22,24 +22,36 @@ class BookVenueForm extends React.Component {
     this.onPurposeChange = this.onPurposeChange.bind(this);
   }
 
-  onStartDateChange(startDate) {
+  onStartDateChange(newStartDate) {
+    const startDate = newStartDate ? newStartDate : "";
+    console.log("Start date changed:", startDate);
     this.setState({ startDate });
   }
 
-  onEndDateChange(endDate) {
+  onEndDateChange(newEndDate) {
+    const endDate = newEndDate ? newEndDate : "";
+    console.log("End date changed:", endDate);
     this.setState({ endDate });
   }
 
-  onStartTimeChange(startTime) {
+  onStartTimeChange(newStartTime) {
+    const startTime = newStartTime
+      ? newStartTime.format("HH:mm").toString()
+      : "";
+    console.log("Start time changed:", startTime);
     this.setState({ startTime });
   }
 
-  onEndTimeChange({ endTime }) {
+  onEndTimeChange(newEndTime) {
+    const endTime = newEndTime ? newEndTime.format("HH:mm").toString() : "";
+    console.log("End time changed:", endTime);
     this.setState({ endTime });
   }
 
-  onPurposeChange({ event, purpose }) {
-    this.setState({ purpose });
+  onPurposeChange(event, purpose) {
+    const newValue = purpose.value;
+    console.log("Booking purpose changed:", newValue);
+    this.setState({ purpose: newValue });
   }
 
   render() {
@@ -73,10 +85,10 @@ class BookVenueForm extends React.Component {
               />
             </Form.Field>
             <Form.TextArea
-              rows={5}
-              required
+              rows={8}
               label="Booking purpose"
               placeholder="Briefly describe the purpose for this booking..."
+              onChange={this.onPurposeChange}
             />
           </Form>
         </Card.Content>
