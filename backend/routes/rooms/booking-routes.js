@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/roomBooking-model');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
-const { checkApprovedOverlaps, checkPotentialOverlaps } = require('../../services/booking-service');
+const { checkApprovedOverlaps, checkPotentialOverlaps, rejectOverlaps } = require('../../services/booking-service');
 const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('express-validator');
 
 const jsonParser = bodyParser.json();
@@ -67,7 +67,7 @@ router.get('/all/:status', [
 });
 
 //Admin: Get conflicts that approval can cause
-router.get('/conflicts/:id', [
+router.get('/manage/:id', [
 param('id').exists()
 ], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
 async (req, res) => {
@@ -83,13 +83,48 @@ async (req, res) => {
                 res.status(500).send("Database Error");
             } else {
                 const responseObject = conflictDocs.overlaps.filter((elem) => {
-                    return elem.reqId.toString() !== relevantReq._id.toString();
+                    return elem.toString() !== relevantReq._id.toString();
                 });
                 res.send(responseObject);
             }
         }
     }
 });
+
+//Admin: Patches the bookingRequest with approval or rejection, returns affected if approval
+router.patch('/manage/:id', jsonParser, [
+    param('id').exists(),
+    body('approved').exists().isInt()
+    ], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
+    async (req, res) => {
+        if (req.user.permissionLevel < constants.permissionLevels.Admin) {
+            res.status(401).send("Insufficient permissions")
+        } else if (req.body.approved === constants.approvalStates.approved) {
+            const relevantReq = await RoomBooking.findOne({ _id:req.params.id }).lean();
+            if (!relevantReq) {
+                res.sendStatus(400);
+            } else {
+                const conflictDocs = await rejectOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
+                await RoomBooking.findOneAndUpdate({ _id:req.params.id }, { approved: constants.approvalStates.approved }).lean();
+                if (conflictDocs.error === 1) {
+                    res.status(500).send("Database Error");
+                } else {
+                    const responseObject = conflictDocs.overlaps.filter((elem) => {
+                        return elem.toString() !== relevantReq._id.toString();
+                    });
+                    res.send(responseObject);
+                }
+            }
+        } else if (req.body.approved === constants.approvalStates.rejected) {
+            await RoomBooking.findOneAndUpdate({ _id:req.params.id }, { approved: constants.approvalStates.rejected }).lean();
+            res.sendStatus(200);
+        } else if (req.body.approved === constants.approvalStates.pending) {
+            await RoomBooking.findOneAndUpdate({ _id:req.params.id }, { approved: constants.approvalStates.pending }).lean();
+            res.sendStatus(200);
+        } else {
+            res.status(400).status("ValueError");
+        }
+    });
 
 //Resident and up: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
 router.get('/:roomId/:start-:end', [
