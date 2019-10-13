@@ -7,7 +7,7 @@ const { param, body, validationResult } = require('express-validator');
 const jsonParser = bodyParser.json();
 
 //Level 0: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
-router.get('/:start/:end', passport.authenticate('jwt', { session: false }), [
+router.get('/:start-:end', [
     param('roomId').exists(),
     param('start').exists().toInt(),
     param('end').exists().toInt()
@@ -17,12 +17,13 @@ router.get('/:start/:end', passport.authenticate('jwt', { session: false }), [
         if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
         } else {
-            const {roomId, start, end} = req.params;
+            const {roomId,start,end} = req.params;
+            
             RoomBooking.find({
                 approved: true, 
                 roomId: roomId, 
-                startDate: {"$lte": end},
-                endDate: {"$gte": start},
+                start: {"$lte": end},
+                end: {"$gte": start},
             }, (err, resp) => {
                 if (err) {
                     res.sendStatus(500);
@@ -30,8 +31,8 @@ router.get('/:start/:end', passport.authenticate('jwt', { session: false }), [
                     const response = [];
                     resp.forEach((doc) => {
                         response.push({
-                            startDate: doc.startDate,
-                            endDate: doc.endDate
+                            startDate: doc.start.getTime(),
+                            endDate: doc.end.getTime()
                         });
                     });
                     res.send(response);
@@ -70,6 +71,5 @@ router.post('/', jsonParser, [
             });
         }
 });
-
 
 module.exports = router;
