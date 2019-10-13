@@ -43,6 +43,8 @@ router.get('/all/:status', [
         constants.approvalStates.rejected
     ].includes(req.params.status)) {
         res.status(422).json({ "ValueError": "invalid state" });
+    } else if (req.user.permissionLevel < constants.permissionLevels.Admin) {
+        res.status(401).send("Insufficient permissions")
     } else {
         RoomBooking.find({ approved: req.params.status }).lean()
         .then(resp => {
