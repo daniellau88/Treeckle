@@ -7,7 +7,30 @@ const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('
 
 const jsonParser = bodyParser.json();
 
-//Level 0: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
+//Resident and up: Get an array of all roomBookings' made by requesting user
+router.get('/', (req, res) => {
+    RoomBooking.find({ createdBy: req.user.userId }, (err, resp) => {
+        if (err) {
+            res.status(500).send("Database Error");
+        } else {
+            const sendToUser = [];
+            resp.forEach(doc => {
+                sendToUser.push({
+                    bookingId: doc._id,
+                    roomId: doc.roomId,
+                    description: doc.description,
+                    start: doc.start.getTime(),
+                    end: doc.end.getTime(),
+                    approved: doc.approved
+                });
+            });
+            res.send(sendToUser);
+        }
+    });
+});
+
+
+//Resident and up: Get an array of approved roomBookings' start-end intervals, within a specified range for a particular room
 router.get('/:roomId/:start-:end', [
     param('roomId').exists(),
     param('start').exists().isInt().toInt(),
@@ -32,7 +55,7 @@ router.get('/:roomId/:start-:end', [
         }   
 });
 
-//Level 0: Create a new bookingRequest
+//Resident and up: Create a new bookingRequest
 router.post('/', jsonParser, [
     body('roomId').exists(),
     body('description').exists(),

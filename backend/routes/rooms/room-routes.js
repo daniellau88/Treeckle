@@ -11,6 +11,7 @@ const jsonParser = bodyParser.json();
 router.use('/categories', categoryRoutes);
 router.use('/bookings', bookingRoutes);
 
+//Admin: Create new room
 router.post('/', jsonParser, [
     body('name').exists(),
     body('category').exists(),

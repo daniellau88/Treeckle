@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const Rooms = require('../../models/rooms-model');
 
-//Level 0: get list of categories
+//Resident and up: get list of categories
 router.get('/', (req, res) => {
     Rooms.distinct('category', (error, results) => {
         if (error) {
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
     });
 });
 
-//Level 0: Get an array of room names, recommended capacity and ids belonging to a particular category
+//Resident and up: Get an array of room names, recommended capacity and ids belonging to a particular category
 router.get('/:category', (req, res) => {
     const category = req.params.category;
     Rooms.find({ category: category }, (err, resp) => {
