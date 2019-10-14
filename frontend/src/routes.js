@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
+import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 
 export const Routes = () => {
   return (
@@ -15,6 +16,7 @@ export const Routes = () => {
         <Route path="/events" component={EventsPage}></Route>
         <Route path="/bookings" component={VenueBookingPage}></Route>
         <Route path="/profile" component={ProfilePage}></Route>
+        <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
       </Switch>
     </div>
   );
