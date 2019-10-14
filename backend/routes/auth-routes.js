@@ -1,6 +1,10 @@
 const router = require('express').Router();
 const User = require('../models/user-model');
+const CreateAccount = require('../models/createAccount-model');
 const authService = require('../services/auth-service');
+const shortid = require('shortid');
+const EmailService = require('../services/email-service');
+const constants = require('../config/constants');
 const bodyParser = require('body-parser');
 const passport = require("passport");
 const { check, validationResult } = require('express-validator');
@@ -50,5 +54,39 @@ router.post('/accounts',
         authService.signJWT(req, res);
     }
 );
+
+//Account creation request
+router.post('/newAccountRequest', passport.authenticate('jwt', { session: false }), jsonParser, [
+    check('email').isEmail(),
+], (req, res) => {
+    //Check for input errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else if (req.user.permissionLevel < constants.permissionLevels.Admin) {
+        res.status(401).send("Insufficient permissions")
+    } else {
+        //Generate a shortid
+        const id = shortid.generate();
+        //Create a new Database entry for account creation
+        new CreateAccount({
+            email: req.body.email,
+            uniqueURIcomponent: id
+        }).save((err, product) => {
+            if (err) {
+                    res.status(500).send("Database Error");
+            } else {
+                EmailService.sendText(req.body.email, 'Account Creation for Treeckle', `Dear User, Please proceed with account creation using the following link:\n 
+                https://treeckle.com/auth/newAccounts/${id}\n
+                \n We look forward to having you in our community!`)
+                .then(() => {
+                    res.sendStatus(200);
+                }).catch(() => {
+                    res.sendStatus(503);
+                });
+            }
+        });
+    }
+});
 
 module.exports = router;
