@@ -10,18 +10,17 @@ import {
   Grid,
   Segment,
   Image,
-  Header
+  Header,
+  Message
 } from "semantic-ui-react";
 
 class CreateAccountAdmin extends React.Component {
   static contextType = Context;
   state = {
     email: "",
-    password: "",
     submittedEmail: "",
-    submittedPassword: "",
     emailError: null,
-    passwordError: null
+    userCreated: false
   };
 
   constructor(props) {
@@ -33,8 +32,7 @@ class CreateAccountAdmin extends React.Component {
     email: yup
       .string()
       .email()
-      .required(),
-    password: yup.string().required()
+      .required()
   });
 
   EmailSchema = yup.object().shape({
@@ -44,40 +42,40 @@ class CreateAccountAdmin extends React.Component {
       .required()
   });
 
-  PasswordSchema = yup.object().shape({
-    password: yup.string().required()
-  });
 
   handleChange = (e, { name, value }) => {
     this.setState({ [name]: value });
   };
 
   handleSubmit = () => {
-    const { email, password } = this.state;
+    const { email } = this.state;
     this.setState({
       submittedEmail: email,
-      submittedPassword: password,
-      emailError: null,
-      passwordError: null
+      emailError: null
     });
-    console.log(this.state.email, this.state.password);
-    let inputData = { email: this.state.email, password: this.state.password };
+    console.log(this.state.email);
+    let inputData = { email: this.state.email };
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!");
-        //TODO axios POST
+        axios
+          .post("/auth/newAccountRequest", {
+            email: this.state.email,
+          })
+          .then(res => {
+            if (res.status === 200) {
+              console.log(res.data);
+              this.setState({ userCreated: true });
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
           if (!valid) {
             this.setState({
               emailError: { content: "Please enter a valid email." }
-            });
-          }
-        });
-        this.PasswordSchema.isValid(inputData).then(valid => {
-          if (!valid) {
-            this.setState({
-              passwordError: { content: "Please enter your password." }
             });
           }
         });
@@ -92,11 +90,7 @@ class CreateAccountAdmin extends React.Component {
   render() {
     const {
       email,
-      password,
-      submittedEmail,
-      submittedPassword,
       emailError,
-      passwordError
     } = this.state;
     return (
       <Segment placeholder>
@@ -119,6 +113,15 @@ class CreateAccountAdmin extends React.Component {
                 style={{ minWidth: "210px", margin: "1em auto" }}
               />
             </Form>
+            {this.state.userCreated ? (
+              <Message
+                success
+                header='User Created'
+                content={`${this.state.submittedEmail} has received the email`}
+              />
+            ) : (
+                null
+              )}
           </Grid.Column>
           <Grid.Column verticalAlign="middle">
             <Button
@@ -130,7 +133,10 @@ class CreateAccountAdmin extends React.Component {
         </Grid>
 
         {<Divider vertical>OR</Divider>}
+
+
       </Segment>
+
     );
   }
 }
