@@ -11,12 +11,18 @@ function App() {
   let name = contextValue.name;
   let profilePic = contextValue.profilePic;
 
+  if (contextValue.token !== -1 && contextValue.token !== -2) {
+    token = localStorage.getItem("token");
+    name = localStorage.getItem("name");
+    profilePic = localStorage.getItem("profilePic");
+  }
+
   token = token === null ? "" : token;
   name = name === null ? "" : name;
   profilePic = profilePic === null ? "" : profilePic;
 
   React.useEffect(() => {
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", token); //TODO keys for localStorage
     localStorage.setItem("name", name);
     localStorage.setItem("profilePic", profilePic);
     if (contextValue.token !== -1 && contextValue.token !== -2) {
