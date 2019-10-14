@@ -33,8 +33,6 @@ class NavigationBar extends React.Component {
 
     return (
       <div>
-        <Menu size="huge"></Menu>
-        <br />
         <Menu fixed="top" borderless size="huge">
           <Menu.Item header>
             <Image size="mini" src={logo} style={{ marginRight: "0.5rem" }} />

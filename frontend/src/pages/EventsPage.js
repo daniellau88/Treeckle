@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import CarousellCards from "../components/CarousellCards";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { Card, Icon, Image, Header } from "semantic-ui-react";
+import { Card, Icon, Image, Header, Menu } from "semantic-ui-react";
 import EventCard from "../components/EventCard";
 import EventList from "../components/EventList";
 
 const EventsPage = props => {
   return (
     <main className="events-page">
+      <Menu size="huge"></Menu>
+      <br />
       <div className="placeholder">
 
         <br /><br />

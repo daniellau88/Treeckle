@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
-import Login from "./pages/authentication/Login";
+import LoginForm from "./pages/authentication/Login";
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 
 export const Routes = () => {
@@ -13,7 +13,7 @@ export const Routes = () => {
     <div>
       <NavigationBar />
       <Switch>
-        <Route exact path="/" component={Login} />
+        <Route exact path="/" component={LoginForm} />
         <Route path="/dashboard" component={Dashboard}></Route>
         <Route path="/events" component={EventsPage}></Route>
         <Route path="/bookings" component={VenueBookingPage}></Route>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CreateBookingRequest from "../components/venue_booking/CreateBookingRequest";
-import { Container, Button, Icon } from "semantic-ui-react";
+import { Container, Button, Icon, Menu } from "semantic-ui-react";
 import ExistingBookings from "../components/ExistingBookings";
 
 const VenueBookingPage = props => {
@@ -8,6 +8,8 @@ const VenueBookingPage = props => {
 
   return (
     <Container>
+      <Menu size="huge"></Menu>
+      <br />
       {!creating ? (
         <Button fluid animated="fade" onClick={() => setCreating(!creating)}>
           <Button.Content visible>
