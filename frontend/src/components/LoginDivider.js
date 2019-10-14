@@ -10,7 +10,8 @@ import {
   Grid,
   Segment,
   Image,
-  Header
+  Header,
+  Message
 } from "semantic-ui-react";
 
 class LoginDivider extends React.Component {
@@ -21,7 +22,8 @@ class LoginDivider extends React.Component {
     submittedEmail: "",
     submittedPassword: "",
     emailError: null,
-    passwordError: null
+    passwordError: null,
+    invalidUserError: false
   };
 
   constructor(props) {
@@ -65,7 +67,25 @@ class LoginDivider extends React.Component {
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!");
-        //TODO axios POST
+        axios
+          .post("/auth/accounts", {
+            email: this.state.email,
+            password: this.state.password
+          })
+          .then(res => {
+            if (res.status === 200) {
+              const token = res.data.token;
+              const name = res.data.name;
+              const profilePic = res.data.profilePic;
+              this.context.setUser(token, name, profilePic);
+            }
+          })
+          .catch(err => {
+            this.setState({
+              invalidUserError: true
+            });
+            console.log(err);
+          });
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
           if (!valid) {
@@ -86,7 +106,7 @@ class LoginDivider extends React.Component {
   };
 
   handleForgot() {
-    this.context.setUser(-2, "");
+    this.context.setUser(-2, "", "");
   }
 
   render() {
@@ -96,14 +116,15 @@ class LoginDivider extends React.Component {
       submittedEmail,
       submittedPassword,
       emailError,
-      passwordError
+      passwordError,
+      invalidUserError
     } = this.state;
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
           <Grid.Column verticalAlign="middle">
             <Header style={{ margin: "1.5em auto" }}>Sign in</Header>
-            <Form onSubmit={this.handleSubmit}>
+            <Form error onSubmit={this.handleSubmit}>
               <Form.Input
                 error={emailError}
                 icon="user"
@@ -123,8 +144,15 @@ class LoginDivider extends React.Component {
                 value={password}
                 onChange={this.handleChange}
               />
+              {invalidUserError && (
+                <Message
+                  error
+                  content="Incorrect email/password."
+                  style={{ maxWidth: "210px", margin: "1em auto" }}
+                />
+              )}
               <div style={{ margin: "1em auto" }}>
-                <a href={""}>Forgot password?</a>
+                <a onClick={this.handleForgot}>Forgot password?</a>
               </div>
               <Button
                 content="Login"
