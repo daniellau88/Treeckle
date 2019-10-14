@@ -88,7 +88,7 @@ class CreateAccountUser extends React.Component {
     let inputData = { email: this.state.email, password: this.state.password, confirmPassword: this.state.confirmPassword };
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
-        console.log("yell hea!");
+        console.log("yell hea!" + this.context.token);
         axios
           .post("/auth/newAccounts", {
             name: this.state.name,
