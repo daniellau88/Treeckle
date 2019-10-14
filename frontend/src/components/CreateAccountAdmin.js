@@ -58,10 +58,14 @@ class CreateAccountAdmin extends React.Component {
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!");
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZGEzMzVmZWU2YThkOTM2NDBlNjAzZjgiLCJwZXJtaXNzaW9uTGV2ZWwiOjIwMCwiaWF0IjoxNTcxMDYxOTA5LCJleHAiOjE1NzEwNjM3MDl9.Y3NQsn8vS6CxTRoR7RSr6PBzc4rq-HyFOYA9KdlH19U`
+        }
         axios
           .post("/auth/newAccountRequest", {
             email: this.state.email,
-          })
+          }, {headers : headers})
           .then(res => {
             if (res.status === 200) {
               console.log(res.data);

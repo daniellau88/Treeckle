@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginForm from "./pages/authentication/Login";
 import ForgotPasswordForm from "./pages/authentication/ForgotPassword";
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
+import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
 
 export const Routes = () => {
   const contextValue = useContext(Context);
@@ -32,9 +33,6 @@ export const Routes = () => {
       {token !== "" && token !== -1 && token !== -2 && (
         <Route path="/profile" component={ProfilePage}></Route>
       )}
-      {token !== "" && token !== -1 && token !== -2 && (
-        <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
-      )}
       {token === "" && <Route exact path="/" component={LoginForm} />}
       {/* {token === -1 && (
         <Route exact path="/" component={} />
@@ -46,6 +44,8 @@ export const Routes = () => {
           component={PasswordReset}
         />
       } */}
+      <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
+      <Route path="/user/create/:uniqueId" component={CreateAccountUserPage}></Route>
     </div>
   );
 };
