@@ -10,11 +10,18 @@ const EventsPage = props => {
   return (
     <main className="events-page">
       <div className="placeholder">
+
+        <br /><br />
         <Header style={{ margin: "1em 1em" }}>Recommended Events</Header>
         <CarousellCards />
-        <Header style={{ margin: "1em 1em" }}>Your Created Events</Header>
+        <br /><br />
+        <br /><br />
+
         <div style={{ margin: "auto 10vw" }}>
+          <Header style={{ margin: "1em 1em" }}>Your Created Events</Header>
           <EventList />
+          <br /><br />
+          <br /><br />
         </div>
       </div>
     </main>
