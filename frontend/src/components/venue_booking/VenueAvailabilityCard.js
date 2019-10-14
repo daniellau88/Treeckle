@@ -1,44 +1,12 @@
 import React from "react";
 import Axios from "axios";
+import moment from "moment";
 import { Card, Button, Form, Table } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
 
-const roomOptions = [
-  {
-    key: "sr1",
-    text: "Seminar Room 1",
-    value: "Seminar Room 1"
-  },
-  {
-    key: "sr2",
-    text: "Seminar Room 2",
-    value: "Seminar Room 2"
-  },
-  {
-    key: "sr3",
-    text: "Seminar Room 3",
-    value: "Seminar Room 3"
-  },
-  {
-    key: "sr4",
-    text: "Seminar Room 4",
-    value: "Seminar Room 4"
-  },
-  {
-    key: "sr5",
-    text: "Seminar Room 5",
-    value: "Seminar Room 5"
-  },
-  {
-    key: "sr6",
-    text: "Seminar Room 6",
-    value: "Seminar Room 6"
-  }
-];
-
-const availabilityOptions = [
+const defaultAvailabilityOptions = [
   {
     time: "12:00 am",
     availability: "available"
@@ -240,15 +208,22 @@ class VenueAvailabilityCard extends React.Component {
     super(props);
 
     this.state = {
+      rooms: null,
       roomName: "",
-      recommendatedCapacity: "",
+      recommendedCapacity: "",
       roomId: "",
-      date: "",
-      availabilityOptions: availabilityOptions
+      date: 0,
+      availabilityOptions: []
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
     this.onDateChange = this.onDateChange.bind(this);
+    this.updateRoomOptions = this.updateRoomOptions.bind(this);
+    this.updateDateChange = this.updateDateChange.bind(this);
+    this.isValidFields = this.isValidFields.bind(this);
+    this.updateAvailabilityOptions = this.updateAvailabilityOptions.bind(this);
+    this.updateRoomChange = this.updateRoomChange.bind(this);
+    this.onRoomChange = this.onRoomChange.bind(this);
   }
 
   renderBodyRow(data, index) {
@@ -265,15 +240,109 @@ class VenueAvailabilityCard extends React.Component {
     );
   }
 
+  async updateDateChange(date) {
+    this.setState({ date });
+  }
+
+  async updateRoomChange(roomName, recommendedCapacity, roomId) {
+    this.setState({ roomName, recommendedCapacity, roomId });
+  }
+
   onDateChange(newDate) {
-    const date = newDate ? newDate : "";
-    this.setState(date);
-    if (date && this.room) {
+    const date = newDate ? moment(newDate).valueOf() : 0;
+    if (date !== this.state.date) {
+      this.updateDateChange(date).then(() => {
+        if (this.isValidFields()) {
+          this.updateAvailabilityOptions();
+        }
+      });
     }
   }
 
+  onRoomChange(event, data) {
+    console.log(data);
+    this.updateRoomChange(
+      data.options[data.value].text,
+      data.options[data.value].recommendedCapacity,
+      data.options[data.value].key
+    ).then(() => {
+      if (this.isValidFields()) {
+        this.updateAvailabilityOptions();
+      }
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.category !== prevProps.category) {
+      this.updateRoomOptions();
+    }
+  }
+
+  componentDidMount() {
+    this.updateRoomOptions();
+  }
+
+  updateRoomOptions() {
+    Axios.get(`api/rooms/categories/${this.props.category}`, {
+      headers: { Authorization: `Bearer ${this.context.token}` }
+    }).then(response => {
+      if (response.status === 200) {
+        console.log(response.data);
+        const data = response.data;
+        const rooms = [];
+        for (let i = 0; i < data.length; i++) {
+          let room = data[i];
+          rooms.push({
+            key: room.roomId,
+            text: room.name,
+            value: i,
+            recommendedCapacity: room.recommendedCapacity.toString()
+          });
+        }
+        this.setState({ rooms });
+        console.log(rooms);
+      }
+    });
+  }
+
   updateAvailabilityOptions() {
-    Axios.get("/api/rooms/bookings/:roomId/:start-:end");
+    Axios.get(
+      `api/rooms/bookings/${this.state.roomId}/${this.state.date}-${this.state
+        .date + 86400000}`,
+      {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      }
+    ).then(response => {
+      if (response.status === 200) {
+        const bookedSlots = response.data;
+        console.log(bookedSlots);
+        var availabilityOptions = defaultAvailabilityOptions;
+        for (let i = 0; i < bookedSlots.length; i++) {
+          const start = bookedSlots[i].startDate - this.state.date;
+          const end = bookedSlots[i].endDate - this.state.date;
+          const offset = moment("12:00 am", "h:mm a").valueOf();
+          console.log(start, end);
+          availabilityOptions = availabilityOptions.map(period => {
+            const currentTime =
+              moment(period.time, "h:mm a").valueOf() - offset;
+            console.log(currentTime);
+            return {
+              time: period.time,
+              availability:
+                start <= currentTime && currentTime < end
+                  ? "unavailable"
+                  : "available"
+            };
+          });
+        }
+        this.setState({ availabilityOptions });
+      }
+    });
+  }
+
+  isValidFields() {
+    console.log(this.state);
+    return this.state.roomId && this.state.date;
   }
 
   render() {
@@ -284,8 +353,16 @@ class VenueAvailabilityCard extends React.Component {
         </Card.Content>
         <Card.Content>
           <Form>
-            <Form.Select options={roomOptions} placeholder="Choose room" />
-            <DatePicker placeholder="Select date" />
+            <Form.Select
+              options={this.state.rooms}
+              placeholder="Choose room"
+              scrolling
+              onChange={this.onRoomChange}
+            />
+            <DatePicker
+              placeholder="Select date"
+              onDateChange={this.onDateChange}
+            />
           </Form>
           <div
             style={{ overflowY: "auto", maxHeight: "19em", marginTop: "1em" }}
@@ -298,7 +375,7 @@ class VenueAvailabilityCard extends React.Component {
                   <Table.HeaderCell>Availability</Table.HeaderCell>
                 </Table.Row>
               }
-              tableData={availabilityOptions}
+              tableData={this.state.availabilityOptions}
               renderBodyRow={this.renderBodyRow}
             ></Table>
           </div>

@@ -7,15 +7,16 @@ class CreateBookingRequest extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { venue: "" };
+    this.state = { category: "" };
 
     this.renderVenueAvailabilityCard = this.renderVenueAvailabilityCard.bind(
       this
     );
   }
 
-  renderVenueAvailabilityCard(venue) {
-    this.setState({ venue });
+  renderVenueAvailabilityCard(category) {
+    this.setState({ category });
+    console.log(category);
   }
 
   render() {
@@ -31,7 +32,9 @@ class CreateBookingRequest extends React.Component {
         <SelectVenueCard
           renderVenueAvailabilityCard={this.renderVenueAvailabilityCard}
         />
-        {this.state.venue && <VenueAvailabilityCard venue={this.state.venue} />}
+        {this.state.category && (
+          <VenueAvailabilityCard category={this.state.category} />
+        )}
         <BookVenueForm />
       </div>
     );
