@@ -7,12 +7,11 @@ router.get('/', (req, res) => {
     .then(results => {
         res.json({
             categories: results
-        })
+        })})
     .catch(error => {
         res.status(500).send("Database Error");
         });
-    })
-});
+    });
 
 //Resident and up: Get an array of room names, recommended capacity and ids belonging to a particular category
 router.get('/:category', (req, res) => {
