@@ -65,7 +65,22 @@ class LoginDivider extends React.Component {
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!");
-        //TODO axios POST
+        axios
+          .post("/auth/accounts", {
+            email: this.state.email,
+            password: this.state.password
+          })
+          .then(res => {
+            if (res.status === 200) {
+              const token = res.data.token;
+              const name = res.data.name;
+              const profilePic = res.data.profilePic;
+              this.context.setUser(token, name, profilePic);
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
           if (!valid) {
