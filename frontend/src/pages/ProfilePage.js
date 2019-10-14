@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "semantic-ui-react";
+import { Container, Menu } from "semantic-ui-react";
 import ProfileCard from "../components/ProfileCard";
 
 class ProfilePage extends React.Component {
@@ -16,6 +16,8 @@ class ProfilePage extends React.Component {
   render() {
     return (
       <main className="profile-page">
+        <Menu size="huge"></Menu>
+        <br />
         <div style={{ margin: "2em 2em" }}>
           <ProfileCard user={this.user1} />
         </div>

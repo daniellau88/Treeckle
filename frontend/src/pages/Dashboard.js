@@ -1,4 +1,5 @@
 import React from "react";
+import { Menu } from "semantic-ui-react";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -10,6 +11,8 @@ class Dashboard extends React.Component {
   render() {
     return (
       <main className="dashboard">
+        <Menu size="huge"></Menu>
+        <br />
         <div className="placeholder">This is the dashboard.</div>
       </main>
     );

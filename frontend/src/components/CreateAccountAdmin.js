@@ -101,7 +101,7 @@ class CreateAccountAdmin extends React.Component {
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
-          <Grid.Column verticalAlign="middle">
+          <Grid.Column>
             <Header style={{ margin: "1.5em auto" }}>Create Account</Header>
             <Form onSubmit={this.handleSubmit}>
               <Form.Input
