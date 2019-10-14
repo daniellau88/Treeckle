@@ -5,20 +5,21 @@ export const Context = React.createContext();
 class UserProvider extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { user: "", displayName: "" };
+    this.state = { token: "", name: "", profilePic: "" };
     this.setUser = this.setUser.bind(this);
   }
 
-  setUser(user, displayName) {
-    this.setState({ user: user, displayName: displayName });
+  setUser(token, name, profilePic) {
+    this.setState({ token: token, name: name, profilePic: profilePic });
   }
 
   render() {
     return (
       <Context.Provider
         value={{
-          user: this.state.user,
-          displayName: this.state.displayName,
+          token: this.state.token,
+          name: this.state.name,
+          profilePic: this.state.profilePic,
           setUser: this.setUser
         }}
       >
