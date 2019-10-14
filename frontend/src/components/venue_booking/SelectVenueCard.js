@@ -9,7 +9,7 @@ class SelectVenueCard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { categories: [], buttons: [] };
+    this.state = { categories: [], buttons: [], activeButton: "" };
 
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.renderButtons = this.renderButtons.bind(this);
@@ -17,10 +17,11 @@ class SelectVenueCard extends React.Component {
 
   handleButtonClick(event, data) {
     this.setState({ activeButton: data.name });
+    this.props.renderVenueAvailabilityCard(data.name);
   }
 
   componentDidMount() {
-    Axios.get("/api/rooms/categories", {
+    Axios.get("api/rooms/categories", {
       headers: { Authorization: `Bearer ${this.context.token}` }
     })
       .then(response => {
@@ -30,15 +31,15 @@ class SelectVenueCard extends React.Component {
           });
         }
       })
-      .then(() => this.renderButtons);
+      .then(this.renderButtons);
   }
 
   renderButtons() {
-    const buttons = this.categories.map(category => {
+    const buttons = this.state.categories.map(category => {
       return (
         <Button
           name={category}
-          active={this.state.activeButton === { category }}
+          active={this.state.activeButton === category}
           onClick={this.handleButtonClick}
         >
           <Container type="text">{category}</Container>

@@ -7,7 +7,15 @@ class CreateBookingRequest extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = { venue: "" };
+
+    this.renderVenueAvailabilityCard = this.renderVenueAvailabilityCard.bind(
+      this
+    );
+  }
+
+  renderVenueAvailabilityCard(venue) {
+    this.setState({ venue });
   }
 
   render() {
@@ -20,8 +28,10 @@ class CreateBookingRequest extends React.Component {
           flexWrap: "wrap"
         }}
       >
-        <SelectVenueCard />
-        <VenueAvailabilityCard />
+        <SelectVenueCard
+          renderVenueAvailabilityCard={this.renderVenueAvailabilityCard}
+        />
+        {this.state.venue && <VenueAvailabilityCard venue={this.state.venue} />}
         <BookVenueForm />
       </div>
     );
