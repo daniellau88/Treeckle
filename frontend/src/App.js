@@ -19,7 +19,7 @@ function App() {
     localStorage.setItem("token", token);
     localStorage.setItem("name", name);
     localStorage.setItem("profilePic", profilePic);
-    if (contextValue.user !== -1 && contextValue.user !== -2) {
+    if (contextValue.token !== -1 && contextValue.token !== -2) {
       contextValue.setUser(token, name, profilePic);
     }
   }, []);
