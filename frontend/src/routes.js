@@ -13,12 +13,11 @@ export const Routes = () => {
     <div>
       <NavigationBar />
       <Switch>
-        <Route exact path="/" component={Login} />
+        <Route exact path="/" component={LoginForm} />
         <Route path="/dashboard" component={Dashboard}></Route>
         <Route path="/events" component={EventsPage}></Route>
         <Route path="/bookings" component={VenueBookingPage}></Route>
         <Route path="/profile" component={ProfilePage}></Route>
-        <Route path="/login" component={LoginForm}></Route>
         <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
       </Switch>
     </div>
