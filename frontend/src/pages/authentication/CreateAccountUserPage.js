@@ -1,13 +1,13 @@
 import React from "react";
-import LoginDivider from "../../components/LoginDivider";
+import CreateAccountUser from "../../components/CreateAccountUser";
 import { Grid } from "semantic-ui-react";
 
-const CreateAccountUser = () => (
+const CreateAccountUserPage = () => (
   <Grid style={{ height: "100vh" }} textAlign="center" verticalAlign="middle">
     <Grid.Column style={{ maxWidth: "70%" }}>
-      <LoginDivider />
+      <CreateAccountUser />
     </Grid.Column>
   </Grid>
 );
 
-export default CreateAccountUser;
+export default CreateAccountUserPage;
