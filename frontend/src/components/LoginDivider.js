@@ -19,7 +19,9 @@ class LoginDivider extends React.Component {
     email: "",
     password: "",
     submittedEmail: "",
-    submittedPassword: ""
+    submittedPassword: "",
+    emailError: null,
+    passwordError: null
   };
 
   constructor(props) {
@@ -35,18 +37,50 @@ class LoginDivider extends React.Component {
     password: yup.string().required()
   });
 
+  EmailSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email()
+      .required()
+  });
+
+  PasswordSchema = yup.object().shape({
+    password: yup.string().required()
+  });
+
   handleChange = (e, { name, value }) => {
     this.setState({ [name]: value });
   };
 
   handleSubmit = () => {
     const { email, password } = this.state;
-    this.setState({ submittedEmail: email, submittedPassword: password });
+    this.setState({
+      submittedEmail: email,
+      submittedPassword: password,
+      emailError: null,
+      passwordError: null
+    });
     console.log(this.state.email, this.state.password);
     let inputData = { email: this.state.email, password: this.state.password };
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!");
+        //TODO axios POST
+      } else {
+        this.EmailSchema.isValid(inputData).then(valid => {
+          if (!valid) {
+            this.setState({
+              emailError: { content: "Please enter a valid email." }
+            });
+          }
+        });
+        this.PasswordSchema.isValid(inputData).then(valid => {
+          if (!valid) {
+            this.setState({
+              passwordError: { content: "Please enter your password." }
+            });
+          }
+        });
       }
     });
   };
@@ -56,7 +90,14 @@ class LoginDivider extends React.Component {
   }
 
   render() {
-    const { email, password, submittedEmail, submittedPassword } = this.state;
+    const {
+      email,
+      password,
+      submittedEmail,
+      submittedPassword,
+      emailError,
+      passwordError
+    } = this.state;
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
@@ -64,6 +105,7 @@ class LoginDivider extends React.Component {
             <Header style={{ margin: "1.5em auto" }}>Sign in</Header>
             <Form onSubmit={this.handleSubmit}>
               <Form.Input
+                error={emailError}
                 icon="user"
                 iconPosition="left"
                 placeholder="Email"
@@ -72,6 +114,7 @@ class LoginDivider extends React.Component {
                 onChange={this.handleChange}
               />
               <Form.Input
+                error={passwordError}
                 icon="lock"
                 iconPosition="left"
                 placeholder="Password"
