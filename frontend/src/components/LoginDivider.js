@@ -106,7 +106,7 @@ class LoginDivider extends React.Component {
   };
 
   handleForgot() {
-    this.context.setUser(-2, "");
+    this.context.setUser(-2, "", "");
   }
 
   render() {
@@ -152,7 +152,7 @@ class LoginDivider extends React.Component {
                 />
               )}
               <div style={{ margin: "1em auto" }}>
-                <a href={""}>Forgot password?</a>
+                <a onClick={this.handleForgot}>Forgot password?</a>
               </div>
               <Button
                 content="Login"
