@@ -10,7 +10,8 @@ import {
   Grid,
   Segment,
   Image,
-  Header
+  Header,
+  Message
 } from "semantic-ui-react";
 
 class LoginDivider extends React.Component {
@@ -21,7 +22,8 @@ class LoginDivider extends React.Component {
     submittedEmail: "",
     submittedPassword: "",
     emailError: null,
-    passwordError: null
+    passwordError: null,
+    invalidUserError: false
   };
 
   constructor(props) {
@@ -79,6 +81,9 @@ class LoginDivider extends React.Component {
             }
           })
           .catch(err => {
+            this.setState({
+              invalidUserError: true
+            });
             console.log(err);
           });
       } else {
@@ -111,14 +116,15 @@ class LoginDivider extends React.Component {
       submittedEmail,
       submittedPassword,
       emailError,
-      passwordError
+      passwordError,
+      invalidUserError
     } = this.state;
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
           <Grid.Column verticalAlign="middle">
             <Header style={{ margin: "1.5em auto" }}>Sign in</Header>
-            <Form onSubmit={this.handleSubmit}>
+            <Form error onSubmit={this.handleSubmit}>
               <Form.Input
                 error={emailError}
                 icon="user"
@@ -138,6 +144,13 @@ class LoginDivider extends React.Component {
                 value={password}
                 onChange={this.handleChange}
               />
+              {invalidUserError && (
+                <Message
+                  error
+                  content="Incorrect email/password."
+                  style={{ maxWidth: "210px", margin: "1em auto" }}
+                />
+              )}
               <div style={{ margin: "1em auto" }}>
                 <a href={""}>Forgot password?</a>
               </div>

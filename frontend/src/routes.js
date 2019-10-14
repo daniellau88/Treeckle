@@ -5,11 +5,8 @@ import Dashboard from "./pages/Dashboard";
 import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
-<<<<<<< HEAD
 import Login from "./pages/authentication/Login";
-=======
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
->>>>>>> a69b43e9b6c916afb5db87aa3aab3e6f6e9dd05c
 
 export const Routes = () => {
   return (
