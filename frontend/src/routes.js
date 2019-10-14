@@ -7,6 +7,7 @@ import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginForm from "./pages/authentication/Login"
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
+import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
 
 export const Routes = () => {
   return (
@@ -19,6 +20,7 @@ export const Routes = () => {
         <Route path="/bookings" component={VenueBookingPage}></Route>
         <Route path="/profile" component={ProfilePage}></Route>
         <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
+        <Route path="/user/create/:uniqueId" component={CreateAccountUserPage}></Route>
       </Switch>
     </div>
   );
