@@ -17,6 +17,9 @@ export const Routes = () => {
   let token = contextValue.token;
   let name = contextValue.name;
   let profilePic = contextValue.profilePic;
+  localStorage.setItem("token", token);
+  localStorage.setItem("name", name);
+  localStorage.setItem("profilePic", profilePic);
 
   return (
     <div>
@@ -45,7 +48,10 @@ export const Routes = () => {
         />
       } */}
       <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
-      <Route path="/user/create/:uniqueId" component={CreateAccountUserPage}></Route>
+      <Route
+        path="/user/create/:uniqueId"
+        component={CreateAccountUserPage}
+      ></Route>
     </div>
   );
 };
