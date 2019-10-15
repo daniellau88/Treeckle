@@ -152,7 +152,9 @@ class LoginDivider extends React.Component {
                 />
               )}
               <div style={{ margin: "1em auto" }}>
-                <a onClick={this.handleForgot}>Forgot password?</a>
+                <a onClick={this.handleForgot} style={{ cursor: "pointer" }}>
+                  Forgot password?
+                </a>
               </div>
               <Button
                 content="Login"
