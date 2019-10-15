@@ -16,7 +16,7 @@ class CreateBookingRequest extends React.Component {
 
   renderVenueAvailabilityCard(category) {
     this.setState({ category });
-    console.log(category);
+    console.log("Selected category:", category);
   }
 
   render() {

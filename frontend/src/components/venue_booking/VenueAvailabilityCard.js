@@ -1,10 +1,208 @@
 import React from "react";
 import Axios from "axios";
 import moment from "moment";
-import { Card, Button, Form, Table } from "semantic-ui-react";
+import { Card, Button, Form, Table, Select } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
+
+// number of milliseconds in 1 day
+const NEXT_DAY = 24 * 60 * 60 * 1000;
+
+const emptyAvailabilityOptions = [
+  {
+    time: "12:00 am",
+    availability: ""
+  },
+  {
+    time: "12:30 am",
+    availability: ""
+  },
+  {
+    time: "1:00 am",
+    availability: ""
+  },
+  {
+    time: "1:30 am",
+    availability: ""
+  },
+  {
+    time: "2:00 am",
+    availability: ""
+  },
+  {
+    time: "2:30 am",
+    availability: ""
+  },
+  {
+    time: "3:00 am",
+    availability: ""
+  },
+  {
+    time: "3:30 am",
+    availability: ""
+  },
+  {
+    time: "4:00 am",
+    availability: ""
+  },
+  {
+    time: "4:30 am",
+    availability: ""
+  },
+  {
+    time: "5:00 am",
+    availability: ""
+  },
+  {
+    time: "5:30 am",
+    availability: ""
+  },
+  {
+    time: "6:00 am",
+    availability: ""
+  },
+  {
+    time: "6:30 am",
+    availability: ""
+  },
+  {
+    time: "7:00 am",
+    availability: ""
+  },
+  {
+    time: "7:30 am",
+    availability: ""
+  },
+  {
+    time: "8:00 am",
+    availability: ""
+  },
+  {
+    time: "8:30 am",
+    availability: ""
+  },
+  {
+    time: "9:00 am",
+    availability: ""
+  },
+  {
+    time: "9:30 am",
+    availability: ""
+  },
+  {
+    time: "10:00 am",
+    availability: ""
+  },
+  {
+    time: "10:30 am",
+    availability: ""
+  },
+  {
+    time: "11:00 am",
+    availability: ""
+  },
+  {
+    time: "11:30 am",
+    availability: ""
+  },
+  {
+    time: "12:00 pm",
+    availability: ""
+  },
+  {
+    time: "12:30 pm",
+    availability: ""
+  },
+  {
+    time: "1:00 pm",
+    availability: ""
+  },
+  {
+    time: "1:30 pm",
+    availability: ""
+  },
+  {
+    time: "2:00 pm",
+    availability: ""
+  },
+  {
+    time: "2:30 pm",
+    availability: ""
+  },
+  {
+    time: "3:00 pm",
+    availability: ""
+  },
+  {
+    time: "3:30 pm",
+    availability: ""
+  },
+  {
+    time: "4:00 pm",
+    availability: ""
+  },
+  {
+    time: "4:30 pm",
+    availability: ""
+  },
+  {
+    time: "5:00 pm",
+    availability: ""
+  },
+  {
+    time: "5:30 pm",
+    availability: ""
+  },
+  {
+    time: "6:00 pm",
+    availability: ""
+  },
+  {
+    time: "6:30 pm",
+    availability: ""
+  },
+  {
+    time: "7:00 pm",
+    availability: ""
+  },
+  {
+    time: "7:30 pm",
+    availability: ""
+  },
+  {
+    time: "8:00 pm",
+    availability: ""
+  },
+  {
+    time: "8:30 pm",
+    availability: ""
+  },
+  {
+    time: "9:00 pm",
+    availability: ""
+  },
+  {
+    time: "9:30 pm",
+    availability: ""
+  },
+  {
+    time: "10:00 pm",
+    availability: ""
+  },
+  {
+    time: "10:30 pm",
+    availability: ""
+  },
+  {
+    time: "11:00 pm",
+    availability: ""
+  },
+  {
+    time: "11:30 pm",
+    availability: ""
+  }
+];
 
 const defaultAvailabilityOptions = [
   {
@@ -208,12 +406,12 @@ class VenueAvailabilityCard extends React.Component {
     super(props);
 
     this.state = {
-      rooms: null,
+      rooms: [],
       roomName: "",
       recommendedCapacity: "",
       roomId: "",
       date: 0,
-      availabilityOptions: []
+      availabilityOptions: emptyAvailabilityOptions
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
@@ -251,25 +449,16 @@ class VenueAvailabilityCard extends React.Component {
   onDateChange(newDate) {
     const date = newDate ? moment(newDate).valueOf() : 0;
     if (date !== this.state.date) {
-      this.updateDateChange(date).then(() => {
-        if (this.isValidFields()) {
-          this.updateAvailabilityOptions();
-        }
-      });
+      this.updateDateChange(date).then(this.updateAvailabilityOptions);
     }
   }
 
   onRoomChange(event, data) {
-    console.log(data);
     this.updateRoomChange(
       data.options[data.value].text,
       data.options[data.value].recommendedCapacity,
       data.options[data.value].key
-    ).then(() => {
-      if (this.isValidFields()) {
-        this.updateAvailabilityOptions();
-      }
-    });
+    ).then(this.updateAvailabilityOptions);
   }
 
   componentDidUpdate(prevProps) {
@@ -283,65 +472,69 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   updateRoomOptions() {
-    Axios.get(`api/rooms/categories/${this.props.category}`, {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      if (response.status === 200) {
-        console.log(response.data);
-        const data = response.data;
-        const rooms = [];
-        for (let i = 0; i < data.length; i++) {
-          let room = data[i];
-          rooms.push({
-            key: room.roomId,
-            text: room.name,
-            value: i,
-            recommendedCapacity: room.recommendedCapacity.toString()
-          });
-        }
-        this.setState({ rooms });
-        console.log(rooms);
-      }
-    });
+    if (this.props.category) {
+      Axios.get(`api/rooms/categories/${this.props.category}`, {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
+        .then(response => {
+          if (response.status === 200) {
+            const data = response.data;
+            const rooms = [];
+            for (let i = 0; i < data.length; i++) {
+              let room = data[i];
+              rooms.push({
+                key: room.roomId,
+                text: room.name,
+                value: i,
+                recommendedCapacity: room.recommendedCapacity.toString()
+              });
+            }
+            this.setState({ rooms });
+            console.log("Room options updated:", rooms);
+          }
+        })
+        .then(this.updateAvailabilityOptions);
+    }
   }
 
   updateAvailabilityOptions() {
-    Axios.get(
-      `api/rooms/bookings/${this.state.roomId}/${this.state.date}-${this.state
-        .date + 86400000}`,
-      {
-        headers: { Authorization: `Bearer ${this.context.token}` }
-      }
-    ).then(response => {
-      if (response.status === 200) {
-        const bookedSlots = response.data;
-        console.log(bookedSlots);
-        var availabilityOptions = defaultAvailabilityOptions;
-        for (let i = 0; i < bookedSlots.length; i++) {
-          const start = bookedSlots[i].startDate - this.state.date;
-          const end = bookedSlots[i].endDate - this.state.date;
-          const offset = moment("12:00 am", "h:mm a").valueOf();
-          console.log(start, end);
-          availabilityOptions = availabilityOptions.map(period => {
-            const currentTime =
-              moment(period.time, "h:mm a").valueOf() - offset;
-            console.log(currentTime);
-            return {
-              time: period.time,
-              availability:
-                start <= currentTime && currentTime < end
-                  ? "unavailable"
-                  : "available"
-            };
-          });
+    if (this.isValidFields()) {
+      Axios.get(
+        `api/rooms/bookings/${this.state.roomId}/${this.state.date}-${this.state
+          .date + NEXT_DAY}`,
+        {
+          headers: { Authorization: `Bearer ${this.context.token}` }
         }
-        this.setState({ availabilityOptions });
-      }
-    });
+      ).then(response => {
+        if (response.status === 200) {
+          const bookedSlots = response.data;
+          var availabilityOptions = defaultAvailabilityOptions;
+          for (let i = 0; i < bookedSlots.length; i++) {
+            const start = bookedSlots[i].startDate - this.state.date;
+            const end = bookedSlots[i].endDate - this.state.date;
+            const offset = moment("12:00 am", "h:mm a").valueOf();
+            availabilityOptions = availabilityOptions.map(period => {
+              const currentTime =
+                moment(period.time, "h:mm a").valueOf() - offset;
+              return {
+                time: period.time,
+                availability:
+                  start <= currentTime && currentTime < end
+                    ? "unavailable"
+                    : "available"
+              };
+            });
+          }
+          this.setState({ availabilityOptions });
+          console.log("Availability options updated:", availabilityOptions);
+        }
+      });
+    } else if (this.state.availabilityOptions !== emptyAvailabilityOptions) {
+      this.setState({ availabilityOptions: emptyAvailabilityOptions });
+    }
   }
 
   isValidFields() {
-    console.log(this.state);
     return this.state.roomId && this.state.date;
   }
 
@@ -356,7 +549,6 @@ class VenueAvailabilityCard extends React.Component {
             <Form.Select
               options={this.state.rooms}
               placeholder="Choose room"
-              scrolling
               onChange={this.onRoomChange}
             />
             <DatePicker
