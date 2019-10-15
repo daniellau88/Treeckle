@@ -2,7 +2,7 @@ import React from "react";
 import SelectVenueCard from "./SelectVenueCard";
 import VenueAvailabilityCard from "./VenueAvailabilityCard";
 import BookVenueForm from "./BookVenueForm";
-import { Card } from "semantic-ui-react";
+import { Card, Transition } from "semantic-ui-react";
 
 class CreateBookingRequest extends React.Component {
   constructor(props) {

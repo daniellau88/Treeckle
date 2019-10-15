@@ -401,7 +401,7 @@ const defaultAvailabilityOptions = [
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
-  //this.context.token -> jwt token
+  //this.context.token => jwt token
   constructor(props) {
     super(props);
 
@@ -416,7 +416,7 @@ class VenueAvailabilityCard extends React.Component {
     this.onDateChange = this.onDateChange.bind(this);
     this.updateRoomOptions = this.updateRoomOptions.bind(this);
     this.updateDateChange = this.updateDateChange.bind(this);
-    this.isValidFields = this.isValidFields.bind(this);
+    this.areValidFields = this.areValidFields.bind(this);
     this.updateAvailabilityOptions = this.updateAvailabilityOptions.bind(this);
     this.updateRoomChange = this.updateRoomChange.bind(this);
     this.onRoomChange = this.onRoomChange.bind(this);
@@ -503,7 +503,7 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   updateAvailabilityOptions() {
-    if (this.isValidFields()) {
+    if (this.areValidFields()) {
       Axios.get(
         `api/rooms/bookings/${this.state.room.roomId}/${this.state.date}-${this
           .state.date + NEXT_DAY}`,
@@ -539,7 +539,7 @@ class VenueAvailabilityCard extends React.Component {
     }
   }
 
-  isValidFields() {
+  areValidFields() {
     return this.state.room && this.state.date;
   }
 
@@ -584,7 +584,7 @@ class VenueAvailabilityCard extends React.Component {
         <Card.Content>
           <Button
             fluid
-            disabled={!this.isValidFields()}
+            disabled={!this.areValidFields()}
             onClick={this.handleButtonClick}
           >
             Make a booking

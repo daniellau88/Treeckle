@@ -1,7 +1,7 @@
 import React from "react";
 import "rc-time-picker/assets/index.css";
 import ReactTimePicker from "rc-time-picker";
-import { Icon } from "semantic-ui-react";
+import { Icon, Button } from "semantic-ui-react";
 import "../../styles/TimePicker.scss";
 
 const TimePicker = props => {
@@ -18,6 +18,24 @@ const TimePicker = props => {
       minuteStep={30}
       inputIcon={props.showInputIcon ? inputIcon : null}
       clearIcon={<Icon name="cancel" style={{ margin: 0 }} link />}
+      addon={panel => {
+        return (
+          <Button
+            style={{
+              position: "absolute",
+              right: "0",
+              bottom: "0",
+              fontSize: "1em",
+              marginBottom: "0.25em"
+            }}
+            positive
+            onClick={() => panel.close()}
+            compact
+          >
+            OK
+          </Button>
+        );
+      }}
     />
   );
 };
