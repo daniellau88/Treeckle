@@ -58,7 +58,9 @@ class BookVenueForm extends React.Component {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
         <Card.Content>
-          <Card.Header textAlign="center">Book Seminar Room 5</Card.Header>
+          <Card.Header textAlign="center">
+            Book {this.props.room.roomName}
+          </Card.Header>
         </Card.Content>
         <Card.Content>
           <Form>

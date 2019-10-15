@@ -407,9 +407,7 @@ class VenueAvailabilityCard extends React.Component {
 
     this.state = {
       rooms: [],
-      roomName: "",
-      recommendedCapacity: "",
-      roomId: "",
+      room: null,
       date: 0,
       availabilityOptions: emptyAvailabilityOptions
     };
@@ -422,6 +420,7 @@ class VenueAvailabilityCard extends React.Component {
     this.updateAvailabilityOptions = this.updateAvailabilityOptions.bind(this);
     this.updateRoomChange = this.updateRoomChange.bind(this);
     this.onRoomChange = this.onRoomChange.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
   }
 
   renderBodyRow(data, index) {
@@ -443,7 +442,13 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   async updateRoomChange(roomName, recommendedCapacity, roomId) {
-    this.setState({ roomName, recommendedCapacity, roomId });
+    const room = {
+      roomName: roomName,
+      recommendedCapacity: recommendedCapacity,
+      roomId: roomId
+    };
+    this.setState({ room });
+    console.log("Room changed:", room);
   }
 
   onDateChange(newDate) {
@@ -500,8 +505,8 @@ class VenueAvailabilityCard extends React.Component {
   updateAvailabilityOptions() {
     if (this.isValidFields()) {
       Axios.get(
-        `api/rooms/bookings/${this.state.roomId}/${this.state.date}-${this.state
-          .date + NEXT_DAY}`,
+        `api/rooms/bookings/${this.state.room.roomId}/${this.state.date}-${this
+          .state.date + NEXT_DAY}`,
         {
           headers: { Authorization: `Bearer ${this.context.token}` }
         }
@@ -535,7 +540,11 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   isValidFields() {
-    return this.state.roomId && this.state.date;
+    return this.state.room && this.state.date;
+  }
+
+  handleButtonClick(event, data) {
+    this.props.renderBookingForm(this.state.room);
   }
 
   render() {
@@ -573,7 +582,13 @@ class VenueAvailabilityCard extends React.Component {
           </div>
         </Card.Content>
         <Card.Content>
-          <Button fluid>Make a booking</Button>
+          <Button
+            fluid
+            disabled={!this.isValidFields()}
+            onClick={this.handleButtonClick}
+          >
+            Make a booking
+          </Button>
         </Card.Content>
       </Card>
     );
