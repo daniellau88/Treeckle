@@ -1,13 +1,6 @@
 import React from "react";
 import Axios from "axios";
-import {
-  Card,
-  Form,
-  Button,
-  Confirm,
-  Portal,
-  Segment
-} from "semantic-ui-react";
+import { Card, Form, Button, Confirm } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import TimePicker from "./TimePicker";
 import { getTime, set, getMinutes } from "date-fns";
@@ -15,7 +8,9 @@ import { Context } from "../../contexts/UserProvider";
 
 const SUCCESS_MSG = "Booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG = "The requested booking period is unavailable.";
-const ERROR_MSG =
+const UNAUTHORIZED_MSG =
+  "Unauthorized. Current session may have already expired.";
+const UNKNOWN_ERROR_MSG =
   "An unknown error has occurred. Please visit subbash.com to resolve the issue.";
 
 class BookVenueForm extends React.Component {
@@ -30,9 +25,7 @@ class BookVenueForm extends React.Component {
       endDate: "",
       startTime: "",
       endTime: "",
-      purpose: "",
-      success: null,
-      message: ""
+      purpose: ""
     };
 
     this.onStartDateChange = this.onStartDateChange.bind(this);
@@ -96,16 +89,28 @@ class BookVenueForm extends React.Component {
         };
         Axios.post("api/rooms/bookings", data, {
           headers: { Authorization: `Bearer ${this.context.token}` }
-        }).then(response => {
-          console.log(response);
-          if (response.status === 200) {
-            this.setState({ success: true, message: SUCCESS_MSG });
-          } else if (response.status === 400) {
-            this.setState({ success: false, message: OVERLAP_CONFLICT_MSG });
-          } else {
-            this.setState({ success: false, message: ERROR_MSG });
-          }
-        });
+        })
+          .then(response => {
+            console.log(response);
+            if (response.status === 200) {
+              this.props.renderSuccessStatusBar(SUCCESS_MSG);
+            }
+          })
+          .catch(({ response }) => {
+            console.log(response);
+            var msg;
+            switch (response.status) {
+              case 400:
+                msg = OVERLAP_CONFLICT_MSG;
+                break;
+              case 401:
+                msg = UNAUTHORIZED_MSG;
+                break;
+              default:
+                msg = UNKNOWN_ERROR_MSG;
+            }
+            this.props.renderErrorStatusBar(msg);
+          });
       })
       .then(() => {
         this.setState({ submitting: false });
@@ -130,11 +135,6 @@ class BookVenueForm extends React.Component {
   render() {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
-        <Portal open={this.state.success !== null}>
-          <Segment inverted color={this.state.success ? "green" : "red"}>
-            {this.state.message}
-          </Segment>
-        </Portal>
         <Card.Content>
           <Card.Header textAlign="center">
             Book {this.props.room.roomName}
@@ -184,6 +184,8 @@ class BookVenueForm extends React.Component {
             open={this.state.confirming}
             onCancel={this.toggleConfirmation}
             onConfirm={this.handleOnSubmit}
+            content="Confirm booking?"
+            size="mini"
           />
         </Card.Content>
       </Card>
