@@ -1,7 +1,7 @@
 import React from "react";
 import Axios from "axios";
 import moment from "moment";
-import { Card, Button, Form, Table, Select } from "semantic-ui-react";
+import { Card, Button, Form, Table } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
@@ -12,195 +12,195 @@ const NEXT_DAY = 24 * 60 * 60 * 1000;
 const emptyAvailabilityOptions = [
   {
     time: "12:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "12:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "1:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "1:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "2:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "2:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "3:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "3:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "4:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "4:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "5:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "5:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "6:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "6:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "7:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "7:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "8:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "8:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "9:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "9:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "10:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "10:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "11:00 am",
-    availability: ""
+    available: null
   },
   {
     time: "11:30 am",
-    availability: ""
+    available: null
   },
   {
     time: "12:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "12:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "1:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "1:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "2:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "2:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "3:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "3:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "4:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "4:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "5:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "5:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "6:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "6:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "7:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "7:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "8:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "8:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "9:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "9:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "10:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "10:30 pm",
-    availability: ""
+    available: null
   },
   {
     time: "11:00 pm",
-    availability: ""
+    available: null
   },
   {
     time: "11:30 pm",
-    availability: ""
+    available: null
   }
 ];
 
