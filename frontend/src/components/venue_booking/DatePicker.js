@@ -10,6 +10,7 @@ const DatePicker = props => {
       format="DD-MM-YYYY"
       placeholder={props.placeholder}
       onDateChange={props.onDateChange}
+      disabled={props.disabled}
     />
   );
 };

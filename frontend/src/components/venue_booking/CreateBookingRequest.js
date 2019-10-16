@@ -2,20 +2,21 @@ import React from "react";
 import SelectVenueCard from "./SelectVenueCard";
 import VenueAvailabilityCard from "./VenueAvailabilityCard";
 import BookVenueForm from "./BookVenueForm";
-import { Card, Segment } from "semantic-ui-react";
+import StatusBar from "./StatusBar";
+import { Card } from "semantic-ui-react";
 
 class CreateBookingRequest extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { category: "", room: null };
+    this.state = { category: "", room: null, status: null, submitting: false };
 
     this.renderVenueAvailabilityCard = this.renderVenueAvailabilityCard.bind(
       this
     );
     this.renderBookingForm = this.renderBookingForm.bind(this);
-    this.renderSuccessStatusBar = this.renderSuccessStatusBar.bind(this);
-    this.renderErrorStatusBar = this.renderErrorStatusBar.bind(this);
+    this.loadStatusBar = this.loadStatusBar.bind(this);
+    this.renderStatusBar = this.renderStatusBar.bind(this);
   }
 
   renderVenueAvailabilityCard(category) {
@@ -28,35 +29,27 @@ class CreateBookingRequest extends React.Component {
     console.log("Selected room:", room);
   }
 
-  renderSuccessStatusBar(message) {
-    const status = {
-      success: true,
-      message: message
-    };
-    this.setState({ status });
-    console.log("Success status:", status);
+  toggleStatusBar(submitting) {
+    this.setState({ submitting });
   }
 
-  renderErrorStatusBar(message) {
+  renderStatusBar(success, message) {
     const status = {
-      success: false,
+      success: success,
       message: message
     };
     this.setState({ status });
-    console.log("Error status:", status);
+    console.log("Status:", status);
   }
 
   render() {
     return (
       <div>
-        {this.state.status && (
-          <Segment
-            textAlign="center"
-            inverted
-            color={this.state.status.success ? "green" : "red"}
-          >
-            {this.state.status.message}
-          </Segment>
+        {(this.state.status || this.state.submitting) && (
+          <StatusBar
+            status={this.status.status}
+            submitting={this.state.submitting}
+          />
         )}
         <div
           style={{
@@ -80,8 +73,8 @@ class CreateBookingRequest extends React.Component {
           {this.state.room ? (
             <BookVenueForm
               room={this.state.room}
-              renderSuccessStatusBar={this.renderSuccessStatusBar}
-              renderErrorStatusBar={this.renderErrorStatusBar}
+              renderStatusBar={this.renderStatusBar}
+              loadStatusBar={this.loadStatusBar}
             />
           ) : (
             <Card style={{ boxShadow: "none" }} />

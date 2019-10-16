@@ -11,13 +11,9 @@ class SelectVenueCard extends React.Component {
 
     this.state = { categories: [], buttons: [], activeButton: "" };
 
-    this.handleButtonClick = this.handleButtonClick.bind(this);
     this.renderButtons = this.renderButtons.bind(this);
-  }
-
-  handleButtonClick(event, data) {
-    this.setState({ activeButton: data.name });
-    this.props.renderVenueAvailabilityCard(data.name);
+    this.updateActiveButton = this.updateActiveButton.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
   }
 
   componentDidMount() {
@@ -26,6 +22,7 @@ class SelectVenueCard extends React.Component {
     })
       .then(response => {
         if (response.status === 200) {
+          console.log("GET categories response:", response);
           this.setState({
             categories: response.data.categories
           });
@@ -46,7 +43,17 @@ class SelectVenueCard extends React.Component {
         </Button>
       );
     });
+    console.log("Rendered categories:", buttons);
     this.setState({ buttons });
+  }
+
+  async updateActiveButton(activeButton) {
+    this.setState({ activeButton });
+  }
+
+  handleButtonClick(event, { name }) {
+    this.updateActiveButton(name).then(this.renderButtons);
+    this.props.renderVenueAvailabilityCard(name);
   }
 
   render() {

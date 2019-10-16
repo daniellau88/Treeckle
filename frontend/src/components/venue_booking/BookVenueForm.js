@@ -3,8 +3,8 @@ import Axios from "axios";
 import { Card, Form, Button, Confirm } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import TimePicker from "./TimePicker";
-import { getTime, set, getMinutes } from "date-fns";
 import { Context } from "../../contexts/UserProvider";
+import { parseDateTime } from "../../util/DateUtil";
 
 const SUCCESS_MSG = "Booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG = "The requested booking period is unavailable.";
@@ -18,64 +18,82 @@ class BookVenueForm extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      confirming: false,
-      submitting: false,
-      startDate: "",
-      endDate: "",
-      startTime: "",
-      endTime: "",
-      purpose: ""
-    };
+    this.state = this.getInitialState();
 
     this.onStartDateChange = this.onStartDateChange.bind(this);
     this.onEndDateChange = this.onEndDateChange.bind(this);
     this.onStartTimeChange = this.onStartTimeChange.bind(this);
     this.onEndTimeChange = this.onEndTimeChange.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
-    this.handleOnSubmit = this.handleOnSubmit.bind(this);
-    this.areValidFields = this.areValidFields.bind(this);
-    this.toggleConfirmation = this.toggleConfirmation.bind(this);
     this.onSubmitting = this.onSubmitting.bind(this);
+    this.handleOnSubmit = this.handleOnSubmit.bind(this);
+    this.toggleConfirmation = this.toggleConfirmation.bind(this);
   }
 
-  onStartDateChange(newStartDate) {
-    const startDate = newStartDate ? newStartDate : "";
+  getInitialState() {
+    const initialState = {
+      confirming: false,
+      startDate: null, //js Date object
+      endDate: null, //js Date object
+      startTime: null, //js Date object
+      endTime: null, //js Date object
+      purpose: "",
+      success: false
+    };
+    return initialState;
+  }
+
+  // called when user leaves the page or when a booking is successfully made.
+  resetState() {
+    this.setState(this.getInitialState());
+  }
+
+  // all fields cannot be empty
+  areValidFields() {
+    return (
+      this.props.room &&
+      this.state.startDate &&
+      this.state.startTime &&
+      this.state.endDate &&
+      this.state.endTime &&
+      this.state.purpose
+    );
+  }
+
+  onStartDateChange(startDate) {
     console.log("Start date changed:", startDate);
     this.setState({ startDate });
   }
 
-  onEndDateChange(newEndDate) {
-    const endDate = newEndDate ? newEndDate : "";
+  onEndDateChange(endDate) {
     console.log("End date changed:", endDate);
     this.setState({ endDate });
   }
 
-  onStartTimeChange(newStartTime) {
-    console.log(newStartTime);
-    console.log(typeof newStartTime.format("HH:mm"));
-    console.log(getMinutes(newStartTime.format("HH:mm")));
-    const startTime = newStartTime
-      ? newStartTime.format("HH:mm").toString()
-      : "";
-    console.log("Start time changed:", startTime);
-    this.setState({ startTime });
+  // startTime is a moment object.
+  onStartTimeChange(startTime) {
+    // parse to js Date object
+    const newStartTime = startTime ? startTime.toDate() : null;
+    console.log("Start time changed:", newStartTime);
+    this.setState({ startTime: newStartTime });
   }
 
-  onEndTimeChange(newEndTime) {
-    const endTime = newEndTime ? newEndTime.format("HH:mm").toString() : "";
-    console.log("End time changed:", endTime);
-    this.setState({ endTime });
+  // endTime is a moment object.
+  onEndTimeChange(endTime) {
+    // parse to js Date object
+    const newEndTime = endTime ? endTime.toDate() : null;
+    console.log("End time changed:", newEndTime);
+    this.setState({ endTime: newEndTime });
   }
 
-  onPurposeChange(event, data) {
-    const purpose = data.value;
-    console.log("Booking purpose changed:", purpose);
-    this.setState({ purpose });
+  onPurposeChange(event, { value }) {
+    console.log("Booking purpose changed:", value);
+    this.setState({ purpose: value });
   }
 
   async onSubmitting() {
-    this.setState({ submitting: true });
+    this.toggleConfirmation();
+    this.props.loadStatusBar(true);
   }
 
   handleOnSubmit() {
@@ -84,20 +102,21 @@ class BookVenueForm extends React.Component {
         const data = {
           roomId: this.props.room.roomId,
           description: this.state.purpose,
-          start: getTime(this.state.startDate, this.state.startTime),
-          end: getTime(this.state.endDate, this.state.endTime)
+          start: parseDateTime(this.state.startDate, this.state.startTime),
+          end: parseDateTime(this.state.endDate, this.state.endTime)
         };
         Axios.post("api/rooms/bookings", data, {
           headers: { Authorization: `Bearer ${this.context.token}` }
         })
           .then(response => {
-            console.log(response);
+            console.log("POST response:", response);
             if (response.status === 200) {
-              this.props.renderSuccessStatusBar(SUCCESS_MSG);
+              this.setState({ success: true });
+              this.props.renderStatusBar(true, SUCCESS_MSG);
             }
           })
           .catch(({ response }) => {
-            console.log(response);
+            console.log("Error response:", response);
             var msg;
             switch (response.status) {
               case 400:
@@ -109,27 +128,16 @@ class BookVenueForm extends React.Component {
               default:
                 msg = UNKNOWN_ERROR_MSG;
             }
-            this.props.renderErrorStatusBar(msg);
+            this.props.renderStatusBar(false, msg);
           });
       })
       .then(() => {
-        this.setState({ submitting: false });
-        this.toggleConfirmation();
+        this.props.loadStatusBar(false);
       });
   }
 
   toggleConfirmation() {
     this.setState({ confirming: !this.state.confirming });
-  }
-
-  areValidFields() {
-    return (
-      this.state.startDate &&
-      this.state.startTime &&
-      this.state.endDate &&
-      this.state.endTime &&
-      this.state.purpose
-    );
   }
 
   render() {
@@ -145,8 +153,9 @@ class BookVenueForm extends React.Component {
             <DatePicker
               placeholder="Start date"
               onDateChange={this.onStartDateChange}
+              disabled={this.state.success}
             />
-            <Form.Field>
+            <Form.Field disabled={this.state.success}>
               <TimePicker
                 placeholder="Start time"
                 showInputIcon={this.state.startTime === ""}
@@ -156,8 +165,9 @@ class BookVenueForm extends React.Component {
             <DatePicker
               placeholder="End date"
               onDateChange={this.onEndDateChange}
+              disabled={this.state.success}
             />
-            <Form.Field>
+            <Form.Field disabled={this.state.success}>
               <TimePicker
                 placeholder="End time"
                 showInputIcon={this.state.endTime === ""}
@@ -169,13 +179,14 @@ class BookVenueForm extends React.Component {
               label="Booking purpose"
               placeholder="Briefly describe the purpose for this booking..."
               onChange={this.onPurposeChange}
+              disabled={this.state.success}
             />
           </Form>
         </Card.Content>
         <Card.Content>
           <Button
             fluid
-            disabled={!this.areValidFields()}
+            disabled={!this.areValidFields() || this.state.success}
             onClick={this.toggleConfirmation}
           >
             Submit
