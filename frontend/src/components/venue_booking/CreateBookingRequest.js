@@ -15,7 +15,7 @@ class CreateBookingRequest extends React.Component {
       this
     );
     this.renderBookingForm = this.renderBookingForm.bind(this);
-    this.loadStatusBar = this.loadStatusBar.bind(this);
+    this.toggleStatusBar = this.toggleStatusBar.bind(this);
     this.renderStatusBar = this.renderStatusBar.bind(this);
   }
 
@@ -47,7 +47,7 @@ class CreateBookingRequest extends React.Component {
       <div>
         {(this.state.status || this.state.submitting) && (
           <StatusBar
-            status={this.status.status}
+            status={this.state.status}
             submitting={this.state.submitting}
           />
         )}
@@ -74,7 +74,7 @@ class CreateBookingRequest extends React.Component {
             <BookVenueForm
               room={this.state.room}
               renderStatusBar={this.renderStatusBar}
-              loadStatusBar={this.loadStatusBar}
+              toggleStatusBar={this.toggleStatusBar}
             />
           ) : (
             <Card style={{ boxShadow: "none" }} />

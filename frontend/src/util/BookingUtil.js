@@ -1,9 +1,9 @@
 import { lightFormat, addMinutes, isWithinInterval } from "date-fns";
-import { TIME_FORMAT, TOTAL_MINUTES, TIME_INTERVAL } from "./Constants";
+import { TIME_FORMAT, DAY_MINUTES, TIME_INTERVAL } from "./Constants";
 
-export const getAvailabilityOptions = (time = new Date(0), initial = null) => {
+const createAvailabilityOptions = (time = new Date(0, 0), initial = null) => {
   const defaultAvailabilityOptions = [];
-  for (let i = 0; i < TOTAL_MINUTES / TIME_INTERVAL; i++) {
+  for (let i = 0; i < DAY_MINUTES / TIME_INTERVAL; i++) {
     let period = {
       time: time, // js Date object
       available: initial
@@ -14,7 +14,7 @@ export const getAvailabilityOptions = (time = new Date(0), initial = null) => {
   return defaultAvailabilityOptions;
 };
 
-export const getUserViewAvailabilityOptions = availabilityOptions => {
+const createUserViewAvailabilityOptions = availabilityOptions => {
   return availabilityOptions.map(period => {
     return {
       time: lightFormat(period.time, TIME_FORMAT),
@@ -23,10 +23,14 @@ export const getUserViewAvailabilityOptions = availabilityOptions => {
   });
 };
 
-export const updateUserViewAvailabilityOptions = (date, bookedSlots) => {
-  var availabilityOptions = getAvailabilityOptions(date, true);
+export const getDefaultAvailabilityOptions = () => {
+  return createUserViewAvailabilityOptions(createAvailabilityOptions());
+};
 
-  for (let i = 0; bookedSlots.length; i++) {
+export const getUpdatedAvailabilityOptions = (date, bookedSlots) => {
+  var availabilityOptions = createAvailabilityOptions(date, true);
+
+  for (let i = 0; i < bookedSlots.length; i++) {
     let interval = {
       start: bookedSlots[i].startDate,
       end: bookedSlots[i].endDate
@@ -40,5 +44,5 @@ export const updateUserViewAvailabilityOptions = (date, bookedSlots) => {
       };
     });
   }
-  return getUserViewAvailabilityOptions(availabilityOptions);
+  return createUserViewAvailabilityOptions(availabilityOptions);
 };

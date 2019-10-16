@@ -19,7 +19,7 @@ const StatusBar = props => {
       loading={props.submitting}
       color={renderColor()}
     >
-      {props.status.message}
+      {props.status ? props.status.message : ""}
     </Segment>
   );
 };

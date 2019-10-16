@@ -93,7 +93,7 @@ class BookVenueForm extends React.Component {
 
   async onSubmitting() {
     this.toggleConfirmation();
-    this.props.loadStatusBar(true);
+    this.props.toggleStatusBar(true);
   }
 
   handleOnSubmit() {
@@ -132,7 +132,7 @@ class BookVenueForm extends React.Component {
           });
       })
       .then(() => {
-        this.props.loadStatusBar(false);
+        this.props.toggleStatusBar(false);
       });
   }
 

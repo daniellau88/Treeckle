@@ -1,414 +1,27 @@
 import React from "react";
 import Axios from "axios";
-import moment from "moment";
 import { Card, Button, Form, Table } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
+import {
+  getDefaultAvailabilityOptions,
+  getUpdatedAvailabilityOptions
+} from "../../util/BookingUtil";
+import { DAY_MILLISECONDS } from "../../util/Constants";
 
-// number of milliseconds in 1 day
-const NEXT_DAY = 24 * 60 * 60 * 1000;
-
-const emptyAvailabilityOptions = [
-  {
-    time: "12:00 am",
-    available: null
-  },
-  {
-    time: "12:30 am",
-    available: null
-  },
-  {
-    time: "1:00 am",
-    available: null
-  },
-  {
-    time: "1:30 am",
-    available: null
-  },
-  {
-    time: "2:00 am",
-    available: null
-  },
-  {
-    time: "2:30 am",
-    available: null
-  },
-  {
-    time: "3:00 am",
-    available: null
-  },
-  {
-    time: "3:30 am",
-    available: null
-  },
-  {
-    time: "4:00 am",
-    available: null
-  },
-  {
-    time: "4:30 am",
-    available: null
-  },
-  {
-    time: "5:00 am",
-    available: null
-  },
-  {
-    time: "5:30 am",
-    available: null
-  },
-  {
-    time: "6:00 am",
-    available: null
-  },
-  {
-    time: "6:30 am",
-    available: null
-  },
-  {
-    time: "7:00 am",
-    available: null
-  },
-  {
-    time: "7:30 am",
-    available: null
-  },
-  {
-    time: "8:00 am",
-    available: null
-  },
-  {
-    time: "8:30 am",
-    available: null
-  },
-  {
-    time: "9:00 am",
-    available: null
-  },
-  {
-    time: "9:30 am",
-    available: null
-  },
-  {
-    time: "10:00 am",
-    available: null
-  },
-  {
-    time: "10:30 am",
-    available: null
-  },
-  {
-    time: "11:00 am",
-    available: null
-  },
-  {
-    time: "11:30 am",
-    available: null
-  },
-  {
-    time: "12:00 pm",
-    available: null
-  },
-  {
-    time: "12:30 pm",
-    available: null
-  },
-  {
-    time: "1:00 pm",
-    available: null
-  },
-  {
-    time: "1:30 pm",
-    available: null
-  },
-  {
-    time: "2:00 pm",
-    available: null
-  },
-  {
-    time: "2:30 pm",
-    available: null
-  },
-  {
-    time: "3:00 pm",
-    available: null
-  },
-  {
-    time: "3:30 pm",
-    available: null
-  },
-  {
-    time: "4:00 pm",
-    available: null
-  },
-  {
-    time: "4:30 pm",
-    available: null
-  },
-  {
-    time: "5:00 pm",
-    available: null
-  },
-  {
-    time: "5:30 pm",
-    available: null
-  },
-  {
-    time: "6:00 pm",
-    available: null
-  },
-  {
-    time: "6:30 pm",
-    available: null
-  },
-  {
-    time: "7:00 pm",
-    available: null
-  },
-  {
-    time: "7:30 pm",
-    available: null
-  },
-  {
-    time: "8:00 pm",
-    available: null
-  },
-  {
-    time: "8:30 pm",
-    available: null
-  },
-  {
-    time: "9:00 pm",
-    available: null
-  },
-  {
-    time: "9:30 pm",
-    available: null
-  },
-  {
-    time: "10:00 pm",
-    available: null
-  },
-  {
-    time: "10:30 pm",
-    available: null
-  },
-  {
-    time: "11:00 pm",
-    available: null
-  },
-  {
-    time: "11:30 pm",
-    available: null
-  }
-];
-
-const defaultAvailabilityOptions = [
-  {
-    time: "12:00 am",
-    availability: "available"
-  },
-  {
-    time: "12:30 am",
-    availability: "available"
-  },
-  {
-    time: "1:00 am",
-    availability: "available"
-  },
-  {
-    time: "1:30 am",
-    availability: "available"
-  },
-  {
-    time: "2:00 am",
-    availability: "available"
-  },
-  {
-    time: "2:30 am",
-    availability: "available"
-  },
-  {
-    time: "3:00 am",
-    availability: "available"
-  },
-  {
-    time: "3:30 am",
-    availability: "available"
-  },
-  {
-    time: "4:00 am",
-    availability: "available"
-  },
-  {
-    time: "4:30 am",
-    availability: "available"
-  },
-  {
-    time: "5:00 am",
-    availability: "available"
-  },
-  {
-    time: "5:30 am",
-    availability: "available"
-  },
-  {
-    time: "6:00 am",
-    availability: "available"
-  },
-  {
-    time: "6:30 am",
-    availability: "available"
-  },
-  {
-    time: "7:00 am",
-    availability: "available"
-  },
-  {
-    time: "7:30 am",
-    availability: "available"
-  },
-  {
-    time: "8:00 am",
-    availability: "available"
-  },
-  {
-    time: "8:30 am",
-    availability: "available"
-  },
-  {
-    time: "9:00 am",
-    availability: "available"
-  },
-  {
-    time: "9:30 am",
-    availability: "available"
-  },
-  {
-    time: "10:00 am",
-    availability: "available"
-  },
-  {
-    time: "10:30 am",
-    availability: "available"
-  },
-  {
-    time: "11:00 am",
-    availability: "available"
-  },
-  {
-    time: "11:30 am",
-    availability: "available"
-  },
-  {
-    time: "12:00 pm",
-    availability: "available"
-  },
-  {
-    time: "12:30 pm",
-    availability: "available"
-  },
-  {
-    time: "1:00 pm",
-    availability: "available"
-  },
-  {
-    time: "1:30 pm",
-    availability: "available"
-  },
-  {
-    time: "2:00 pm",
-    availability: "available"
-  },
-  {
-    time: "2:30 pm",
-    availability: "available"
-  },
-  {
-    time: "3:00 pm",
-    availability: "available"
-  },
-  {
-    time: "3:30 pm",
-    availability: "available"
-  },
-  {
-    time: "4:00 pm",
-    availability: "available"
-  },
-  {
-    time: "4:30 pm",
-    availability: "available"
-  },
-  {
-    time: "5:00 pm",
-    availability: "available"
-  },
-  {
-    time: "5:30 pm",
-    availability: "available"
-  },
-  {
-    time: "6:00 pm",
-    availability: "available"
-  },
-  {
-    time: "6:30 pm",
-    availability: "available"
-  },
-  {
-    time: "7:00 pm",
-    availability: "available"
-  },
-  {
-    time: "7:30 pm",
-    availability: "available"
-  },
-  {
-    time: "8:00 pm",
-    availability: "available"
-  },
-  {
-    time: "8:30 pm",
-    availability: "available"
-  },
-  {
-    time: "9:00 pm",
-    availability: "available"
-  },
-  {
-    time: "9:30 pm",
-    availability: "available"
-  },
-  {
-    time: "10:00 pm",
-    availability: "available"
-  },
-  {
-    time: "10:30 pm",
-    availability: "available"
-  },
-  {
-    time: "11:00 pm",
-    availability: "available"
-  },
-  {
-    time: "11:30 pm",
-    availability: "available"
-  }
-];
+const emptyAvailabilityOptions = getDefaultAvailabilityOptions();
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
-  //this.context.token => jwt token
+
   constructor(props) {
     super(props);
 
     this.state = {
       rooms: [],
       room: null,
-      date: 0,
+      date: null,
       availabilityOptions: emptyAvailabilityOptions
     };
 
@@ -424,14 +37,15 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   renderBodyRow(data, index) {
+    const available = data.available === true;
+    const unavailable = data.available === false;
+    const notApplicable = data.available === null;
+    const label = notApplicable ? "" : available ? "available" : "unavailable";
     return (
       <Table.Row>
         <Table.Cell>{data.time}</Table.Cell>
-        <Table.Cell
-          positive={data.availability === "available"}
-          negative={data.availability === "unavailable"}
-        >
-          {data.availability}
+        <Table.Cell positive={available} negative={unavailable}>
+          {label}
         </Table.Cell>
       </Table.Row>
     );
@@ -451,8 +65,7 @@ class VenueAvailabilityCard extends React.Component {
     console.log("Room changed:", room);
   }
 
-  onDateChange(newDate) {
-    const date = newDate ? moment(newDate).valueOf() : 0;
+  onDateChange(date) {
     if (date !== this.state.date) {
       this.updateDateChange(date).then(this.updateAvailabilityOptions);
     }
@@ -505,31 +118,21 @@ class VenueAvailabilityCard extends React.Component {
   updateAvailabilityOptions() {
     if (this.areValidFields()) {
       Axios.get(
-        `api/rooms/bookings/${this.state.room.roomId}/${this.state.date}-${this
-          .state.date + NEXT_DAY}`,
+        `api/rooms/bookings/${
+          this.state.room.roomId
+        }/${this.state.date.getTime()}-${this.state.date.getTime() +
+          DAY_MILLISECONDS}`,
         {
           headers: { Authorization: `Bearer ${this.context.token}` }
         }
       ).then(response => {
+        console.log("GET room bookings:", response);
         if (response.status === 200) {
           const bookedSlots = response.data;
-          var availabilityOptions = defaultAvailabilityOptions;
-          for (let i = 0; i < bookedSlots.length; i++) {
-            const start = bookedSlots[i].startDate - this.state.date;
-            const end = bookedSlots[i].endDate - this.state.date;
-            const offset = moment("12:00 am", "h:mm a").valueOf();
-            availabilityOptions = availabilityOptions.map(period => {
-              const currentTime =
-                moment(period.time, "h:mm a").valueOf() - offset;
-              return {
-                time: period.time,
-                availability:
-                  start <= currentTime && currentTime < end
-                    ? "unavailable"
-                    : "available"
-              };
-            });
-          }
+          const availabilityOptions = getUpdatedAvailabilityOptions(
+            this.state.date,
+            bookedSlots
+          );
           this.setState({ availabilityOptions });
           console.log("Availability options updated:", availabilityOptions);
         }
