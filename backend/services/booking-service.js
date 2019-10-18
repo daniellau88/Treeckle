@@ -1,4 +1,4 @@
-const RoomBooking = require('../models/roomBooking-model');
+const RoomBooking = require('../models/room-booking/roomBooking-model');
 const constants = require('../config/constants');
 
 const checkApprovedOverlaps = async (roomId, start, end) => {

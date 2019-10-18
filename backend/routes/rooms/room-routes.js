@@ -2,7 +2,7 @@ const router = require('express').Router();
 const bookingRoutes = require('./booking-routes');
 const categoryRoutes = require('./category-routes');
 const bodyParser = require('body-parser');
-const Room = require('../../models/rooms-model');
+const Room = require('../../models/room-booking/rooms-model');
 const constants = require('../../config/constants');
 const { body, validationResult } = require('express-validator');
 
