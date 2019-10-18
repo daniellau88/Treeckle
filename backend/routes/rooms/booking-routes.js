@@ -1,6 +1,6 @@
 const router = require('express').Router({ mergeParams: true});
 const bodyParser = require('body-parser');
-const RoomBooking = require('../../models/roomBooking-model');
+const RoomBooking = require('../../models/room-booking/roomBooking-model');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
 const { checkApprovedOverlaps, checkPotentialOverlaps, rejectOverlaps } = require('../../services/booking-service');

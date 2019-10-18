@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Rooms = require('../../models/rooms-model');
+const Rooms = require('../../models/room-booking/rooms-model');
 
 //Resident and up: get list of categories
 router.get('/', (req, res) => {
