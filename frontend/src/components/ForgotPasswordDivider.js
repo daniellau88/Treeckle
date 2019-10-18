@@ -1,6 +1,8 @@
 import React from "react";
 import logo from "../images/treeckle_startup.png";
 import { Context } from "../contexts/UserProvider";
+import axios from "axios";
+import * as yup from "yup";
 import {
   Button,
   Divider,
@@ -13,6 +15,42 @@ import {
 
 class ForgotPasswordDivider extends React.Component {
   static contextType = Context;
+
+  state = {
+    email: "",
+    submittedEmail: "",
+    emailError: null
+  };
+
+  EmailSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email()
+      .required()
+  });
+
+  handleChange = (e, { name, value }) => {
+    this.setState({ [name]: value });
+  };
+
+  handleSubmit = () => {
+    const { email, password } = this.state;
+    this.setState({
+      submittedEmail: email,
+      emailError: null
+    });
+    console.log(this.state.email);
+    let inputData = { email: this.state.email };
+    this.EmailSchema.isValid(inputData).then(valid => {
+      if (valid) {
+        //axios
+      } else {
+        this.setState({
+          emailError: { content: "Please enter a valid email." }
+        });
+      }
+    });
+  };
 
   render() {
     return (
@@ -30,8 +68,15 @@ class ForgotPasswordDivider extends React.Component {
               Please key in your email so that we can send you a link to reset
               your password.
             </p>
-            <Form>
-              <Form.Input icon="user" iconPosition="left" placeholder="Email" />
+            <Form onSubmit={this.handleSubmit}>
+              <Form.Input
+                icon="user"
+                iconPosition="left"
+                placeholder="Email"
+                name="email"
+                value={email}
+                onChange={this.handleChange}
+              />
               <Button
                 content="Submit"
                 primary
