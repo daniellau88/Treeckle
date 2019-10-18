@@ -136,7 +136,7 @@ class CreateAccountAdmin extends React.Component {
           </Grid.Column>
         </Grid>
 
-        {<Divider vertical>OR</Divider>}
+        
 
 
       </Segment>

@@ -76,6 +76,9 @@ class CreateAccountUser extends React.Component {
   };
 
   handleSubmit = () => {
+    if (this.state.password != this.state.passwordRepeated) {
+      return;
+    }
 
     const { email, password } = this.state;
     this.setState({
@@ -177,6 +180,10 @@ class CreateAccountUser extends React.Component {
                 value={passwordRepeated}
                 onChange={this.handleChange}
               />
+              {(this.state.password == "") ? (null) : (
+                (this.state.password == this.state.passwordRepeated) ? ("passwords match") : ("passwords don't match")
+              )}
+
               <Button
                 content={this.state.userCreated ? (
                   "User Created"
