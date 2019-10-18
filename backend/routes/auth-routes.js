@@ -56,15 +56,6 @@ router.post("/newAccounts", jsonParser, [
     }
 });
 
-// Login as new user
-router.post('/accounts',
-    jsonParser,
-    passport.authenticate('local', { session: false }),
-    (req, res) => {
-        authService.signJWT(req, res);
-    }
-);
-
 //Account creation request
 router.post('/newAccountRequest', passport.authenticate('jwt', { session: false }), jsonParser, [
     check('email').isEmail(),
@@ -101,7 +92,39 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
     }
 });
 
-// Reset password request
+//Reset password for local account
+router.post('/resetAttempt', jsonParser, [
+  check('email').isEmail(),
+  check('uniqueURIcomponent').exists(),
+  check('password').isLength({ min: 8 })
+], async (req, res) => {
+    //Check for input errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        const currTime = Date.now();
+
+        try {
+            //Update link expiry to current time
+            const doc = await PasswordReset.findOneAndUpdate({email: req.body.email, uniqueURIcomponent: req.body.uniqueURIcomponent}, {expiry: currTime}).lean();
+            
+            if (!doc || doc.expiry <= currTime) {
+                res.status(500).send("Invalid Link.");
+            } else {
+                const user = await User.findOne({email: doc.email});
+                const modifiedUser = await user.setPassword(req.body.password);
+                await modifiedUser.save();
+                res.sendStatus(200);
+            }
+        } catch(err) {
+            res.status(500).send("Database Error");
+        }
+    }
+});
+
+
+//Reset password request
 router.post('/resetAccount', jsonParser, [
     check('email').isEmail(),
 ], async (req, res) => {
@@ -112,34 +135,43 @@ router.post('/resetAccount', jsonParser, [
     }
 
     //Find user within database
-    const userFound = await User.findByUsername(req.body.username, false).catch(error => res.sendStatus(500));
+    const userFound = await User.findByUsername(req.body.email, false).catch(error => res.status(500).send("Database Error"));
 
     if (!userFound) {
-        res.sendStatus(500);
-    }
-
-    //Generate cryptic URI
-    const uniqueURIcomponent = shortid.generate();
-
-    //Save reset request
-    await PasswordReset.findByIdAndUpdate({email: email}, {
-        email : email,
-        uniqueURIcomponent: uniqueURIcomponent,
-        expiry: Date.now() + (3600 * 1000) //Link valid for one hour
-    }, {upsert: true}).lean().catch(error => res.sendStatus(500));
-
-    //Send email to user
-    EmailService.sendText(req.body.email, 'Password Reset for Treeckle', 
-        `<p>Dear User, we have received a request to reset your password.</p> 
-        <p>click <a href="${constants.baseURI}/${constants.resetURI}/${uniqueURIcomponent}">here</a> to reset your password</p>
-        <p>If this request was not initiated by you, kindly ignore this email.</p>
-        <p>Yours Sincerely,\n Treeckle Team</p>`)
-    .then(() => {
         res.sendStatus(200);
-    }).catch(() => {
-        res.sendStatus(503);
-    });
+    } else {
+        //Generate cryptic URI
+        const uniqueURIcomponent = shortid.generate();
 
-})
+        //Save reset request
+        await PasswordReset.findOneAndUpdate({email: req.body.email}, {
+            email : req.body.email,
+            uniqueURIcomponent: uniqueURIcomponent,
+            expiry: Date.now() + (3600 * 1000) //Link valid for one hour
+        }, {upsert: true}).lean()
+        .then(result => res.sendStatus(200))
+        .catch(error => res.status(500).send("Database Error"));
+
+        //Send email to user
+        await EmailService.sendText(req.body.email, 'Password Reset for Treeckle', 
+            `<p>Dear User,</p>
+            <p>We have received a request to reset your password.</p>
+            <p>Click <a href="${constants.baseURI}/${constants.resetURI}/${uniqueURIcomponent}">here</a> to reset your password</p>
+            <br>
+            <p>If this request was not initiated by you, kindly ignore this email.</p>
+            <p>Yours Sincerely,</p>
+            <p>Treeckle Team</p>`);
+    }
+});
+
+
+// Login as new user
+router.post('/accounts',
+    jsonParser,
+    passport.authenticate('local', { session: false }),
+    (req, res) => {
+        authService.signJWT(req, res);
+    }
+);
 
 module.exports = router;
