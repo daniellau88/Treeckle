@@ -19,7 +19,7 @@ const EventCard = props => {
   const curr = props.event;
 
   return (
-    <Container text="true" style={{ padding: "5px 5px 5px 5px" }}>
+    <Container text="true" style={{ padding: "5px 5px 5px 5px" , width:"auto"}}>
       <Card style={{ borderRadius: "1.25rem", overflow: "hidden" }}>
         <Modal
           trigger={
