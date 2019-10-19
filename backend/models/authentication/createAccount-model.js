@@ -17,8 +17,8 @@ const createAccountSchema = new schema({
         required: true,
         unique: true
     },
-    permissions: {
-        type: [String],
+    role: {
+        type: String,
         required: true,
         unique: false
     }

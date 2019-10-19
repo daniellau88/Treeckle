@@ -14,12 +14,12 @@ const userSchema = new schema({
         required: true,
         unique: false
     },
-    permissions: {
-        type: [String],
+    residence: {
+        type: String,
         required: true,
         unique: false
     },
-    residence: {
+    role: {
         type: String,
         required: true,
         unique: false
@@ -33,11 +33,6 @@ const userSchema = new schema({
         type: String,
         required: true,
         unique: true
-    },
-    permissionLevel: {
-        type: Number,
-        required: true,
-        unique: false
     },
     participatedEventsIds: {
         type: [schema.Types.ObjectId],

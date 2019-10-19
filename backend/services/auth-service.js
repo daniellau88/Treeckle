@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
 const path = require('path');
+const { Permissions } = require('../models/authentication/permissions-model');
 const imageThumbnail = require('image-thumbnail');
 
 const signJWT = (req, res) => {
@@ -8,8 +9,8 @@ const signJWT = (req, res) => {
     jwt.sign(
         {
             userId: user._id,
-            permissionLevel: user.permissionLevel,
-            residence: user.residence
+            residence: user.residence,
+            role: user.role
         },
         keys.JWT.secretKey,
         {
@@ -29,7 +30,7 @@ const signJWT = (req, res) => {
 
             res.status(200).send({
                 name: user.name,
-                permissionLevel: user.permissionLevel,
+                role: user.role,
                 token: token,
                 profilePic: profilePic
             });
@@ -37,6 +38,16 @@ const signJWT = (req, res) => {
     });
 }
 
+const isPermitted = async (role, category, action) => {
+    return await Permissions.findOne({role: role})
+    .then(doc => {
+        return doc.get(category + "." + action);
+    }).catch(err => {
+        console.log(err);
+        return false;
+    });
+}
+
 //Todo refreshing of tokens
 
-module.exports = {signJWT};
+module.exports = {signJWT, isPermitted};

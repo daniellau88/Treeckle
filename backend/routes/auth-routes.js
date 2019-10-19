@@ -3,7 +3,7 @@ const User = require('../models/authentication/user-model');
 const CreateAccount = require('../models/authentication/createAccount-model');
 const PasswordReset = require('../models/authentication/passwordReset-model');
 const constants = require('../config/constants');
-const authService = require('../services/auth-service');
+const {isPermitted, signJWT} = require('../services/auth-service');
 const fastCsv = require('fast-csv');
 const path = require('path');
 const validator = require('validator');
@@ -47,12 +47,11 @@ router.post("/newAccounts", jsonParser, [
             User.register(new User({
                 email: req.body.email,
                 name: req.body.name,
-                permissionLevel: 0,
+                role: relevantReq.role,
+                residence: relevantReq.residence,
                 participatedEventIds: [],
                 subscribedCategories: [],
-                profilePicPath: "", //To modify once created
-                residence: relevantReq.residence,
-                permissions: relevantReq.permissions
+                profilePicPath: ""
             }),
             req.body.password,
             async err => {
@@ -74,22 +73,30 @@ router.post("/newAccounts", jsonParser, [
 //Account creation request
 router.post('/newAccountRequest', passport.authenticate('jwt', { session: false }), jsonParser, [
     check('email').isEmail(),
-], (req, res) => {
+], async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    const permitted = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.create);
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
-    } else if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-        res.status(401).send("Insufficient permissions")
     } else {
         //Generate a shortid
         const id = shortid.generate();
+
+        //Get role or assign default
+        const userRole = constants.roles.Resident;
+        if (req.body.role && Object.values(constants.roles).includes(req.body.role)) {
+            userRole = req.body.role;
+        }
+        
         //Create a new Database entry for account creation
         new CreateAccount({
             email: req.body.email,
             uniqueURIcomponent: id,
             residence: req.user.residence,
-            permissions: ["Resident"]
+            role: userRole
         }).save((err, product) => {
             if (err) {
                     res.status(500).send("Database Error");
@@ -114,16 +121,18 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
     const acceptedRows = [];
     const rejectedRows = [];
 
-    if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-        res.status(401).send("Insufficient permissions")
+    const permitted = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.create);
+
+    if (!permitted) {
+        res.sendStatus(401);
     } else {
         fastCsv.parseFile(req.file.path)
         .on("error", (err) => res.sendStatus(500))
         .on("data", (row) => {
-            if (row.length !== 2 || !validator.isEmail(row[0])|| constants.roles[row[1]] !== true) {
-                rejectedRows.push(row);
-            } else {
+            if (row.length === 2 && validator.isEmail(row[0]) && Object.values(constants.roles).includes([row[1]])) {
                 acceptedRows.push(row);
+            } else {
+                rejectedRows.push(row);
             }})
         .on("end", (rowCount) => {
             fastCsv.writeToPath(req.file.path, rejectedRows)
@@ -236,7 +245,7 @@ router.post('/accounts',
     jsonParser,
     passport.authenticate('local', { session: false }),
     (req, res) => {
-        authService.signJWT(req, res);
+        signJWT(req, res);
     }
 );
 
