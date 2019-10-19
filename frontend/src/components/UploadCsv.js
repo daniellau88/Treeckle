@@ -31,7 +31,7 @@ class UploadCsv extends React.Component {
     fileUpload(file) {
         const url = '/auth/newAccountRequestCSV';
         const formData = new FormData();
-        formData.append('file', file)
+        formData.append('csvFile', file)
         const config = {
             headers: {
                 Authorization: `Bearer ${this.context.token}`,
