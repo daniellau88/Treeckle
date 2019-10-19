@@ -14,8 +14,8 @@ module.exports = {
     resetURI: "auth/resetAttempt",
     createURI: "auth/newAccounts",
     roles: {
-        "Resident": true,
-        "Organiser": true,
-        "Admin": true
+        Resident: "Resident",
+        Organiser: "Organiser",
+        Admin: "Admin"
     }
 }

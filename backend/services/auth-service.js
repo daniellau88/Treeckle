@@ -7,9 +7,7 @@ const signJWT = (req, res) => {
     const user = req.user;
     jwt.sign(
         {
-            userId: user._id,
-            permissionLevel: user.permissionLevel,
-            residence: user.residence
+            userId: user._id
         },
         keys.JWT.secretKey,
         {
@@ -29,7 +27,7 @@ const signJWT = (req, res) => {
 
             res.status(200).send({
                 name: user.name,
-                permissionLevel: user.permissionLevel,
+                role: user.role,
                 token: token,
                 profilePic: profilePic
             });
