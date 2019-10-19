@@ -61,7 +61,7 @@ class CreateAccountAdmin extends React.Component {
         console.log("ok !");
         const headers = {
           "Content-Type": "application/json",
-          "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZGEzMzVmZWU2YThkOTM2NDBlNjAzZjgiLCJwZXJtaXNzaW9uTGV2ZWwiOjIwMCwiaWF0IjoxNTcxMDYxOTA5LCJleHAiOjE1NzEwNjM3MDl9.Y3NQsn8vS6CxTRoR7RSr6PBzc4rq-HyFOYA9KdlH19U`
+          "Authorization": `Bearer ${this.context.token}`
         }
         axios
           .post("/auth/newAccountRequest", {

@@ -34,6 +34,9 @@ export const Routes = () => {
         <Route path="/bookings" component={VenueBookingPage}></Route>
       )}
       {token !== "" && token !== -1 && token !== -2 && (
+        <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
+      )}
+      {token !== "" && token !== -1 && token !== -2 && (
         <Route path="/profile" component={ProfilePage}></Route>
       )}
       {token === "" && <Route exact path="/" component={LoginForm} />}
@@ -47,7 +50,7 @@ export const Routes = () => {
           component={PasswordReset}
         />
       } */}
-      <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
+      
       <Route
         path="/user/create/:uniqueId"
         component={CreateAccountUserPage}
