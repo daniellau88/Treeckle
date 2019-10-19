@@ -74,7 +74,7 @@ class ForgotPasswordDivider extends React.Component {
                 iconPosition="left"
                 placeholder="Email"
                 name="email"
-                value={email}
+                value={this.state.email}
                 onChange={this.handleChange}
               />
               <Button

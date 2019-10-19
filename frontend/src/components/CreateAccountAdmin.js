@@ -13,6 +13,7 @@ import {
   Header,
   Message
 } from "semantic-ui-react";
+import UploadCsv from "./UploadCsv";
 
 class CreateAccountAdmin extends React.Component {
   static contextType = Context;
@@ -57,7 +58,7 @@ class CreateAccountAdmin extends React.Component {
     let inputData = { email: this.state.email };
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
-        console.log("yell hea!");
+        console.log("ok !");
         const headers = {
           "Content-Type": "application/json",
           "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZGEzMzVmZWU2YThkOTM2NDBlNjAzZjgiLCJwZXJtaXNzaW9uTGV2ZWwiOjIwMCwiaWF0IjoxNTcxMDYxOTA5LCJleHAiOjE1NzEwNjM3MDl9.Y3NQsn8vS6CxTRoR7RSr6PBzc4rq-HyFOYA9KdlH19U`
@@ -128,11 +129,7 @@ class CreateAccountAdmin extends React.Component {
               )}
           </Grid.Column>
           <Grid.Column verticalAlign="middle">
-            <Button
-              content="Upload .csv"
-              secondary
-              style={{ minWidth: "210px", margin: "1em auto" }}
-            />
+            <UploadCsv/>
           </Grid.Column>
         </Grid>
 
