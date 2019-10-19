@@ -14,6 +14,11 @@ const userSchema = new schema({
         required: true,
         unique: false
     },
+    permissions: {
+        type: [String],
+        required: true,
+        unique: false
+    },
     residence: {
         type: String,
         required: true,

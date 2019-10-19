@@ -4,11 +4,24 @@ const CreateAccount = require('../models/authentication/createAccount-model');
 const PasswordReset = require('../models/authentication/passwordReset-model');
 const constants = require('../config/constants');
 const authService = require('../services/auth-service');
+const fastCsv = require('fast-csv');
+const path = require('path');
+const validator = require('validator');
 const shortid = require('shortid');
 const EmailService = require('../services/email-service');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const passport = require("passport");
 const { check, validationResult } = require('express-validator');
+
+const storage = multer.diskStorage({
+    destination: 'uploads/accountCreationCSV',
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+  })
+
+const upload = multer({ storage: storage });
 
 const jsonParser = bodyParser.json();
 
@@ -38,7 +51,8 @@ router.post("/newAccounts", jsonParser, [
                 participatedEventIds: [],
                 subscribedCategories: [],
                 profilePicPath: "", //To modify once created
-                residence: relevantReq.residence
+                residence: relevantReq.residence,
+                permissions: relevantReq.permissions
             }),
             req.body.password,
             async err => {
@@ -74,7 +88,8 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
         new CreateAccount({
             email: req.body.email,
             uniqueURIcomponent: id,
-            residence: req.user.residence
+            residence: req.user.residence,
+            permissions: ["Resident"]
         }).save((err, product) => {
             if (err) {
                     res.status(500).send("Database Error");
@@ -92,6 +107,26 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
             }
         });
     }
+});
+
+//Bulk account creation requests through CSV file
+router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: false }), upload.single('csvFile'), async (req, res) => {
+    const acceptedRows = [];
+    const rejectedRows = [];
+
+    fastCsv.parseFile(req.file.path)
+    .on("error", (err) => res.sendStatus(500))
+    .on("data", (row) => {
+        if (row.length !== 2 || !validator.isEmail(row[0])|| constants.roles[row[1]] !== true) {
+            rejectedRows.push(row);
+        } else {
+            acceptedRows.push(row);
+        }})
+    .on("end", (rowCount) => {
+        fastCsv.writeToPath(req.file.path, rejectedRows)
+        .on("error", (err) => res.sendStatus(500))
+        .on("finish", () => res.sendFile(path.resolve(req.file.path)));
+    });
 });
 
 //Reset password for local account
@@ -166,8 +201,7 @@ router.post('/resetAccount', jsonParser, [
     }
 });
 
-
-// Login as new user
+//Login as new user
 router.post('/accounts',
     jsonParser,
     passport.authenticate('local', { session: false }),

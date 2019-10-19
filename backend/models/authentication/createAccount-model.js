@@ -16,6 +16,11 @@ const createAccountSchema = new schema({
         type: String,
         required: true,
         unique: true
+    },
+    permissions: {
+        type: [String],
+        required: true,
+        unique: false
     }
 });
 

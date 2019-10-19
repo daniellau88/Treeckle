@@ -12,5 +12,10 @@ module.exports = {
     //baseURI: "https://www.treeckle.com",
     baseURI: "http://localhost:3000",
     resetURI: "auth/resetAttempt",
-    createURI: "auth/newAccounts"
+    createURI: "auth/newAccounts",
+    roles: {
+        "Resident": true,
+        "Organiser": true,
+        "Admin": true
+    }
 }
