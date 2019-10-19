@@ -1,6 +1,6 @@
 import React from "react";
 import Axios from "axios";
-import { Card, Button, Form, Table } from "semantic-ui-react";
+import { Card, Button, Form, Table, Label } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
@@ -154,17 +154,12 @@ class VenueAvailabilityCard extends React.Component {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
         <Card.Content>
-          <Card.Header textAlign="center">View availability</Card.Header>
+          <Card.Header textAlign="center">Choose your slot(s)</Card.Header>
         </Card.Content>
         <Card.Content>
           <Form>
-            <Form.Select
-              options={this.state.rooms}
-              placeholder="Choose room"
-              onChange={this.onRoomChange}
-            />
             <DatePicker
-              placeholder="Select date"
+              placeholder="Select start date"
               onDateChange={this.onDateChange}
             />
           </Form>
@@ -199,3 +194,12 @@ class VenueAvailabilityCard extends React.Component {
 }
 
 export default VenueAvailabilityCard;
+
+/*
+            <span>Selected venue: {this.props.category}</span>
+            <Form.Select
+              options={this.state.rooms}
+              placeholder="Choose room"
+              onChange={this.onRoomChange}
+            />
+            */

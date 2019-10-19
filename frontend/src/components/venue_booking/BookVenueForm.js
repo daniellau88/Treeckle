@@ -96,6 +96,7 @@ class BookVenueForm extends React.Component {
     this.props.toggleStatusBar(true);
   }
 
+
   handleOnSubmit() {
     this.onSubmitting()
       .then(() => {

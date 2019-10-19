@@ -1,5 +1,6 @@
 import React from "react";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
+import { isTodayOrFuture } from "../../util/DateUtil";
 import "../../styles/DatePicker.scss";
 
 const DatePicker = props => {
@@ -11,6 +12,8 @@ const DatePicker = props => {
       placeholder={props.placeholder}
       onDateChange={props.onDateChange}
       disabled={props.disabled}
+      clearOnSameDateClick={false}
+      filterDate={date => isTodayOrFuture(date)}
     />
   );
 };
