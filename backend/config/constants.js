@@ -12,5 +12,19 @@ module.exports = {
         Resident: "Resident",
         Organiser: "Organiser",
         Admin: "Admin"
+    },
+    categories: {
+        accountCreationRequest: "accountCreationRequest",
+        accountsAll: "accountsAll",
+        accountsSelf: "accountsSelf",
+        RoomsManagement: "RoomsManagement",
+        BookingRequestsManagement: "BookingRequestsManagement"
+    },
+    actions: {
+        create: "create",
+        read: "read",
+        readAll: "readAll",
+        update: "update",
+        delete: "delete"
     }
 }

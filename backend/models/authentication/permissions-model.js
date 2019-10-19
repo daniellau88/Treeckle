@@ -89,40 +89,40 @@ const configurePermissions = async () => {
         admin.BookingRequestsManagement.set("delete", false);
 
         //Organiser configuration
-        organiser.accountCreationRequest.set("create", true);
-        organiser.accountCreationRequest.set("read", true);
-        organiser.accountCreationRequest.set("update", true);
-        organiser.accountCreationRequest.set("delete", true);
+        organiser.accountCreationRequest.set("create", false);
+        organiser.accountCreationRequest.set("read", false);
+        organiser.accountCreationRequest.set("update", false);
+        organiser.accountCreationRequest.set("delete", false);
 
         organiser.accountsAll.set("create", false);
-        organiser.accountsAll.set("read", true);
-        organiser.accountsAll.set("update", true);
-        organiser.accountsAll.set("delete", true);
+        organiser.accountsAll.set("read", false);
+        organiser.accountsAll.set("update", false);
+        organiser.accountsAll.set("delete", false);
 
         organiser.accountsSelf.set("create", false);
         organiser.accountsSelf.set("read", true);
         organiser.accountsSelf.set("update", true);
         organiser.accountsSelf.set("delete", false);
 
-        organiser.RoomsManagement.set("create", true);
+        organiser.RoomsManagement.set("create", false);
         organiser.RoomsManagement.set("read", true);
-        organiser.RoomsManagement.set("update", true);
-        organiser.RoomsManagement.set("delete", true);
+        organiser.RoomsManagement.set("update", false);
+        organiser.RoomsManagement.set("delete", false);
 
         organiser.BookingRequestsManagement.set("create", true);
-        organiser.BookingRequestsManagement.set("readAll", true);
+        organiser.BookingRequestsManagement.set("readAll", false);
         organiser.BookingRequestsManagement.set("read", true);
-        organiser.BookingRequestsManagement.set("update", true);
+        organiser.BookingRequestsManagement.set("update", false);
         organiser.BookingRequestsManagement.set("delete", false);
 
         //Resident configuration
-        resident.accountCreationRequest.set("create", true);
-        resident.accountCreationRequest.set("read", true);
-        resident.accountCreationRequest.set("update", true);
-        resident.accountCreationRequest.set("delete", true);
+        resident.accountCreationRequest.set("create", false);
+        resident.accountCreationRequest.set("read", false);
+        resident.accountCreationRequest.set("update", false);
+        resident.accountCreationRequest.set("delete", false);
 
         resident.accountsAll.set("create", false);
-        resident.accountsAll.set("read", true);
+        resident.accountsAll.set("read", false);
         resident.accountsAll.set("update", true);
         resident.accountsAll.set("delete", true);
 
@@ -131,15 +131,15 @@ const configurePermissions = async () => {
         resident.accountsSelf.set("update", true);
         resident.accountsSelf.set("delete", false);
 
-        resident.RoomsManagement.set("create", true);
+        resident.RoomsManagement.set("create", false);
         resident.RoomsManagement.set("read", true);
-        resident.RoomsManagement.set("update", true);
-        resident.RoomsManagement.set("delete", true);
+        resident.RoomsManagement.set("update", false);
+        resident.RoomsManagement.set("delete", false);
 
         resident.BookingRequestsManagement.set("create", true);
-        resident.BookingRequestsManagement.set("readAll", true);
+        resident.BookingRequestsManagement.set("readAll", false);
         resident.BookingRequestsManagement.set("read", true);
-        resident.BookingRequestsManagement.set("update", true);
+        resident.BookingRequestsManagement.set("update", false);
         resident.BookingRequestsManagement.set("delete", false);
 
         await admin.save();
@@ -155,4 +155,4 @@ const configurePermissions = async () => {
     }
 }
 
-module.exports = configurePermissions;
+module.exports = { configurePermissions, Permissions } ;

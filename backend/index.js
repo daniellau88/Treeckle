@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const configurePermissions = require('./models/authentication/permissions-model');
+const { configurePermissions } = require('./models/authentication/permissions-model');
 const keys = require('./config/keys');
 
 const passport = require("passport");

@@ -3,7 +3,7 @@ const User = require('../models/authentication/user-model');
 const CreateAccount = require('../models/authentication/createAccount-model');
 const PasswordReset = require('../models/authentication/passwordReset-model');
 const constants = require('../config/constants');
-const authService = require('../services/auth-service');
+const {isPermitted, signJWT} = require('../services/auth-service');
 const fastCsv = require('fast-csv');
 const path = require('path');
 const validator = require('validator');
@@ -73,13 +73,14 @@ router.post("/newAccounts", jsonParser, [
 //Account creation request
 router.post('/newAccountRequest', passport.authenticate('jwt', { session: false }), jsonParser, [
     check('email').isEmail(),
-], (req, res) => {
+], async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    const permitted = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.create);
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
-    } else if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-        res.status(401).send("Insufficient permissions")
     } else {
         //Generate a shortid
         const id = shortid.generate();
@@ -120,8 +121,10 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
     const acceptedRows = [];
     const rejectedRows = [];
 
-    if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-        res.status(401).send("Insufficient permissions")
+    const permitted = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.create);
+
+    if (!permitted) {
+        res.sendStatus(401);
     } else {
         fastCsv.parseFile(req.file.path)
         .on("error", (err) => res.sendStatus(500))
@@ -242,7 +245,7 @@ router.post('/accounts',
     jsonParser,
     passport.authenticate('local', { session: false }),
     (req, res) => {
-        authService.signJWT(req, res);
+        signJWT(req, res);
     }
 );
 
