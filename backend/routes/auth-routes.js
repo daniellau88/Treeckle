@@ -37,7 +37,8 @@ router.post("/newAccounts", jsonParser, [
                 permissionLevel: 0,
                 participatedEventIds: [],
                 subscribedCategories: [],
-                profilePicPath: "" //To modify once created
+                profilePicPath: "", //To modify once created
+                residence: relevantReq.residence
             }),
             req.body.password,
             async err => {
@@ -72,7 +73,8 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
         //Create a new Database entry for account creation
         new CreateAccount({
             email: req.body.email,
-            uniqueURIcomponent: id
+            uniqueURIcomponent: id,
+            residence: req.user.residence
         }).save((err, product) => {
             if (err) {
                     res.status(500).send("Database Error");

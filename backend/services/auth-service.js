@@ -8,7 +8,8 @@ const signJWT = (req, res) => {
     jwt.sign(
         {
             userId: user._id,
-            permissionLevel: user.permissionLevel
+            permissionLevel: user.permissionLevel,
+            residence: user.residence
         },
         keys.JWT.secretKey,
         {
