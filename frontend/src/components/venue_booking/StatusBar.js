@@ -1,10 +1,10 @@
 import React from "react";
-import { Segment } from "semantic-ui-react";
+import { Message } from "semantic-ui-react";
 
 const StatusBar = props => {
   const renderColor = () => {
     if (props.submitting) {
-      return "grey";
+      return "blue";
     } else if (props.status.success) {
       return "green";
     } else {
@@ -13,14 +13,12 @@ const StatusBar = props => {
   };
 
   return (
-    <Segment
+    <Message
+      floating
       textAlign="center"
-      inverted
-      loading={props.submitting}
       color={renderColor()}
-    >
-      {props.status ? props.status.message : ""}
-    </Segment>
+      header={props.status ? props.status.message : "Submission in progress"}
+    />
   );
 };
 

@@ -9,7 +9,12 @@ class CreateBookingRequest extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { category: "", room: null, status: null, submitting: false };
+    this.state = {
+      venue: null, //{roomId: string, name: string}
+      bookingPeriod: null, // {venue, start: date in ms, end: date in ms}
+      status: null, // {success: boolean, message: string}
+      submitting: false // indicates if the submission is still processing
+    };
 
     this.renderVenueAvailabilityCard = this.renderVenueAvailabilityCard.bind(
       this
@@ -19,14 +24,14 @@ class CreateBookingRequest extends React.Component {
     this.renderStatusBar = this.renderStatusBar.bind(this);
   }
 
-  renderVenueAvailabilityCard(category) {
-    this.setState({ category, room: null, status: null });
-    console.log("Selected category:", category);
+  renderVenueAvailabilityCard(venue) {
+    this.setState({ venue, bookingPeriod: null, status: null });
+    console.log("Selected venue:", venue);
   }
 
-  renderBookingForm(room) {
-    this.setState({ room });
-    console.log("Selected room:", room);
+  renderBookingForm(bookingPeriod) {
+    this.setState({ bookingPeriod });
+    console.log("Selected booking period:", bookingPeriod);
   }
 
   toggleStatusBar(submitting) {
@@ -62,17 +67,17 @@ class CreateBookingRequest extends React.Component {
           <SelectVenueCard
             renderVenueAvailabilityCard={this.renderVenueAvailabilityCard}
           />
-          {this.state.category ? (
+          {this.state.venue ? (
             <VenueAvailabilityCard
-              category={this.state.category}
+              venue={this.state.venue}
               renderBookingForm={this.renderBookingForm}
             />
           ) : (
             <Card style={{ boxShadow: "none" }} />
           )}
-          {this.state.room ? (
+          {this.state.bookingPeriod ? (
             <BookVenueForm
-              room={this.state.room}
+              bookingPeriod={this.state.bookingPeriod}
               renderStatusBar={this.renderStatusBar}
               toggleStatusBar={this.toggleStatusBar}
             />

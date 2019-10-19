@@ -1,12 +1,13 @@
 import React from "react";
 import Axios from "axios";
-import { Card, Button, Form, Table, Segment } from "semantic-ui-react";
+import { Card, Button, Form, Table } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
 import { getUpdatedAvailabilityOptions } from "../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../util/Constants";
 import { toTimeString, toDateString } from "../../util/DateUtil";
+import { isAfter, subDays, addDays } from "date-fns";
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
@@ -15,18 +16,20 @@ class VenueAvailabilityCard extends React.Component {
     super(props);
 
     this.state = {
-      date: null,
+      startDate: null,
+      endDate: null,
       availabilityOptions: [],
       startDateTime: null,
       endDateTime: null
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
-    this.onDateChange = this.onDateChange.bind(this);
-    this.updateDateChange = this.updateDateChange.bind(this);
-    this.areValidFields = this.areValidFields.bind(this);
+    this.onStartDateChange = this.onStartDateChange.bind(this);
     this.updateAvailabilityOptions = this.updateAvailabilityOptions.bind(this);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.handleBookingButtonClick = this.handleBookingButtonClick.bind(this);
+    this.handleEditButtonClick = this.handleEditButtonClick.bind(this);
+    this.handleOnNextDay = this.handleOnNextDay.bind(this);
+    this.handleOnPreviousDay = this.handleOnPreviousDay.bind(this);
   }
 
   handleRowClick(time) {
@@ -55,29 +58,45 @@ class VenueAvailabilityCard extends React.Component {
     return row;
   }
 
-  async updateDateChange(date) {
-    this.setState({ date, startDateTime: null, endDateTime: null });
+  async updateStartDateChange(startDate) {
+    this.setState({
+      startDate,
+      endDate: startDate,
+      startDateTime: null,
+      endDateTime: null
+    });
   }
 
-  onDateChange(date) {
-    if (date !== this.state.date) {
-      this.updateDateChange(date).then(this.updateAvailabilityOptions);
+  async updateEndDateChange(endDate) {
+    this.setState({ endDate });
+    console.log(this.state);
+  }
+
+  onStartDateChange(startDate) {
+    if (startDate !== this.state.startDate) {
+      this.updateStartDateChange(startDate).then(
+        this.updateAvailabilityOptions
+      );
     }
   }
 
+  onEndDateChange(endDate) {
+    this.updateEndDateChange(endDate).then(this.updateAvailabilityOptions);
+  }
+
   componentDidUpdate(prevProps) {
-    if (this.props.category !== prevProps.category) {
+    if (this.props.venue !== prevProps.venue) {
       this.setState({ startDateTime: null, endDateTime: null });
-      this.updateAvailabilityOptions();
+      this.onEndDateChange(this.state.startDate);
     }
   }
 
   updateAvailabilityOptions() {
-    if (this.areValidFields()) {
+    if (this.state.endDate) {
       Axios.get(
         `api/rooms/bookings/${
-          this.props.category
-        }/${this.state.date.getTime()}-${this.state.date.getTime() +
+          this.props.venue.roomId
+        }/${this.state.endDate.getTime()}-${this.state.endDate.getTime() +
           DAY_MILLISECONDS}`,
         {
           headers: { Authorization: `Bearer ${this.context.token}` }
@@ -87,7 +106,7 @@ class VenueAvailabilityCard extends React.Component {
         if (response.status === 200) {
           const bookedSlots = response.data;
           const availabilityOptions = getUpdatedAvailabilityOptions(
-            this.state.date,
+            this.state.endDate,
             bookedSlots
           );
           this.setState({ availabilityOptions });
@@ -99,29 +118,45 @@ class VenueAvailabilityCard extends React.Component {
     }
   }
 
-  areValidFields() {
-    return this.state.date !== null;
+  handleBookingButtonClick(event, data) {
+    const bookingPeriod = {
+      venue: this.props.venue,
+      start: this.state.startDateTime.getTime(),
+      end: this.state.endDateTime.getTime()
+    };
+    this.props.renderBookingForm(bookingPeriod);
   }
 
-  handleButtonClick(event, data) {
-    console.log("Make booking clicked");
-    //this.props.renderBookingForm(this.state.room);
+  handleEditButtonClick(event, data) {
+    this.setState({ endDateTime: null });
+  }
+
+  handleOnPreviousDay(event, data) {
+    const prevDay = subDays(this.state.endDate, 1);
+    this.onEndDateChange(prevDay);
+  }
+
+  handleOnNextDay(event, data) {
+    const nextDay = addDays(this.state.endDate, 1);
+    this.onEndDateChange(nextDay);
   }
 
   render() {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
         <Card.Content style={{ flexGrow: 0 }}>
-          <Card.Header textAlign="center">Choose your slot(s)</Card.Header>
+          <Card.Header textAlign="center">
+            Select your booking period
+          </Card.Header>
         </Card.Content>
-        <Card.Content>
+        <Card.Content style={{ flexGrow: 0 }}>
           <Form>
             <Form.Group>
               <Form.Field width={9}>
                 <label>Start date</label>
                 <DatePicker
                   placeholder="Select date"
-                  onDateChange={this.onDateChange}
+                  onDateChange={this.onStartDateChange}
                 />
               </Form.Field>
               {this.state.startDateTime && (
@@ -155,11 +190,14 @@ class VenueAvailabilityCard extends React.Component {
                 </Form.Field>
               </Form.Group>
             )}
-            {!this.state.endDateTime && this.state.date && (
+            {!this.state.endDateTime && this.state.startDate && (
               <Form.Field>
-                <label>
+                <label style={{ fontSize: "1.25rem" }}>
                   Select {this.state.startDateTime ? "end" : "start"} time
                 </label>
+                <div style={{ marginBottom: "0.5rem" }}>
+                  Date: {toDateString(this.state.endDate)}
+                </div>
                 <div
                   style={{
                     overflowY: "auto",
@@ -181,19 +219,47 @@ class VenueAvailabilityCard extends React.Component {
                 </div>
               </Form.Field>
             )}
+            {!this.state.endDateTime && this.state.startDateTime && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Button
+                  style={{ width: "48%" }}
+                  size="mini"
+                  compact
+                  labelPosition="left"
+                  icon="left chevron"
+                  content="Previous day"
+                  disabled={!isAfter(this.state.endDate, this.state.startDate)}
+                  onClick={this.handleOnPreviousDay}
+                />
+                <Button
+                  style={{ width: "48%" }}
+                  size="mini"
+                  compact
+                  labelPosition="right"
+                  icon="right chevron"
+                  content="Next day"
+                  onClick={this.handleOnNextDay}
+                />
+              </div>
+            )}
           </Form>
         </Card.Content>
         {this.state.endDateTime && (
-          <Card.Content flexGrow={0}>
+          <Card.Content style={{ flexGrow: 0 }}>
             <Button
               fluid
-              onClick={this.handleButtonClick}
+              onClick={this.handleEditButtonClick}
               style={{ marginBottom: "1em" }}
             >
-              Edit
+              Edit end time
             </Button>
-            <Button fluid onClick={this.handleButtonClick}>
-              Make a booking
+            <Button primary fluid onClick={this.handleBookingButtonClick}>
+              Proceed to booking form
             </Button>
           </Card.Content>
         )}

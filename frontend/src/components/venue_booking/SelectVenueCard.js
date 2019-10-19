@@ -68,7 +68,8 @@ class SelectVenueCard extends React.Component {
     const renderedVenues = venues.map(venue => {
       return (
         <Button
-          name={venue.roomId}
+          roomId={venue.roomId}
+          name={venue.name}
           active={this.state.activeButton === venue.roomId}
           onClick={this.handleButtonClick}
           category={category}
@@ -86,11 +87,15 @@ class SelectVenueCard extends React.Component {
     this.setState({ activeButton });
   }
 
-  handleButtonClick(event, { name, category }) {
-    this.updateActiveButton(name).then(() =>
+  handleButtonClick(event, { roomId, name, category }) {
+    this.updateActiveButton(roomId).then(() =>
       this.updateCategory(category, this.state.venues)
     );
-    this.props.renderVenueAvailabilityCard(name);
+    const venue = {
+      roomId: roomId,
+      name: name
+    };
+    this.props.renderVenueAvailabilityCard(venue);
   }
 
   render() {
@@ -99,7 +104,7 @@ class SelectVenueCard extends React.Component {
         <Card.Content style={{ flexGrow: 0 }}>
           <Card.Header textAlign="center">Select a venue</Card.Header>
         </Card.Content>
-        <Card.Content>
+        <Card.Content style={{ flexGrow: 0 }}>
           <Accordion
             styled
             panels={this.state.categories}

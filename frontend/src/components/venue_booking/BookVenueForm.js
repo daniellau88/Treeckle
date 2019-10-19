@@ -1,10 +1,7 @@
 import React from "react";
 import Axios from "axios";
 import { Card, Form, Button, Confirm } from "semantic-ui-react";
-import DatePicker from "./DatePicker";
-import TimePicker from "./TimePicker";
 import { Context } from "../../contexts/UserProvider";
-import { parseDateTime } from "../../util/DateUtil";
 
 const SUCCESS_MSG = "Booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG = "The requested booking period is unavailable.";
@@ -20,10 +17,6 @@ class BookVenueForm extends React.Component {
 
     this.state = this.getInitialState();
 
-    this.onStartDateChange = this.onStartDateChange.bind(this);
-    this.onEndDateChange = this.onEndDateChange.bind(this);
-    this.onStartTimeChange = this.onStartTimeChange.bind(this);
-    this.onEndTimeChange = this.onEndTimeChange.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
     this.onSubmitting = this.onSubmitting.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
@@ -33,10 +26,6 @@ class BookVenueForm extends React.Component {
   getInitialState() {
     const initialState = {
       confirming: false,
-      startDate: null, //js Date object
-      endDate: null, //js Date object
-      startTime: null, //js Date object
-      endTime: null, //js Date object
       purpose: "",
       success: false
     };
@@ -50,40 +39,7 @@ class BookVenueForm extends React.Component {
 
   // all fields cannot be empty
   areValidFields() {
-    return (
-      this.props.room &&
-      this.state.startDate &&
-      this.state.startTime &&
-      this.state.endDate &&
-      this.state.endTime &&
-      this.state.purpose
-    );
-  }
-
-  onStartDateChange(startDate) {
-    console.log("Start date changed:", startDate);
-    this.setState({ startDate });
-  }
-
-  onEndDateChange(endDate) {
-    console.log("End date changed:", endDate);
-    this.setState({ endDate });
-  }
-
-  // startTime is a moment object.
-  onStartTimeChange(startTime) {
-    // parse to js Date object
-    const newStartTime = startTime ? startTime.toDate() : null;
-    console.log("Start time changed:", newStartTime);
-    this.setState({ startTime: newStartTime });
-  }
-
-  // endTime is a moment object.
-  onEndTimeChange(endTime) {
-    // parse to js Date object
-    const newEndTime = endTime ? endTime.toDate() : null;
-    console.log("End time changed:", newEndTime);
-    this.setState({ endTime: newEndTime });
+    return this.props.bookingPeriod && this.state.purpose;
   }
 
   onPurposeChange(event, { value }) {
@@ -96,15 +52,14 @@ class BookVenueForm extends React.Component {
     this.props.toggleStatusBar(true);
   }
 
-
   handleOnSubmit() {
     this.onSubmitting()
       .then(() => {
         const data = {
-          roomId: this.props.room.roomId,
+          roomId: this.props.bookingPeriod.venue.roomId,
           description: this.state.purpose,
-          start: parseDateTime(this.state.startDate, this.state.startTime),
-          end: parseDateTime(this.state.endDate, this.state.endTime)
+          start: this.props.bookingPeriod.start,
+          end: this.props.bookingPeriod.end
         };
         Axios.post("api/rooms/bookings", data, {
           headers: { Authorization: `Bearer ${this.context.token}` }
@@ -144,37 +99,13 @@ class BookVenueForm extends React.Component {
   render() {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
-        <Card.Content>
+        <Card.Content style={{ flexGrow: 0 }}>
           <Card.Header textAlign="center">
-            Book {this.props.room.roomName}
+            Book {this.props.bookingPeriod.venue.name}
           </Card.Header>
         </Card.Content>
-        <Card.Content>
+        <Card.Content style={{ flexGrow: 0 }}>
           <Form>
-            <DatePicker
-              placeholder="Start date"
-              onDateChange={this.onStartDateChange}
-              disabled={this.state.success}
-            />
-            <Form.Field disabled={this.state.success}>
-              <TimePicker
-                placeholder="Start time"
-                showInputIcon={this.state.startTime === ""}
-                onChange={this.onStartTimeChange}
-              />
-            </Form.Field>
-            <DatePicker
-              placeholder="End date"
-              onDateChange={this.onEndDateChange}
-              disabled={this.state.success}
-            />
-            <Form.Field disabled={this.state.success}>
-              <TimePicker
-                placeholder="End time"
-                showInputIcon={this.state.endTime === ""}
-                onChange={this.onEndTimeChange}
-              />
-            </Form.Field>
             <Form.TextArea
               rows={8}
               label="Booking purpose"
@@ -184,7 +115,7 @@ class BookVenueForm extends React.Component {
             />
           </Form>
         </Card.Content>
-        <Card.Content>
+        <Card.Content style={{ flexGrow: 0 }}>
           <Button
             fluid
             disabled={!this.areValidFields() || this.state.success}

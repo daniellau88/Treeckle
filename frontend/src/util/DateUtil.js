@@ -1,4 +1,4 @@
-import { set, lightFormat, isFuture, addDays } from "date-fns";
+import { set, lightFormat, isFuture, isToday } from "date-fns";
 import { DATE_FORMAT, TIME_FORMAT } from "./Constants";
 
 // combines date from one js Date object with time from
@@ -24,5 +24,5 @@ export const toTimeString = date => {
 
 // checks if the date is today or in the future.
 export const isTodayOrFuture = date => {
-  return isFuture(addDays(date, 1));
+  return isToday(date) || isFuture(date);
 };
