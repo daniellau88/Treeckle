@@ -114,19 +114,49 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
     const acceptedRows = [];
     const rejectedRows = [];
 
-    fastCsv.parseFile(req.file.path)
-    .on("error", (err) => res.sendStatus(500))
-    .on("data", (row) => {
-        if (row.length !== 2 || !validator.isEmail(row[0])|| constants.roles[row[1]] !== true) {
-            rejectedRows.push(row);
-        } else {
-            acceptedRows.push(row);
-        }})
-    .on("end", (rowCount) => {
-        fastCsv.writeToPath(req.file.path, rejectedRows)
+    if (req.user.permissionLevel < constants.permissionLevels.Admin) {
+        res.status(401).send("Insufficient permissions")
+    } else {
+        fastCsv.parseFile(req.file.path)
         .on("error", (err) => res.sendStatus(500))
-        .on("finish", () => res.sendFile(path.resolve(req.file.path)));
-    });
+        .on("data", (row) => {
+            if (row.length !== 2 || !validator.isEmail(row[0])|| constants.roles[row[1]] !== true) {
+                rejectedRows.push(row);
+            } else {
+                acceptedRows.push(row);
+            }})
+        .on("end", (rowCount) => {
+            fastCsv.writeToPath(req.file.path, rejectedRows)
+            .on("error", (err) => res.sendStatus(500))
+            .on("finish", async () => {
+                res.sendFile(path.resolve(req.file.path));
+                const promises = [];
+
+                for (let i = 0; i < acceptedRows.length; i++) {
+                    //Generate a shortid
+                    const id = shortid.generate();
+
+                    promises.push(CreateAccount({
+                        email: acceptedRows[i][0],
+                        uniqueURIcomponent: id,
+                        residence: req.user.residence,
+                        permissions: [acceptedRows[i][1]]
+                    }).save());
+
+                    promises.push(EmailService.sendText(acceptedRows[i][0], 'Account Creation for Treeckle',
+                    `<p>Dear User, please proceed with account creation using the following link:</p>
+                    <p>${constants.baseURI}/${constants.createURI}/${id}</p>
+                    <p>We look forward to having you in our community!</p>
+                    <p>Yours Sincerely,\n Treeckle Team</p>`));
+                }
+                try {
+                    await Promise.all(promises);
+                } catch(err) {
+                    console.log(err);
+                }
+            });
+        });
+    }
 });
 
 //Reset password for local account
