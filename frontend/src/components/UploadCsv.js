@@ -5,8 +5,10 @@ import {
     Header,
     Input
 } from "semantic-ui-react";
+import { Context } from "../contexts/UserProvider";
 
 class UploadCsv extends React.Component {
+    static contextType = Context;
 
     constructor(props) {
         super(props);
@@ -27,15 +29,16 @@ class UploadCsv extends React.Component {
         this.setState({ file: e.target.files[0] })
     }
     fileUpload(file) {
-        const url = '/auth/newAccountRequest';
+        const url = '/auth/newAccountRequestCSV';
         const formData = new FormData();
-        formData.append('file', file)
+        formData.append('csvFile', file)
         const config = {
             headers: {
                 Authorization: `Bearer ${this.context.token}`,
                 'content-type': 'multipart/form-data'
             }
         }
+        console.log("token is: " + this.context.token);
         return post(url, formData, config)
     }
 
