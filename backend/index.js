@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
+const { configurePermissions } = require('./models/authentication/permissions-model');
 const keys = require('./config/keys');
 
 const passport = require("passport");
@@ -15,6 +15,7 @@ const port = 3000;
 
 //Initialize
 app.use(passport.initialize());
+//configurePermissions();
 
 //Connect to DB
 mongoose.connect(

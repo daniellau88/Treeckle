@@ -1,6 +1,7 @@
 const router = require('express').Router({ mergeParams: true});
 const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/room-booking/roomBooking-model');
+const {isPermitted} = require('../../services/auth-service');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
 const { checkApprovedOverlaps, checkPotentialOverlaps, rejectOverlaps } = require('../../services/booking-service');
@@ -9,33 +10,43 @@ const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('
 const jsonParser = bodyParser.json();
 
 //Resident and up: Get an array of all roomBookings' made by requesting user
-router.get('/', (req, res) => {
-    RoomBooking.find({ createdBy: req.user.userId }).lean()
-    .then(resp => {
-        const sendToUser = [];
-        resp.forEach(request => {
-            sendToUser.push({
-                bookingId: request._id,
-                roomId: request.roomId,
-                description: request.description,
-                start: request.start.getTime(),
-                end: request.end.getTime(),
-                approved: request.approved
+router.get('/', async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.read);
+    
+    if (!permitted) {
+        res.sendStatus(401);
+    } else {
+        RoomBooking.find({ createdBy: req.user.userId }).lean()
+        .then(resp => {
+            const sendToUser = [];
+            resp.forEach(request => {
+                sendToUser.push({
+                    bookingId: request._id,
+                    roomId: request.roomId,
+                    description: request.description,
+                    start: request.start.getTime(),
+                    end: request.end.getTime(),
+                    approved: request.approved
+                });
             });
+            res.send(sendToUser);
+        }).catch(err => {
+            res.status(500).send("Database Error");
         });
-        res.send(sendToUser);
-    }).catch(err => {
-        res.status(500).send("Database Error");
-    });
+    }
 });
 
 //Admin: Get an array of all requests
 router.get('/all/:status', [
     param('status').exists().isInt().toInt()
-], (req, res) => {
+], async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.readAll);
+
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
     } else if (![
         constants.approvalStates.pending, 
@@ -43,8 +54,6 @@ router.get('/all/:status', [
         constants.approvalStates.rejected
     ].includes(req.params.status)) {
         res.status(422).json({ "ValueError": "invalid state" });
-    } else if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-        res.status(401).send("Insufficient permissions")
     } else {
         RoomBooking.find({ approved: req.params.status }).lean()
         .then(resp => {
@@ -71,8 +80,9 @@ router.get('/manage/:id', [
 param('id').exists()
 ], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
 async (req, res) => {
-    if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-        res.status(401).send("Insufficient permissions")
+    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.readAll);
+    if (!permitted) {
+        res.sendStatus(401);
     } else {
         const relevantReq = await RoomBooking.findOne({ _id:req.params.id }).lean();
         if (!relevantReq) {
@@ -97,8 +107,9 @@ router.patch('/manage/:id', jsonParser, [
     body('approved').exists().isInt()
     ], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
     async (req, res) => {
-        if (req.user.permissionLevel < constants.permissionLevels.Admin) {
-            res.status(401).send("Insufficient permissions")
+        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.update);
+        if (!permitted) {
+            res.sendStatus(401);
         } else if (req.body.approved === constants.approvalStates.approved) {
             const relevantReq = await RoomBooking.findOne({ _id:req.params.id }).lean();
             if (!relevantReq) {
@@ -133,10 +144,13 @@ router.get('/:roomId/:start-:end', [
     param('end').exists().isInt().toInt()
     ], sanitizeParam('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
      async (req, res) => {
+        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.read);
         //Check for input errors
         const {roomId,start,end} = req.params;
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
+        if (!permitted) {
+            res.sendStatus(401);
+        } else if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
         } else if (start > end) {
             res.status(422).json({ValueError: "start > end"});
@@ -159,9 +173,12 @@ router.post('/', jsonParser, [
     body('end').exists().isInt(),
     ], sanitizeBody('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
     async (req, res) => {
+        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.create);
         //Check for input errors
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
+        if (!permitted) {
+            res.sendStatus(401);
+        } else if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
         } else {
             //Check for overlaps

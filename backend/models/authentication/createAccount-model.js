@@ -7,10 +7,20 @@ const createAccountSchema = new schema({
         required: true,
         unique: false
     },
+    residence: {
+        type: String,
+        required: true,
+        unique: false
+    },
     uniqueURIcomponent: {
         type: String,
         required: true,
         unique: true
+    },
+    role: {
+        type: String,
+        required: true,
+        unique: false
     }
 });
 
