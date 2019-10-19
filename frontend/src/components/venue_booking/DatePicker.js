@@ -13,7 +13,7 @@ const DatePicker = props => {
       onDateChange={props.onDateChange}
       disabled={props.disabled}
       clearOnSameDateClick={false}
-      filterDate={date => isTodayOrFuture(date)}
+      //filterDate={date => isTodayOrFuture(date)}
     />
   );
 };

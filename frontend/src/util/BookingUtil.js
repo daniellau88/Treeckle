@@ -6,25 +6,13 @@ const createAvailabilityOptions = (time = new Date(0, 0), initial = null) => {
   for (let i = 0; i < DAY_MINUTES / TIME_INTERVAL; i++) {
     let period = {
       time: time, // js Date object
+      timeFormat: lightFormat(time, TIME_FORMAT), // time in string
       available: initial
     };
     defaultAvailabilityOptions.push(period);
     time = addMinutes(time, TIME_INTERVAL);
   }
   return defaultAvailabilityOptions;
-};
-
-const createUserViewAvailabilityOptions = availabilityOptions => {
-  return availabilityOptions.map(period => {
-    return {
-      time: lightFormat(period.time, TIME_FORMAT),
-      available: period.available
-    };
-  });
-};
-
-export const getDefaultAvailabilityOptions = () => {
-  return createUserViewAvailabilityOptions(createAvailabilityOptions());
 };
 
 export const getUpdatedAvailabilityOptions = (date, bookedSlots) => {
@@ -38,11 +26,12 @@ export const getUpdatedAvailabilityOptions = (date, bookedSlots) => {
     availabilityOptions = availabilityOptions.map(period => {
       return {
         time: period.time,
+        timeFormat: lightFormat(period.time, TIME_FORMAT),
         available: isWithinInterval(period.time, interval)
           ? false
           : period.available
       };
     });
   }
-  return createUserViewAvailabilityOptions(availabilityOptions);
+  return availabilityOptions;
 };

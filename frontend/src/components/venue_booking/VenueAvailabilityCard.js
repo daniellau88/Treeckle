@@ -1,16 +1,12 @@
 import React from "react";
 import Axios from "axios";
-import { Card, Button, Form, Table, Label } from "semantic-ui-react";
+import { Card, Button, Form, Table, Segment } from "semantic-ui-react";
 import DatePicker from "./DatePicker";
 import "../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../contexts/UserProvider";
-import {
-  getDefaultAvailabilityOptions,
-  getUpdatedAvailabilityOptions
-} from "../../util/BookingUtil";
+import { getUpdatedAvailabilityOptions } from "../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../util/Constants";
-
-const emptyAvailabilityOptions = getDefaultAvailabilityOptions();
+import { toTimeString, toDateString } from "../../util/DateUtil";
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
@@ -19,50 +15,48 @@ class VenueAvailabilityCard extends React.Component {
     super(props);
 
     this.state = {
-      rooms: [],
-      room: null,
       date: null,
-      availabilityOptions: emptyAvailabilityOptions
+      availabilityOptions: [],
+      startDateTime: null,
+      endDateTime: null
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
     this.onDateChange = this.onDateChange.bind(this);
-    this.updateRoomOptions = this.updateRoomOptions.bind(this);
     this.updateDateChange = this.updateDateChange.bind(this);
     this.areValidFields = this.areValidFields.bind(this);
     this.updateAvailabilityOptions = this.updateAvailabilityOptions.bind(this);
-    this.updateRoomChange = this.updateRoomChange.bind(this);
-    this.onRoomChange = this.onRoomChange.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
   }
 
+  handleRowClick(time) {
+    console.log(time);
+    if (!this.state.startDateTime) {
+      this.setState({ startDateTime: time });
+    } else if (!this.state.endDateTime) {
+      this.setState({ endDateTime: time });
+    }
+  }
+
   renderBodyRow(data, index) {
-    const available = data.available === true;
-    const unavailable = data.available === false;
-    const notApplicable = data.available === null;
-    const label = notApplicable ? "" : available ? "available" : "unavailable";
-    return (
-      <Table.Row>
-        <Table.Cell>{data.time}</Table.Cell>
-        <Table.Cell positive={available} negative={unavailable}>
-          {label}
+    const available = data.available;
+    const row = (
+      <Table.Row onClick={this.handleRowClick.bind(this, data.time)}>
+        <Table.Cell disabled={!available}>{data.timeFormat}</Table.Cell>
+        <Table.Cell
+          positive={available}
+          negative={!available}
+          disabled={!available}
+        >
+          {available ? "available" : "unavailable"}
         </Table.Cell>
       </Table.Row>
     );
+    return row;
   }
 
   async updateDateChange(date) {
-    this.setState({ date });
-  }
-
-  async updateRoomChange(roomName, recommendedCapacity, roomId) {
-    const room = {
-      roomName: roomName,
-      recommendedCapacity: recommendedCapacity,
-      roomId: roomId
-    };
-    this.setState({ room });
-    console.log("Room changed:", room);
+    this.setState({ date, startDateTime: null, endDateTime: null });
   }
 
   onDateChange(date) {
@@ -71,47 +65,10 @@ class VenueAvailabilityCard extends React.Component {
     }
   }
 
-  onRoomChange(event, data) {
-    this.updateRoomChange(
-      data.options[data.value].text,
-      data.options[data.value].recommendedCapacity,
-      data.options[data.value].key
-    ).then(this.updateAvailabilityOptions);
-  }
-
   componentDidUpdate(prevProps) {
     if (this.props.category !== prevProps.category) {
-      this.updateRoomOptions();
-    }
-  }
-
-  componentDidMount() {
-    this.updateRoomOptions();
-  }
-
-  updateRoomOptions() {
-    if (this.props.category) {
-      Axios.get(`api/rooms/categories/${this.props.category}`, {
-        headers: { Authorization: `Bearer ${this.context.token}` }
-      })
-        .then(response => {
-          if (response.status === 200) {
-            const data = response.data;
-            const rooms = [];
-            for (let i = 0; i < data.length; i++) {
-              let room = data[i];
-              rooms.push({
-                key: room.roomId,
-                text: room.name,
-                value: i,
-                recommendedCapacity: room.recommendedCapacity.toString()
-              });
-            }
-            this.setState({ rooms });
-            console.log("Room options updated:", rooms);
-          }
-        })
-        .then(this.updateAvailabilityOptions);
+      this.setState({ startDateTime: null, endDateTime: null });
+      this.updateAvailabilityOptions();
     }
   }
 
@@ -119,7 +76,7 @@ class VenueAvailabilityCard extends React.Component {
     if (this.areValidFields()) {
       Axios.get(
         `api/rooms/bookings/${
-          this.state.room.roomId
+          this.props.category
         }/${this.state.date.getTime()}-${this.state.date.getTime() +
           DAY_MILLISECONDS}`,
         {
@@ -137,69 +94,112 @@ class VenueAvailabilityCard extends React.Component {
           console.log("Availability options updated:", availabilityOptions);
         }
       });
-    } else if (this.state.availabilityOptions !== emptyAvailabilityOptions) {
-      this.setState({ availabilityOptions: emptyAvailabilityOptions });
+    } else {
+      this.setState({ availabilityOptions: [] });
     }
   }
 
   areValidFields() {
-    return this.state.room && this.state.date;
+    return this.state.date !== null;
   }
 
   handleButtonClick(event, data) {
-    this.props.renderBookingForm(this.state.room);
+    console.log("Make booking clicked");
+    //this.props.renderBookingForm(this.state.room);
   }
 
   render() {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
-        <Card.Content>
+        <Card.Content style={{ flexGrow: 0 }}>
           <Card.Header textAlign="center">Choose your slot(s)</Card.Header>
         </Card.Content>
         <Card.Content>
           <Form>
-            <DatePicker
-              placeholder="Select start date"
-              onDateChange={this.onDateChange}
-            />
+            <Form.Group>
+              <Form.Field width={9}>
+                <label>Start date</label>
+                <DatePicker
+                  placeholder="Select date"
+                  onDateChange={this.onDateChange}
+                />
+              </Form.Field>
+              {this.state.startDateTime && (
+                <Form.Field width={7}>
+                  <label>Start time</label>
+                  <input
+                    basic
+                    readOnly
+                    placeholder={toTimeString(this.state.startDateTime)}
+                  />
+                </Form.Field>
+              )}
+            </Form.Group>
+            {this.state.endDateTime && (
+              <Form.Group>
+                <Form.Field width={9}>
+                  <label>End date</label>
+                  <input
+                    basic
+                    readOnly
+                    placeholder={toDateString(this.state.endDateTime)}
+                  />
+                </Form.Field>
+                <Form.Field width={7}>
+                  <label>End time</label>
+                  <input
+                    basic
+                    readOnly
+                    placeholder={toTimeString(this.state.endDateTime)}
+                  />
+                </Form.Field>
+              </Form.Group>
+            )}
+            {!this.state.endDateTime && this.state.date && (
+              <Form.Field>
+                <label>
+                  Select {this.state.startDateTime ? "end" : "start"} time
+                </label>
+                <div
+                  style={{
+                    overflowY: "auto",
+                    maxHeight: "19em"
+                  }}
+                >
+                  <Table
+                    selectable
+                    celled
+                    headerRow={
+                      <Table.Row>
+                        <Table.HeaderCell>Time period</Table.HeaderCell>
+                        <Table.HeaderCell>Availability</Table.HeaderCell>
+                      </Table.Row>
+                    }
+                    tableData={this.state.availabilityOptions}
+                    renderBodyRow={this.renderBodyRow}
+                  />
+                </div>
+              </Form.Field>
+            )}
           </Form>
-          <div
-            style={{ overflowY: "auto", maxHeight: "19em", marginTop: "1em" }}
-          >
-            <Table
-              celled
-              headerRow={
-                <Table.Row>
-                  <Table.HeaderCell>Time period</Table.HeaderCell>
-                  <Table.HeaderCell>Availability</Table.HeaderCell>
-                </Table.Row>
-              }
-              tableData={this.state.availabilityOptions}
-              renderBodyRow={this.renderBodyRow}
-            ></Table>
-          </div>
         </Card.Content>
-        <Card.Content>
-          <Button
-            fluid
-            disabled={!this.areValidFields()}
-            onClick={this.handleButtonClick}
-          >
-            Make a booking
-          </Button>
-        </Card.Content>
+        {this.state.endDateTime && (
+          <Card.Content flexGrow={0}>
+            <Button
+              fluid
+              onClick={this.handleButtonClick}
+              style={{ marginBottom: "1em" }}
+            >
+              Edit
+            </Button>
+            <Button fluid onClick={this.handleButtonClick}>
+              Make a booking
+            </Button>
+          </Card.Content>
+        )}
       </Card>
     );
   }
 }
 
 export default VenueAvailabilityCard;
-
-/*
-            <span>Selected venue: {this.props.category}</span>
-            <Form.Select
-              options={this.state.rooms}
-              placeholder="Choose room"
-              onChange={this.onRoomChange}
-            />
-            */

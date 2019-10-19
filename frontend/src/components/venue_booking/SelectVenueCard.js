@@ -12,7 +12,6 @@ class SelectVenueCard extends React.Component {
     this.state = { categories: [], venues: [], activeButton: "" };
 
     this.handleOnCategoryClick = this.handleOnCategoryClick.bind(this);
-    //this.updateCategory = this.updateCategory.bind(this);
     this.updateActiveButton = this.updateActiveButton.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
   }
