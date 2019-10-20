@@ -1,7 +1,7 @@
 import React from "react";
 import placeholderDP from "../images/avatar.png";
 import { Context } from "../contexts/UserProvider";
-import { axios } from "axios";
+import axios from "axios";
 import {
   Grid,
   Header,
@@ -12,6 +12,18 @@ import {
   Icon,
   Popup
 } from "semantic-ui-react";
+
+function getBase64IntArray(arr) {
+  let TYPED_ARRAY = new Uint8Array(arr);
+  const STRING_CHAR = String.fromCharCode.apply(null, TYPED_ARRAY);
+  return btoa(STRING_CHAR);
+}
+
+function getIntArrayBase64(str) {
+  let STRING_CHAR = Array.from(atob(str));
+  let TYPED_ARRAY = STRING_CHAR.map(x => x.charCodeAt(0));
+  return TYPED_ARRAY;
+}
 
 class ProfileCard extends React.Component {
   static contextType = Context;
@@ -30,14 +42,36 @@ class ProfileCard extends React.Component {
       console.log("File chosen --->", this.state.file);
     });
     const data = new FormData();
-    data.append("file", this.state.file);
+    data.append("profilePicture", this.state.file);
+    let reader = new FileReader();
+    let newProfilePic;
+    reader.readAsDataURL(e.target.files[0]);
+    reader.onloadend = () => {
+      console.log(reader.result);
+      newProfilePic = getIntArrayBase64(reader.result.substring(22));
+    };
     const config = {
       headers: {
         Authorization: `Bearer ${this.context.token}`,
         "Content-Type": "multipart/form-data"
       }
     };
-    //axios.post(, data, config).then(response => {}); //todo
+    axios
+      .put("/api/accounts/profilePicture", data, config)
+      .then(res => {
+        if (res.status === 200) {
+          console.log("Success!");
+          this.context.setUser(
+            this.context.token,
+            this.context.name,
+            newProfilePic,
+            this.context.role
+          );
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   render() {
@@ -49,7 +83,9 @@ class ProfileCard extends React.Component {
               <Popup
                 trigger={
                   <Image
-                    src={placeholderDP}
+                    src={`data:image/jpeg;base64,${getBase64IntArray(
+                      this.context.profilePic
+                    )}`}
                     size="medium"
                     circular
                     bordered
