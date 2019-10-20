@@ -19,7 +19,8 @@ router.put('/profilePicture', upload.single('profilePicture'), async (req, res) 
 
     if (!permitted) {
         res.sendStatus(401);
-    } else if (req.file.mimetype !== 'image/jpeg' || req.file.mimetype !== 'image/png') {
+    } else if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/png') {
+        console.log(req.file.mimetype);
         res.sendStatus(400);
     } else {
         User.findByIdAndUpdate(req.user.userId, {profilePicPath: req.file.path}, {new: true})
