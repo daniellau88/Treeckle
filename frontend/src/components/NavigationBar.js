@@ -16,14 +16,19 @@ class NavigationBar extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {};
-
     this.handleItemClick = this.handleItemClick.bind(this);
+    this.handleSignOut = this.handleSignOut.bind(this);
   }
 
   handleItemClick(event, data) {
     this.setState({ activeItem: data.name });
+  }
+
+  handleSignOut() {
+    localStorage.clear();
+    this.context.setUser("", "", "", "");
+    window.location.replace("/");
   }
 
   render() {
@@ -37,7 +42,12 @@ class NavigationBar extends React.Component {
         to="/profile"
         onClick={this.handleItemClick}
       />,
-      <Dropdown.Item name="sign-out" text="Sign Out" icon="sign out" />
+      <Dropdown.Item
+        name="sign-out"
+        text="Sign Out"
+        icon="sign out"
+        onClick={this.handleSignOut}
+      />
     ];
 
     return (
