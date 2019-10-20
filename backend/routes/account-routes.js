@@ -10,6 +10,7 @@ const { body, validationResult } = require('express-validator');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
+//Resident & above: Update profile picture
 router.put('/profilePicture', upload.single('profilePicture'), async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.accountsSelf, constants.actions.update);
 
@@ -29,6 +30,7 @@ router.put('/profilePicture', upload.single('profilePicture'), async (req, res) 
     }
 });
 
+//Admin: Get all pending and created users under their RC
 router.get('/', async (req, res) => {
     const permittedOne = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.read);
     const permittedTwo = await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.read);
@@ -69,6 +71,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+//Admin: update specific created user or all pending requests under their RC - emails updates commented out
 router.patch('/', jsonParser, [
     body('email').exists().isEmail(),
     body('name').optional().isString(),
@@ -98,6 +101,29 @@ router.patch('/', jsonParser, [
                     role: req.body.role
                 },
                 {omitUndefined: true}).lean();       
+            res.sendStatus(200);
+        } catch (err) {
+            res.sendStatus(500);
+        }
+    }
+});
+
+//Admin: delete specific created user or all pending requests for that user under under their RC
+router.delete('/', jsonParser, [
+    body('email').exists().isEmail(),
+], async (req, res) => {
+    const errors = validationResult(req);
+    const permittedOne = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.delete);
+    const permittedTwo = await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.delete);
+
+    if (!permittedOne || !permittedTwo) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        try {
+            await User.deleteOne({ email: req.body.email, _id : { $ne : req.user.userId }}).lean();
+            await CreateAccount.deleteMany({ email: req.body.email }).lean();
             res.sendStatus(200);
         } catch (err) {
             res.sendStatus(500);
