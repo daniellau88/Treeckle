@@ -13,6 +13,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const passport = require("passport");
 const { check, validationResult } = require('express-validator');
+const imageThumbnail = require('image-thumbnail');
 
 const storage = multer.diskStorage({
     destination: 'uploads/accountCreationCSV',
@@ -43,6 +44,7 @@ router.post("/newAccounts", jsonParser, [
                 message: "Invalid link."
             });
         } else {
+            const profilePic = await imageThumbnail(path.resolve(path.join(__dirname, '../defaults/avatar.png')), { height:300, width:300, responseType:'buffer'});
             //Attempt to register user
             User.register(new User({
                 email: req.body.email,
@@ -51,7 +53,8 @@ router.post("/newAccounts", jsonParser, [
                 residence: relevantReq.residence,
                 participatedEventIds: [],
                 subscribedCategories: [],
-                profilePicPath: ""
+                profilePicPath: "",
+                profilePic: profilePic
             }),
             req.body.password,
             async err => {

@@ -44,10 +44,11 @@ const userSchema = new schema({
         required: false,
         unique: false
     },
-    profilePicPath: {
-        type: String,
-        required: false,
-        unique: false
+    profilePic: {
+        type: Buffer,
+        required: true,
+        unique: false,
+        index: false
     }
 });
 
