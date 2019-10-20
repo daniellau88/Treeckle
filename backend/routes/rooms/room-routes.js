@@ -34,7 +34,9 @@ router.post('/', jsonParser, [
             createdBy: req.user.userId
         }
 
-        new Room.byTenant(req.user.residence)(newRoom).save((err, product) => {
+        const room = Room.byTenant(req.user.residence);
+        const roomInstance = new room(newRoom);
+        roomInstance.save(newRoom, (err, product) => {
             if (err) {
                 if (err.code === 11000) {
                     res.status(400).send("duplicated room name");

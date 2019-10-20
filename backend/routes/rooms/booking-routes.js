@@ -231,7 +231,9 @@ router.post('/', jsonParser, [
                     approved: constants.approvalStates.pending
                 };
 
-                new RoomBooking.byTenant(req.user.residence)(newBookingRequest).save()
+                const roomBooking = RoomBooking.byTenant(req.user.residence);
+                const roomBookingInstance = new roomBooking(newBookingRequest);
+                roomBookingInstance.save()
                 .then((result, error) => {
                     if (error) {
                         res.status(500).send("Database Error");
