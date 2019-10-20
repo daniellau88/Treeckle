@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoTenant = require('mongo-tenant');
 const schema = mongoose.Schema;
 
 const announcementSchema = new schema({
@@ -32,5 +33,6 @@ const announcementSchema = new schema({
 });
 
 announcementSchema.index({ expireAt: 1}, { expireAfterSeconds: 0 });
+announcementSchema.plugin(mongoTenant);
 const Announcement = mongoose.model('announcement', announcementSchema);
 module.exports = Announcement;

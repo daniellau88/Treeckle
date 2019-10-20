@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        RoomBooking.find({ createdBy: req.user.userId }).lean()
+        RoomBooking.byTenant(req.user.residence).find({ createdBy: req.user.userId }).lean()
         .then(resp => {
             const sendToUser = [];
             resp.forEach(request => {
@@ -56,7 +56,7 @@ router.get('/all/:status', [
     ].includes(req.params.status)) {
         res.status(422).json({ "ValueError": "invalid state" });
     } else {
-        RoomBooking.find({ approved: req.params.status }).lean()
+        RoomBooking.byTenant(req.user.residence).find({ approved: req.params.status }).lean()
         .then(resp => {
             const sendToAdmin = [];
             resp.forEach(request => {
@@ -82,12 +82,12 @@ router.get('/manage/:id', async (req, res) => {
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        RoomBooking.findOne({ _id:req.params.id }).lean()
+        RoomBooking.byTenant(req.user.residence).findOne({ _id:req.params.id }).lean()
         .then(async relevantReq => {
             if (!relevantReq) {
                 res.sendStatus(400);
             } else {
-                const conflictDocs = await checkPotentialOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
+                const conflictDocs = await checkPotentialOverlaps(req, relevantReq.roomId, relevantReq.start, relevantReq.end);
                 if (conflictDocs.error === 1) {
                     res.status(500).send("Database Error");
                 } else {
@@ -115,7 +115,7 @@ router.patch('/', jsonParser, [
     } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
     } else {
-        RoomBooking.findOneAndUpdate({ _id: req.body.id, createdBy: req.user.userId }, { approved: constants.approvalStates.cancelled }).lean()
+        RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.id, createdBy: req.user.userId }, { approved: constants.approvalStates.cancelled }).lean()
         .then(result => (result)? res.sendStatus(200): res.sendStatus(403))
         .catch(error => (error.name === 'CastError')? res.sendStatus(400) : res.status(500).send("Database Error"));
     }
@@ -136,13 +136,13 @@ router.patch('/manage', jsonParser, [
             res.status(422).json({ errors: errors.array() });
 
         } else if (req.body.approved === constants.approvalStates.approved) {
-            RoomBooking.findOne({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }).lean()
+            RoomBooking.byTenant(req.user.residence).findOne({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }).lean()
             .then(async result => {
                 if (!result) {
                     res.sendStatus(403);
                 } else {
-                    const conflictDocs = await rejectOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
-                    await RoomBooking.findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.approved }).lean();
+                    const conflictDocs = await rejectOverlaps(req, relevantReq.roomId, relevantReq.start, relevantReq.end);
+                    await RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.approved }).lean();
                     if (conflictDocs.error === 1) {
                         res.status(500).send("Database Error");
                     } else {
@@ -156,12 +156,12 @@ router.patch('/manage', jsonParser, [
             .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
 
         } else if (req.body.approved === constants.approvalStates.rejected) {
-            RoomBooking.findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.rejected }).lean()
+            RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.rejected }).lean()
             .then(result => (result)? res.sendStatus(200) : res.sendStatus(403))
             .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
             
         } else if (req.body.approved === constants.approvalStates.pending) {
-            RoomBooking.findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.pending }).lean()
+            RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.pending }).lean()
             .then(result => (result)? res.sendStatus(200) : res.sendStatus(403))
             .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
 
@@ -188,7 +188,7 @@ router.get('/:roomId/:start-:end', [
         } else if (start > end) {
             res.status(422).json({ValueError: "start > end"});
         } else {         
-            responseObject = await checkApprovedOverlaps(roomId, start, end);
+            responseObject = await checkApprovedOverlaps(req, roomId, start, end);
 
             if (responseObject.error === 1) {
                 res.status(500).send("Database Error");
@@ -215,7 +215,7 @@ router.post('/', jsonParser, [
             res.status(422).json({ errors: errors.array() });
         } else {
             //Check for overlaps
-            let responseObject = await checkApprovedOverlaps(req.body.roomId, req.body.start, req.body.end);
+            let responseObject = await checkApprovedOverlaps(req, req.body.roomId, req.body.start, req.body.end);
 
             if (responseObject.error === 1) {
                 res.status(500).send("Database Error");
@@ -231,7 +231,7 @@ router.post('/', jsonParser, [
                     approved: constants.approvalStates.pending
                 };
 
-                new RoomBooking(newBookingRequest).save()
+                new RoomBooking.byTenant(req.user.residence)(newBookingRequest).save()
                 .then((result, error) => {
                     if (error) {
                         res.status(500).send("Database Error");

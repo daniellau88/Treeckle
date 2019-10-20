@@ -34,7 +34,7 @@ router.post('/', jsonParser, [
             createdBy: req.user.userId
         }
 
-        new Room(newRoom).save((err, product) => {
+        new Room.byTenant(req.user.residence)(newRoom).save((err, product) => {
             if (err) {
                 if (err.code === 11000) {
                     res.status(400).send("duplicated room name");
@@ -67,7 +67,7 @@ router.patch('/', jsonParser, [
         res.status(422).json({ errors: errors.array() });
     }
 
-    Room.findOneAndUpdate({ _id: req.body.roomId }, { 
+    Room.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.roomId }, { 
         name: req.body.name,
         category: req.body.category,
         recommendedCapacity: req.body.recommendedCapacity

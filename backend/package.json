@@ -16,6 +16,7 @@
     "image-thumbnail": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.22.0",
+    "mongo-tenant": "^1.7.0",
     "mongoose": "^5.7.4",
     "mongoose-type-email": "^1.0.11",
     "multer": "^1.4.2",

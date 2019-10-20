@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoTenant = require('mongo-tenant');
 const schema = mongoose.Schema;
 
 const eventSchema = new schema({
@@ -65,5 +66,6 @@ const eventSchema = new schema({
     }
 });
 
+eventSchema.plugin(mongoTenant);
 const Event = mongoose.model('event', eventSchema);
 module.exports = Event;

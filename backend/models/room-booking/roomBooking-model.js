@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoTenant = require('mongo-tenant');
 const schema = mongoose.Schema;
 
 const roomBookingSchema = new schema({
@@ -34,5 +35,6 @@ const roomBookingSchema = new schema({
     }
 });
 
+roomBookingSchema.plugin(mongoTenant);
 const RoomBooking = mongoose.model('roomBooking', roomBookingSchema);
 module.exports = RoomBooking;

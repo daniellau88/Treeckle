@@ -1,14 +1,14 @@
 const RoomBooking = require('../models/room-booking/roomBooking-model');
 const constants = require('../config/constants');
 
-const checkApprovedOverlaps = async (roomId, start, end) => {
+const checkApprovedOverlaps = async (req, roomId, start, end) => {
     const returnObject = {
         error: 0,
         overlaps: []
     }
     
     try {
-        const resp = await RoomBooking.find({
+        const resp = await RoomBooking.byTenant(req.user.residence).find({
             approved: constants.approvalStates.approved, 
             roomId: roomId, 
             start: {"$lt": end},
@@ -27,14 +27,14 @@ const checkApprovedOverlaps = async (roomId, start, end) => {
     return returnObject;
 }
 
-const checkPotentialOverlaps = async (roomId, start, end) => {
+const checkPotentialOverlaps = async (req, roomId, start, end) => {
     const returnObject = {
         error: 0,
         overlaps: []
     }
     
     try {
-        const resp = await RoomBooking.find({
+        const resp = await RoomBooking.byTenant(req.user.residence).find({
             roomId: roomId, 
             approved: {"$ne": constants.approvalStates.rejected},
             approved: {"$ne": constants.approvalStates.cancelled},  //approved != rejected and != cancelled 
@@ -51,14 +51,14 @@ const checkPotentialOverlaps = async (roomId, start, end) => {
     return returnObject;
 }
 
-const rejectOverlaps = async (roomId, start, end) => {
+const rejectOverlaps = async (req, roomId, start, end) => {
     const returnObject = {
         error: 0,
         overlaps: []
     }
     
     try {
-        const resp = await RoomBooking.find({
+        const resp = await RoomBooking.byTenant(req.user.residence).find({
             roomId: roomId, 
             approved: {"$ne": constants.approvalStates.rejected},
             approved: {"$ne": constants.approvalStates.cancelled}, 
@@ -66,7 +66,7 @@ const rejectOverlaps = async (roomId, start, end) => {
             end: {"$gt": start},
         }).lean();
 
-        await RoomBooking.updateMany({
+        await RoomBooking.byTenant(req.user.residence).updateMany({
             roomId: roomId,
             approved: {"$ne": constants.approvalStates.rejected},
             approved: {"$ne": constants.approvalStates.cancelled},  

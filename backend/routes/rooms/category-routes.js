@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        Rooms.distinct('category').lean()
+        Rooms.byTenant(req.user.residence).distinct('category').lean()
         .then(results => {
             res.json({
                 categories: results
@@ -28,7 +28,7 @@ router.get('/:category', async (req, res) => {
         res.sendStatus(401);
     } else {
         const category = req.params.category;
-        Rooms.find({ category: category }).lean()
+        Rooms.byTenant(req.user.residence).find({ category: category }).lean()
         .then(resp => {
             const response = [];
             resp.forEach((doc) => {
