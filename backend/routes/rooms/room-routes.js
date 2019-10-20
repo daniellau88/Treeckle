@@ -67,26 +67,26 @@ router.patch('/', jsonParser, [
         res.sendStatus(401);
     } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
+    } else {
+        Room.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.roomId }, { 
+            name: req.body.name,
+            category: req.body.category,
+            recommendedCapacity: req.body.recommendedCapacity
+        }, {omitUndefined: true}).lean()
+        .then(result => {
+            if (result) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        }).catch(error => {
+            if (error.name === 'CastError') {
+                res.sendStatus(400);
+            } else {
+                res.status(500).send("Database Error");
+            }
+        })
     }
-
-    Room.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.roomId }, { 
-        name: req.body.name,
-        category: req.body.category,
-        recommendedCapacity: req.body.recommendedCapacity
-    }, {omitUndefined: true}).lean()
-    .then(result => {
-        if (result) {
-            res.sendStatus(200);
-        } else {
-            res.sendStatus(400);
-        }
-    }).catch(error => {
-        if (error.name === 'CastError') {
-            res.sendStatus(400);
-        } else {
-            res.status(500).send("Database Error");
-        }
-    })
 });
 
 module.exports = router;
