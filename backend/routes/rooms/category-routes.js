@@ -9,10 +9,23 @@ router.get('/', async (req, res) => {
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        Rooms.byTenant(req.user.residence).distinct('category').lean()
+        Rooms.byTenant(req.user.residence).find({}).lean()
         .then(results => {
+            let uniqueCategories = new Set();
+            let uniques = [];
+            for (let i = 0; i < results.length; i++) {
+                uniqueCategories.add(results[i].category);
+            }
+            let it = uniqueCategories.keys();
+            let result = it.next();
+            
+            while(!result.done) {
+                uniques.push(result.value);
+                result = it.next();
+            }
+
             res.json({
-                categories: results
+                categories: uniques
             })})
         .catch(error => {
             res.status(500).send("Database Error");
