@@ -2,9 +2,18 @@ import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../images/treeckle_logo.png";
 import avatar from "../images/avatar.png";
+import { Context } from "../contexts/UserProvider";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 
+function getBase64IntArray(arr) {
+  let TYPED_ARRAY = new Uint8Array(arr);
+  const STRING_CHAR = String.fromCharCode.apply(null, TYPED_ARRAY);
+  return btoa(STRING_CHAR);
+}
+
 class NavigationBar extends React.Component {
+  static contextType = Context;
+
   constructor(props) {
     super(props);
 
@@ -86,7 +95,16 @@ class NavigationBar extends React.Component {
               </Dropdown.Menu>
             </Dropdown>
             <Dropdown
-              trigger={<Image size="mini" src={avatar} avatar />}
+              trigger={
+                <Image
+                  size="mini"
+                  src={`data:image/jpeg;base64,${getBase64IntArray(
+                    this.context.profilePic
+                  )}`}
+                  avatar
+                  bordered
+                />
+              }
               options={options}
               className="link item"
               icon={null}
