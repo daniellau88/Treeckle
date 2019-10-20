@@ -41,9 +41,26 @@ class ForgotPasswordDivider extends React.Component {
     });
     console.log(this.state.email);
     let inputData = { email: this.state.email };
+    const config = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
     this.EmailSchema.isValid(inputData).then(valid => {
       if (valid) {
-        //axios
+        axios
+          .post("/auth/resetAccount", inputData, config)
+          .then(res => {
+            if (res.status === 200) {
+              alert(
+                "An email to reset your password has been sent to your account."
+              );
+              this.props.history.push("/");
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
       } else {
         this.setState({
           emailError: { content: "Please enter a valid email." }

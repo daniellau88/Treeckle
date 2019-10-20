@@ -75,7 +75,11 @@ class ResetPasswordDivider extends React.Component {
     if (this.state.password != this.state.passwordRepeated) {
       return;
     }
-
+    const config = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
     const { email, password } = this.state;
     this.setState({
       submittedEmail: email,
@@ -93,12 +97,16 @@ class ResetPasswordDivider extends React.Component {
       if (valid) {
         console.log("yell hea!" + this.context.token);
         axios
-          .post("/auth/resetAttempt", {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password,
-            uniqueURIcomponent: this.props.match.params.uniqueId
-          })
+          .post(
+            "/auth/resetAttempt",
+            {
+              name: this.state.name,
+              email: this.state.email,
+              password: this.state.password,
+              uniqueURIcomponent: this.props.match.params.uniqueId
+            },
+            config
+          )
           .then(res => {
             if (res.status === 200) {
               this.props.history.push("/");
