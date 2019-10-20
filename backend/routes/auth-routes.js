@@ -89,7 +89,7 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
         const id = shortid.generate();
 
         //Get role or assign default
-        const userRole = constants.roles.Resident;
+        let userRole = constants.roles.Resident;
         if (req.body.role && Object.values(constants.roles).includes(req.body.role)) {
             userRole = req.body.role;
         }
