@@ -8,6 +8,7 @@ import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginForm from "./pages/authentication/Login";
 import ForgotPasswordForm from "./pages/authentication/ForgotPassword";
+import ResetPasswordForm from "./pages/authentication/ResetPassword";
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
 
@@ -56,6 +57,10 @@ export const Routes = () => {
       <Route
         path="/user/create/:uniqueId"
         component={CreateAccountUserPage}
+      ></Route>
+      <Route
+        path="/auth/newAccounts/:uniqueId"
+        component={ResetPasswordForm}
       ></Route>
     </div>
   );
