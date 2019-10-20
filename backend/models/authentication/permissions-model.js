@@ -85,6 +85,7 @@ const configurePermissions = async () => {
         admin.BookingRequestsManagement.set("create", true);
         admin.BookingRequestsManagement.set("readAll", true);
         admin.BookingRequestsManagement.set("read", true);
+        admin.BookingRequestsManagement.set("cancelSelf", true);
         admin.BookingRequestsManagement.set("update", true);
         admin.BookingRequestsManagement.set("delete", false);
 
@@ -112,6 +113,7 @@ const configurePermissions = async () => {
         organiser.BookingRequestsManagement.set("create", true);
         organiser.BookingRequestsManagement.set("readAll", false);
         organiser.BookingRequestsManagement.set("read", true);
+        organiser.BookingRequestsManagement.set("cancelSelf", true);
         organiser.BookingRequestsManagement.set("update", false);
         organiser.BookingRequestsManagement.set("delete", false);
 
@@ -139,6 +141,7 @@ const configurePermissions = async () => {
         resident.BookingRequestsManagement.set("create", true);
         resident.BookingRequestsManagement.set("readAll", false);
         resident.BookingRequestsManagement.set("read", true);
+        resident.BookingRequestsManagement.set("cancelSelf", true);
         resident.BookingRequestsManagement.set("update", false);
         resident.BookingRequestsManagement.set("delete", false);
 

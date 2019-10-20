@@ -9,10 +9,10 @@ const checkApprovedOverlaps = async (roomId, start, end) => {
     
     try {
         const resp = await RoomBooking.find({
-            approved: 1, 
+            approved: constants.approvalStates.approved, 
             roomId: roomId, 
-            start: {"$lte": end},
-            end: {"$gte": start},
+            start: {"$lt": end},
+            end: {"$gt": start},
         }).lean();
 
         resp.forEach((doc) => {
@@ -37,8 +37,9 @@ const checkPotentialOverlaps = async (roomId, start, end) => {
         const resp = await RoomBooking.find({
             roomId: roomId, 
             approved: {"$ne": constants.approvalStates.rejected},
-            start: {"$lte": end},
-            end: {"$gte": start},
+            approved: {"$ne": constants.approvalStates.cancelled},  //approved != rejected and != cancelled 
+            start: {"$lt": end},
+            end: {"$gt": start},
         }).lean();
 
         resp.forEach((doc) => {
@@ -59,23 +60,24 @@ const rejectOverlaps = async (roomId, start, end) => {
     try {
         const resp = await RoomBooking.find({
             roomId: roomId, 
-            approved: {"$ne": constants.approvalStates.rejected}, 
-            start: {"$lte": end},
-            end: {"$gte": start},
+            approved: {"$ne": constants.approvalStates.rejected},
+            approved: {"$ne": constants.approvalStates.cancelled}, 
+            start: {"$lt": end},
+            end: {"$gt": start},
         }).lean();
 
         await RoomBooking.updateMany({
             roomId: roomId,
-            approved: {"$ne": constants.approvalStates.rejected},  
-            start: {"$lte": end},
-            end: {"$gte": start},
+            approved: {"$ne": constants.approvalStates.rejected},
+            approved: {"$ne": constants.approvalStates.cancelled},  
+            start: {"$lt": end},
+            end: {"$gt": start},
         }, {"$set" : {approved: constants.approvalStates.rejected}}).lean();
 
         resp.forEach((doc) => {
             returnObject.overlaps.push(doc._id);
         });
     } catch(err) {
-        console.log(err);
         returnObject.error = 1
     }
     return returnObject;

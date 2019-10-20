@@ -51,7 +51,8 @@ router.get('/all/:status', [
     } else if (![
         constants.approvalStates.pending, 
         constants.approvalStates.approved, 
-        constants.approvalStates.rejected
+        constants.approvalStates.rejected,
+        constants.approvalStates.cancelled
     ].includes(req.params.status)) {
         res.status(422).json({ "ValueError": "invalid state" });
     } else {
@@ -76,47 +77,17 @@ router.get('/all/:status', [
 });
 
 //Admin: Get conflicts that approval can cause
-router.get('/manage/:id', [
-param('id').exists()
-], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
-async (req, res) => {
+router.get('/manage/:id', async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.readAll);
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        const relevantReq = await RoomBooking.findOne({ _id:req.params.id }).lean();
-        if (!relevantReq) {
-            res.sendStatus(400);
-        } else {
-            const conflictDocs = await checkPotentialOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
-            if (conflictDocs.error === 1) {
-                res.status(500).send("Database Error");
-            } else {
-                const responseObject = conflictDocs.overlaps.filter((elem) => {
-                    return elem.toString() !== relevantReq._id.toString();
-                });
-                res.send(responseObject);
-            }
-        }
-    }
-});
-
-//Admin: Patches the bookingRequest with approval or rejection, returns affected if approval
-router.patch('/manage/:id', jsonParser, [
-    param('id').exists(),
-    body('approved').exists().isInt()
-    ], sanitizeParam('id').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
-    async (req, res) => {
-        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.update);
-        if (!permitted) {
-            res.sendStatus(401);
-        } else if (req.body.approved === constants.approvalStates.approved) {
-            const relevantReq = await RoomBooking.findOne({ _id:req.params.id }).lean();
+        RoomBooking.findOne({ _id:req.params.id }).lean()
+        .then(async relevantReq => {
             if (!relevantReq) {
                 res.sendStatus(400);
             } else {
-                const conflictDocs = await rejectOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
-                await RoomBooking.findOneAndUpdate({ _id:req.params.id }, { approved: constants.approvalStates.approved }).lean();
+                const conflictDocs = await checkPotentialOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
                 if (conflictDocs.error === 1) {
                     res.status(500).send("Database Error");
                 } else {
@@ -126,14 +97,76 @@ router.patch('/manage/:id', jsonParser, [
                     res.send(responseObject);
                 }
             }
+        })
+        .catch(err => {
+            res.sendStatus(400);
+        })
+    }
+});
+
+//Authenticated User: Cancel their own request from pending/approved state
+router.patch('/', jsonParser, [
+    body('id').exists()
+], async (req, res) => {
+    const errors = validationResult(req);
+    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.cancelSelf);
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        RoomBooking.findOneAndUpdate({ _id: req.body.id, createdBy: req.user.userId }, { approved: constants.approvalStates.cancelled }).lean()
+        .then(result => (result)? res.sendStatus(200): res.sendStatus(403))
+        .catch(error => (error.name === 'CastError')? res.sendStatus(400) : res.status(500).send("Database Error"));
+    }
+})
+
+//Admin: Patches the bookingRequest with approval or rejection, returns affected if approval
+router.patch('/manage', jsonParser, [
+    body('id').exists(),
+    body('approved').exists().isInt()
+    ], async (req, res) => {
+        const errors = validationResult(req);
+        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.update);
+        
+        if (!permitted) {
+            res.sendStatus(401);
+
+        } else if (!errors.isEmpty()) {
+            res.status(422).json({ errors: errors.array() });
+
+        } else if (req.body.approved === constants.approvalStates.approved) {
+            RoomBooking.findOne({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }).lean()
+            .then(async result => {
+                if (!result) {
+                    res.sendStatus(403);
+                } else {
+                    const conflictDocs = await rejectOverlaps(relevantReq.roomId, relevantReq.start, relevantReq.end);
+                    await RoomBooking.findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.approved }).lean();
+                    if (conflictDocs.error === 1) {
+                        res.status(500).send("Database Error");
+                    } else {
+                        const responseObject = conflictDocs.overlaps.filter((elem) => {
+                            return elem.toString() !== relevantReq._id.toString();
+                        });
+                        res.send(responseObject);
+                    }
+                }
+            })
+            .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
+
         } else if (req.body.approved === constants.approvalStates.rejected) {
-            await RoomBooking.findOneAndUpdate({ _id:req.params.id }, { approved: constants.approvalStates.rejected }).lean();
-            res.sendStatus(200);
+            RoomBooking.findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.rejected }).lean()
+            .then(result => (result)? res.sendStatus(200) : res.sendStatus(403))
+            .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
+            
         } else if (req.body.approved === constants.approvalStates.pending) {
-            await RoomBooking.findOneAndUpdate({ _id:req.params.id }, { approved: constants.approvalStates.pending }).lean();
-            res.sendStatus(200);
+            RoomBooking.findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.pending }).lean()
+            .then(result => (result)? res.sendStatus(200) : res.sendStatus(403))
+            .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
+
         } else {
-            res.status(400).status("ValueError");
+            res.sendStatus(403);
         }
     });
 

@@ -2,7 +2,8 @@ module.exports = {
     approvalStates: {
         pending: 0,
         approved: 1,
-        rejected: 2
+        rejected: 2,
+        cancelled: 3
     },
     //baseURI: "https://www.treeckle.com",
     baseURI: "http://localhost:3000",
@@ -24,6 +25,7 @@ module.exports = {
         create: "create",
         read: "read",
         readAll: "readAll",
+        cancelSelf: "cancelSelf",
         update: "update",
         delete: "delete"
     }
