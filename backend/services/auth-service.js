@@ -22,11 +22,11 @@ const signJWT = (req, res) => {
             res.sendStatus(500);
         } else {
             // Send default profile pic unless one exists
-            let profilePicPath = path.resolve(path.join(__dirname,'../defaults/avatar.png'));  
+            let profilePicPath = path.resolve(path.join(__dirname,'../defaults/avatar.png')); 
             if (user.profilePicPath) {
                 profilePicPath = path.resolve(user.profilePicPath);
             }
-            const profilePic = await imageThumbnail(profilePicPath, {percentage: 50, responseType:'base64'});
+            const profilePic = await imageThumbnail(profilePicPath, {percentage: 100, responseType:'base64'});
 
             res.status(200).send({
                 name: user.name,

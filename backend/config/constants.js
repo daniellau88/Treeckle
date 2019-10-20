@@ -28,5 +28,6 @@ module.exports = {
         cancelSelf: "cancelSelf",
         update: "update",
         delete: "delete"
-    }
+    },
+    profilePicSizeLimit: 4096000
 }
