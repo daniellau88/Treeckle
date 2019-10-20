@@ -89,4 +89,23 @@ router.patch('/', jsonParser, [
     }
 });
 
+//Admin: Delete a room
+router.delete('/', jsonParser, [
+    body('roomId').exists()
+], async (req, res) => {
+    //Check for input errors
+    const errors = validationResult(req);
+    const permitted = await isPermitted(req.user.role, constants.categories.RoomsManagement, constants.actions.delete);
+
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        Room.byTenant(req.user.residence).deleteOne({ _id: req.body.roomId }).lean()
+        .then(doc => (doc)? res.sendStatus(200): res.sendStatus(400))
+        .catch(err => ((err.name === 'CastError')? res.sendStatus(400): res.status(500).send("Database Error")));
+    }
+});
+
 module.exports = router;
