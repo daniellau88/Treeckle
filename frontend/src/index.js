@@ -10,7 +10,7 @@ import UserProvider, { Context } from "./contexts/UserProvider";
 ReactDOM.render(
   <UserProvider>
     <Context.Consumer>
-      {(token, name, profilePic, setUser) => {
+      {(token, name, profilePic, role, setUser) => {
         return <App />;
       }}
     </Context.Consumer>

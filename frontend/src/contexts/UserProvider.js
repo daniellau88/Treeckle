@@ -5,12 +5,17 @@ export const Context = React.createContext();
 class UserProvider extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { token: "", name: "", profilePic: "" };
+    this.state = { token: "", name: "", profilePic: "", role: "" };
     this.setUser = this.setUser.bind(this);
   }
 
-  setUser(token, name, profilePic) {
-    this.setState({ token: token, name: name, profilePic: profilePic });
+  setUser(token, name, profilePic, role) {
+    this.setState({
+      token: token,
+      name: name,
+      profilePic: profilePic,
+      role: role
+    });
   }
 
   render() {
@@ -20,6 +25,7 @@ class UserProvider extends React.Component {
           token: this.state.token,
           name: this.state.name,
           profilePic: this.state.profilePic,
+          role: this.state.role,
           setUser: this.setUser
         }}
       >

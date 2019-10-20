@@ -76,8 +76,11 @@ class LoginDivider extends React.Component {
             if (res.status === 200) {
               const token = res.data.token;
               const name = res.data.name;
-              const profilePic = res.data.profilePic;
-              this.context.setUser(token, name, profilePic);
+              const profilePic = res.data.profilePic.data;
+              const role = res.data.role;
+              console.log(token, name, role);
+              this.context.setUser(token, name, profilePic, role);
+              //console.log("Updated!", this.context.state);
             }
           })
           .catch(err => {
@@ -126,6 +129,7 @@ class LoginDivider extends React.Component {
             <Header style={{ margin: "1.5em auto" }}>Sign in</Header>
             <Form error onSubmit={this.handleSubmit}>
               <Form.Input
+                transparent
                 error={emailError}
                 icon="user"
                 iconPosition="left"
@@ -135,6 +139,7 @@ class LoginDivider extends React.Component {
                 onChange={this.handleChange}
               />
               <Form.Input
+                transparent
                 error={passwordError}
                 icon="lock"
                 iconPosition="left"

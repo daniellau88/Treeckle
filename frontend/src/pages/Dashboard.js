@@ -1,10 +1,12 @@
 import React from "react";
+import { Context } from "../contexts/UserProvider";
 import { Menu } from "semantic-ui-react";
 
 class Dashboard extends React.Component {
+  static contextType = Context;
+
   constructor(props) {
     super(props);
-
     this.state = {};
   }
 
@@ -13,7 +15,7 @@ class Dashboard extends React.Component {
       <main className="dashboard">
         <Menu size="huge"></Menu>
         <br />
-        <div className="placeholder">This is the dashboard.</div>
+        <div className="placeholder">Welcome, {this.context.name}.</div>
       </main>
     );
   }

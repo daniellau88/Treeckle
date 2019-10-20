@@ -17,9 +17,11 @@ export const Routes = () => {
   let token = contextValue.token;
   let name = contextValue.name;
   let profilePic = contextValue.profilePic;
+  let role = contextValue.role;
   localStorage.setItem("token", token);
   localStorage.setItem("name", name);
   localStorage.setItem("profilePic", profilePic);
+  localStorage.setItem("role", role);
 
   return (
     <div>
@@ -50,7 +52,7 @@ export const Routes = () => {
           component={PasswordReset}
         />
       } */}
-      
+
       <Route
         path="/user/create/:uniqueId"
         component={CreateAccountUserPage}
