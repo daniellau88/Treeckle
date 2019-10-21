@@ -1,6 +1,7 @@
 const router = require('express').Router({ mergeParams: true});
 const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/room-booking/roomBooking-model');
+const User = require('../../models/authentication/user-model');
 const {isPermitted} = require('../../services/auth-service');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
@@ -26,6 +27,8 @@ router.get('/', async (req, res) => {
                     description: request.description,
                     start: request.start.getTime(),
                     end: request.end.getTime(),
+                    createdDate: request.createdDate.getTime(),
+                    comments: request.comments,
                     approved: request.approved
                 });
             });
@@ -57,20 +60,44 @@ router.get('/all/:status', [
         res.status(422).json({ "ValueError": "invalid state" });
     } else {
         RoomBooking.byTenant(req.user.residence).find({ approved: req.params.status }).lean()
-        .then(resp => {
-            const sendToAdmin = [];
-            resp.forEach(request => {
-                sendToAdmin.push({
-                    bookingId: request._id,
-                    roomId: request.roomId,
-                    description: request.description,
-                    start: request.start.getTime(),
-                    end: request.end.getTime(),
-                    approved: request.approved
+        .then(async resp => {
+            const idToUser = new Map();
+            const promises = [];
+
+            for (const response of resp) {
+                if (!idToUser.has(response.createdBy.toString())) {
+                    promises.push(User.findById(response.createdBy, { profilePic: 0 }).lean());
+                    idToUser.set(response.createdBy.toString(), { name: null, email: null});
+                }
+            }
+
+            try {
+                const userData = await Promise.all(promises);
+                userData.forEach(userDatum => {
+                    idToUser.set(userDatum._id.toString(), { name: userDatum.name, email: userDatum.email })
                 });
-            });
-            res.send(sendToAdmin);
-        }).catch(err => {
+                
+                const sendToAdmin = [];
+                resp.forEach(request => {
+                    sendToAdmin.push({
+                        bookingId: request._id,
+                        roomId: request.roomId,
+                        description: request.description,
+                        start: request.start.getTime(),
+                        end: request.end.getTime(),
+                        createdByName: idToUser.get(request.createdBy.toString()).name,
+                        createdByEmail: idToUser.get(request.createdBy.toString()).email,
+                        createdDate: request.createdDate.getTime(),
+                        comments: request.comments,
+                        approved: request.approved
+                    });
+                });
+                res.send(sendToAdmin);
+            } catch (err) {
+                res.status(500).send("Database Error");
+            };
+        })
+        .catch(err => {
             res.status(500).send("Database Error");
         });
     }
