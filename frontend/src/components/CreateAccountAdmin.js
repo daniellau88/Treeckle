@@ -43,7 +43,6 @@ class CreateAccountAdmin extends React.Component {
       .required()
   });
 
-
   handleChange = (e, { name, value }) => {
     this.setState({ [name]: value });
   };
@@ -61,12 +60,16 @@ class CreateAccountAdmin extends React.Component {
         console.log("ok !");
         const headers = {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.context.token}`
-        }
+          Authorization: `Bearer ${this.context.token}`
+        };
         axios
-          .post("/auth/newAccountRequest", {
-            email: this.state.email,
-          }, {headers : headers})
+          .post(
+            "/auth/newAccountRequest",
+            {
+              email: this.state.email
+            },
+            { headers: headers }
+          )
           .then(res => {
             if (res.status === 200) {
               console.log(res.data);
@@ -93,10 +96,7 @@ class CreateAccountAdmin extends React.Component {
   }
 
   render() {
-    const {
-      email,
-      emailError,
-    } = this.state;
+    const { email, emailError } = this.state;
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
@@ -121,23 +121,19 @@ class CreateAccountAdmin extends React.Component {
             {this.state.userCreated ? (
               <Message
                 success
-                header='User Created'
+                header="User Created"
                 content={`${this.state.submittedEmail} has received the email`}
               />
-            ) : (
-                null
-              )}
+            ) : null}
           </Grid.Column>
-          <Grid.Column verticalAlign="middle">
-            <UploadCsv/>
+          <Grid.Column
+            verticalAlign="middle"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <UploadCsv />
           </Grid.Column>
         </Grid>
-
-        
-
-
       </Segment>
-
     );
   }
 }

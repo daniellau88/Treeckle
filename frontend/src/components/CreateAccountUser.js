@@ -41,10 +41,9 @@ class CreateAccountUser extends React.Component {
     password: yup.string().required(),
     passwordRepeated: yup.string().when("password", {
       is: val => (val && val.length > 0 ? true : false),
-      then: yup.string().oneOf(
-        [yup.ref("password")],
-        "Both password need to be the same"
-      )
+      then: yup
+        .string()
+        .oneOf([yup.ref("password")], "Both password need to be the same")
     })
   });
 
@@ -63,13 +62,11 @@ class CreateAccountUser extends React.Component {
     confirmPassword: yup
       .string()
       .required()
-      .label('Confirm password')
-      .test('passwords-match', 'Passwords must match', function (value) {
+      .label("Confirm password")
+      .test("passwords-match", "Passwords must match", function(value) {
         return this.parent.password === value;
       })
   });
-
-
 
   handleChange = (e, { name, value }) => {
     this.setState({ [name]: value });
@@ -88,7 +85,11 @@ class CreateAccountUser extends React.Component {
       passwordError: null
     });
     console.log(this.state.email, this.state.password);
-    let inputData = { email: this.state.email, password: this.state.password, confirmPassword: this.state.confirmPassword };
+    let inputData = {
+      email: this.state.email,
+      password: this.state.password,
+      confirmPassword: this.state.confirmPassword
+    };
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!" + this.context.token);
@@ -125,7 +126,6 @@ class CreateAccountUser extends React.Component {
       }
     });
   };
-
 
   render() {
     const {
@@ -180,28 +180,40 @@ class CreateAccountUser extends React.Component {
                 value={passwordRepeated}
                 onChange={this.handleChange}
               />
-              {(this.state.password == "") ? (null) : (
-                (this.state.password == this.state.passwordRepeated) ? ("passwords match") : ("passwords don't match")
-              )}
+              {this.state.password == ""
+                ? null
+                : this.state.password == this.state.passwordRepeated
+                ? "passwords match"
+                : "passwords don't match"}
 
               <Button
-                content={this.state.userCreated ? (
-                  "User Created"
-                ) : (
-                    "Create"
-                  )}
+                content={this.state.userCreated ? "User Created" : "Create"}
                 primary
                 style={{ minWidth: "210px", margin: "1em auto" }}
               />
             </Form>
             {this.state.userCreated ? (
-              <button class="ui fluid button" onClick={() => this.props.history.push('/')}>Login here</button>
-            ) : (
-                null
-              )}
+              <button
+                class="ui fluid button"
+                onClick={() => this.props.history.push("/")}
+              >
+                Login here
+              </button>
+            ) : null}
           </Grid.Column>
-          <Grid.Column verticalAlign="middle">
-            <Image src={logo} fluid />
+          <Grid.Column
+            verticalAlign="middle"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <Image
+              src={logo}
+              style={{
+                margin: "2.5em",
+                width: "85%",
+                height: "auto",
+                display: "block"
+              }}
+            />
           </Grid.Column>
         </Grid>
 

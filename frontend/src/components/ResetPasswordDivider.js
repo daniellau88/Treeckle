@@ -203,8 +203,19 @@ class ResetPasswordDivider extends React.Component {
               />
             </Form>
           </Grid.Column>
-          <Grid.Column verticalAlign="middle">
-            <Image src={logo} fluid />
+          <Grid.Column
+            verticalAlign="middle"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <Image
+              src={logo}
+              style={{
+                margin: "2.5em",
+                width: "85%",
+                height: "auto",
+                display: "block"
+              }}
+            />
           </Grid.Column>
         </Grid>
 
