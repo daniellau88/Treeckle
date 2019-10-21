@@ -4,7 +4,8 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 // import "semantic-ui-css/semantic.css"; //for @rohan-av to test themeing
-import "semantic-ui-css/semantic.min.css";
+// import "semantic-ui-css/semantic.min.css";
+import "semantic-ui-less/semantic.less";
 import UserProvider, { Context } from "./contexts/UserProvider";
 
 ReactDOM.render(
