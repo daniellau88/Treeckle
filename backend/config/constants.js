@@ -29,5 +29,11 @@ module.exports = {
         update: "update",
         delete: "delete"
     },
-    profilePicSizeLimit: 4096000
+    profilePicSizeLimit: 4096000,
+    residences: {
+        CAPT: "CAPT",
+        Tembusu: "Tembusu",
+        RVRC: "RVRC",
+        RC4: "RC4"
+    }
 }

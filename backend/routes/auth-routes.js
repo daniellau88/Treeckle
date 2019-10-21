@@ -26,6 +26,44 @@ const upload = multer({ storage: storage });
 
 const jsonParser = bodyParser.json();
 
+//Temporary direct registration of new local account
+router.post("/newAccountsDirect", jsonParser, [
+    check('name').exists().isLength({ min: 1 }),
+    check('email').isEmail(),
+    check('password').isLength({ min: 8 }),
+], async (req, res) => {
+    //Check for input errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        const profilePic = await imageThumbnail(path.resolve(path.join(__dirname, '../defaults/avatar.png')), { height:300, width:300, responseType:'buffer'});
+            //Attempt to register user
+            User.register(new User({
+                email: req.body.email,
+                name: req.body.name,
+                role: constants.roles.Resident,
+                residence: constants.residences.CAPT,
+                participatedEventIds: [],
+                subscribedCategories: [],
+                profilePic: profilePic
+            }),
+            req.body.password,
+            async err => {
+                if (err) {
+                    res.status(400).send({
+                        message: "Invalid link."
+                    });
+                } else {
+                    res.status(200).send({
+                        message: "OK"
+                    });
+                }
+            });
+        }
+    }
+);
+
 //Registration of new local account
 router.post("/newAccounts", jsonParser, [
     check('name').exists().isLength({ min: 1 }),
@@ -53,7 +91,6 @@ router.post("/newAccounts", jsonParser, [
                 residence: relevantReq.residence,
                 participatedEventIds: [],
                 subscribedCategories: [],
-                profilePicPath: "",
                 profilePic: profilePic
             }),
             req.body.password,
