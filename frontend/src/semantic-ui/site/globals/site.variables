@@ -10,3 +10,4 @@
 @fontSmoothing     : antialiased;
 
 @defaultBorderRadius: 1.25rem;
+@placeholderBackground: #FFFFFF;
