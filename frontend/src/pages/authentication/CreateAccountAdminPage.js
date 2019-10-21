@@ -4,7 +4,7 @@ import { Grid } from "semantic-ui-react";
 
 const CreateAccountAdminPage = () => (
   <Grid style={{ height: "100vh" }} textAlign="center" verticalAlign="middle">
-    <Grid.Column style={{ maxWidth: "70%" }}>
+    <Grid.Column style={{ maxWidth: "80%" }}>
       <CreateAccountAdmin />
     </Grid.Column>
   </Grid>

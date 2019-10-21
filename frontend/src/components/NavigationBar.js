@@ -54,7 +54,13 @@ class NavigationBar extends React.Component {
       <div>
         <Menu fixed="top" borderless size="huge">
           <Menu.Item header>
-            <Image size="mini" src={logo} style={{ marginRight: "0.5rem" }} />
+            <Image
+              size="mini"
+              src={logo}
+              style={{ marginRight: "0.5rem" }}
+              as={Link}
+              to={"/dashboard"}
+            />
             Treeckle
           </Menu.Item>
           <Menu.Item

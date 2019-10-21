@@ -101,12 +101,20 @@ class ForgotPasswordDivider extends React.Component {
               />
             </Form>
           </Grid.Column>
-          <Grid.Column verticalAlign="middle">
+          <Grid.Column
+            verticalAlign="middle"
+            style={{ display: "flex", alignItems: "center" }}
+          >
             <Image
               src={logo}
               onClick={() => this.context.setUser("", "", "")}
-              style={{ cursor: "pointer" }}
-              fluid
+              style={{
+                margin: "2.5em",
+                width: "85%",
+                height: "auto",
+                display: "block",
+                cursor: "pointer"
+              }}
             />
           </Grid.Column>
         </Grid>
