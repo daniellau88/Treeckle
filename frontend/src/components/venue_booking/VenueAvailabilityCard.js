@@ -7,7 +7,7 @@ import { Context } from "../../contexts/UserProvider";
 import { getUpdatedAvailabilityOptions } from "../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../util/Constants";
 import { toTimeString, toDateString } from "../../util/DateUtil";
-import { isAfter, subDays, addDays } from "date-fns";
+import { isAfter, subDays, addDays, addMinutes } from "date-fns";
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
@@ -37,7 +37,7 @@ class VenueAvailabilityCard extends React.Component {
     if (!this.state.startDateTime) {
       this.setState({ startDateTime: time });
     } else if (!this.state.endDateTime) {
-      this.setState({ endDateTime: time });
+      this.setState({ endDateTime: addMinutes(time, 30) });
     }
   }
 

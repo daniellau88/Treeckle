@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../images/treeckle_logo.png";
-import avatar from "../images/avatar.png";
 import { Context } from "../contexts/UserProvider";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 
@@ -81,6 +80,16 @@ class NavigationBar extends React.Component {
             content="Bookings"
             onClick={this.handleItemClick}
           />
+          {this.context.role === "Admin" && (
+            <Menu.Item
+              as={Link}
+              to="/admin"
+              name="admin"
+              active={activeItem === "admin"}
+              content="Admin"
+              onClick={this.handleItemClick}
+            />
+          )}
           <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
             <Dropdown
               icon={

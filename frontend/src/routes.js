@@ -3,6 +3,7 @@ import { Route, Switch } from "react-router-dom";
 import { Context } from "./contexts/UserProvider";
 import NavigationBar from "./components/NavigationBar";
 import Dashboard from "./pages/Dashboard";
+import AdminPage from "./pages/AdminPage";
 import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -41,6 +42,9 @@ export const Routes = () => {
       )}
       {token !== "" && token !== -1 && token !== -2 && (
         <Route path="/profile" component={ProfilePage}></Route>
+      )}
+      {token !== "" && token !== -1 && token !== -2 && role === "Admin" && (
+        <Route path="/admin" component={AdminPage}></Route>
       )}
       {token === "" && <Route exact path="/" component={LoginForm} />}
       {/* {token === -1 && (
