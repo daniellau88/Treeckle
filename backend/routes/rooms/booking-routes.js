@@ -2,6 +2,7 @@ const router = require('express').Router({ mergeParams: true});
 const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/room-booking/roomBooking-model');
 const User = require('../../models/authentication/user-model');
+const Room = require('../../models/room-booking/rooms-model');
 const {isPermitted} = require('../../services/auth-service');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
@@ -18,21 +19,42 @@ router.get('/', async (req, res) => {
         res.sendStatus(401);
     } else {
         RoomBooking.byTenant(req.user.residence).find({ createdBy: req.user.userId }).lean()
-        .then(resp => {
-            const sendToUser = [];
-            resp.forEach(request => {
-                sendToUser.push({
-                    bookingId: request._id,
-                    roomId: request.roomId,
-                    description: request.description,
-                    start: request.start.getTime(),
-                    end: request.end.getTime(),
-                    createdDate: request.createdDate.getTime(),
-                    comments: request.comments,
-                    approved: request.approved
+        .then(async resp => {
+            const idToRoom = new Map();
+            const roomPromises = [];
+
+            for (const response of resp) {
+                if (!idToRoom.has(response.roomId.toString())) {
+                    roomPromises.push(Room.findById(response.roomId).lean());
+                    idToRoom.set(response.roomId.toString(), { roomName: null });
+                }
+            }
+
+            try {
+                const roomData = await Promise.all(roomPromises);
+                
+                roomData.forEach(roomDatum => {
+                    idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
                 });
-            });
-            res.send(sendToUser);
+            
+
+                const sendToUser = [];
+                resp.forEach(request => {
+                    sendToUser.push({
+                        bookingId: request._id,
+                        roomName: idToRoom.get(request.roomId.toString()).roomName,
+                        description: request.description,
+                        start: request.start.getTime(),
+                        end: request.end.getTime(),
+                        createdDate: request.createdDate.getTime(),
+                        comments: request.comments,
+                        approved: request.approved
+                    });
+                });
+                res.send(sendToUser);
+            } catch (err) {
+                res.status(500).send("Database Error"); 
+            }
         }).catch(err => {
             res.status(500).send("Database Error");
         });
@@ -62,26 +84,38 @@ router.get('/all/:status', [
         RoomBooking.byTenant(req.user.residence).find({ approved: req.params.status }).lean()
         .then(async resp => {
             const idToUser = new Map();
-            const promises = [];
+            const idToRoom = new Map();
+            const roomPromises = [];
+            const userPromises = [];
 
             for (const response of resp) {
                 if (!idToUser.has(response.createdBy.toString())) {
-                    promises.push(User.findById(response.createdBy, { profilePic: 0 }).lean());
+                    userPromises.push(User.findById(response.createdBy, { profilePic: 0 }).lean());
                     idToUser.set(response.createdBy.toString(), { name: null, email: null});
+                }
+
+                if (!idToRoom.has(response.roomId.toString())) {
+                    roomPromises.push(Room.findById(response.roomId).lean());
+                    idToRoom.set(response.roomId.toString(), { roomName: null });
                 }
             }
 
             try {
-                const userData = await Promise.all(promises);
-                userData.forEach(userDatum => {
-                    idToUser.set(userDatum._id.toString(), { name: userDatum.name, email: userDatum.email })
+                const mixedData = await Promise.all([userPromises, roomPromises].map(Promise.all, Promise));
+
+                mixedData[0].forEach(userDatum => {
+                    idToUser.set(userDatum._id.toString(), { name: userDatum.name, email: userDatum.email });
+                });
+
+                mixedData[1].forEach(roomDatum => {
+                    idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
                 });
                 
                 const sendToAdmin = [];
                 resp.forEach(request => {
                     sendToAdmin.push({
                         bookingId: request._id,
-                        roomId: request.roomId,
+                        roomName: idToRoom.get(request.roomId.toString()).roomName,
                         description: request.description,
                         start: request.start.getTime(),
                         end: request.end.getTime(),
