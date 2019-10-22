@@ -8,7 +8,9 @@ class StatusButton extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { isOpen: false };
+
+    this.togglePopup = this.togglePopup.bind(this);
   }
 
   // 0 => pending, 1 => approved, 2 => rejected, 3 => cancelled
@@ -38,46 +40,79 @@ class StatusButton extends React.Component {
         statusLabel = "Unknown";
     }
 
-    return <Button basic color={color} content={statusLabel} />;
+    return <Button color={color} content={statusLabel} />;
+  }
+
+  updateBookingRequest(newStatus) {
+    const data = {
+      id: this.props.bookingId,
+      approved: newStatus
+    };
+    Axios.patch("api/rooms/bookings/manage", data, {
+      headers: { Authorization: `Bearer ${this.context.token}` }
+    }).then(response => {
+      console.log(response);
+      if (response.status === 200) {
+        console.log("test");
+        this.props.updateTable();
+      }
+    });
   }
 
   renderOptions() {
+    const status = this.props.status;
     return (
       <div style={{ flexDirection: "column", display: "flex" }}>
-        {!this.props.cancellable && this.props.status === 0 && (
+        {!this.props.cancellable && (status === 0 || status === 2) && (
           <Button
             color="green"
             content="Approve"
-            onClick={() => console.log("Approve")}
-            style={{ marginBlockEnd: "0.25em" }}
+            onClick={() => {
+              this.updateBookingRequest(1);
+              this.togglePopup();
+            }}
+            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
           />
         )}
-        {!this.props.cancellable && this.props.status === 1 && (
+        {!this.props.cancellable && (status === 1 || status === 2) && (
           <Button
             color="orange"
             content="Revoke"
-            onClick={() => console.log("Revoke")}
-            style={{ marginBlockEnd: "0.25em" }}
+            onClick={() => {
+              this.updateBookingRequest(0);
+              this.togglePopup();
+            }}
+            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
           />
         )}
-        {!this.props.cancellable && this.props.status !== 2 && (
+        {!this.props.cancellable && status !== 2 && (
           <Button
             color="red"
             content="Reject"
-            onClick={() => console.log("Reject")}
-            style={{ marginBlockStart: "0.25em" }}
+            onClick={() => {
+              this.updateBookingRequest(2);
+              this.togglePopup();
+            }}
+            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
           />
         )}
         {this.props.cancellable && (
           <Button
             color="red"
             content="Cancel"
-            onClick={() => console.log("Cancel")}
-            style={{ marginBlockStart: "0.25em" }}
+            onClick={() => {
+              this.updateBookingRequest(3);
+              this.togglePopup();
+            }}
+            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
           />
         )}
       </div>
     );
+  }
+
+  togglePopup() {
+    this.setState({ isOpen: !this.state.isOpen });
   }
 
   render() {
@@ -86,7 +121,10 @@ class StatusButton extends React.Component {
         trigger={this.renderStatusButton()}
         on="click"
         content={this.renderOptions()}
-        position="right center"
+        position="bottom center"
+        open={this.state.isOpen}
+        onOpen={this.togglePopup}
+        onClose={this.togglePopup}
       />
     );
   }

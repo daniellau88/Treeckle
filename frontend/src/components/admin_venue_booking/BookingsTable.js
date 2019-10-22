@@ -19,6 +19,7 @@ class BookingsTable extends React.Component {
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
+    this.retrieveAllRequests = this.retrieveAllRequests.bind(this);
   }
 
   componentDidMount() {
@@ -84,7 +85,8 @@ class BookingsTable extends React.Component {
       end,
       description,
       createdDate,
-      approved
+      approved,
+      bookingId
     } = data;
     const status = approved;
     const row = (
@@ -97,7 +99,12 @@ class BookingsTable extends React.Component {
         <Table.Cell>{description}</Table.Cell>
         <Table.Cell>{toDateTimeString(createdDate)}</Table.Cell>
         <Table.Cell>
-          <StatusButton status={status} />
+          <StatusButton
+            status={status}
+            cancellable={false}
+            bookingId={bookingId}
+            updateTable={this.retrieveAllRequests}
+          />
         </Table.Cell>
       </Table.Row>
     );
@@ -107,6 +114,7 @@ class BookingsTable extends React.Component {
   render() {
     return (
       <Table
+        fixed
         headerRow={
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
