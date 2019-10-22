@@ -77,14 +77,23 @@ class AdminConfig extends React.Component {
       emailError: null
     });
     console.log(this.state.email);
+    const config = {
+      headers: {
+        Authorization: `Bearer ${this.context.token}`
+      }
+    };
     let inputData = { email: this.state.email };
     this.EmailSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!");
         axios
-          .put("/api/emails", {
-            email: this.state.email
-          })
+          .put(
+            "/api/emails",
+            {
+              email: this.state.email
+            },
+            config
+          )
           .then(res => {
             if (res.status === 200) {
               alert(
