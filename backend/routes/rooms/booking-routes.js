@@ -34,7 +34,9 @@ router.get('/', async (req, res) => {
                 const roomData = await Promise.all(roomPromises);
                 
                 roomData.forEach(roomDatum => {
-                    idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
+                    if (roomDatum) {
+                        idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
+                    }
                 });
             
 
@@ -104,11 +106,15 @@ router.get('/all/:status', [
                 const mixedData = await Promise.all([userPromises, roomPromises].map(Promise.all, Promise));
 
                 mixedData[0].forEach(userDatum => {
-                    idToUser.set(userDatum._id.toString(), { name: userDatum.name, email: userDatum.email });
+                    if (userDatum) {
+                        idToUser.set(userDatum._id.toString(), { name: userDatum.name, email: userDatum.email });
+                    }
                 });
 
                 mixedData[1].forEach(roomDatum => {
-                    idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
+                    if (roomDatum) {
+                        idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
+                    }
                 });
                 
                 const sendToAdmin = [];
