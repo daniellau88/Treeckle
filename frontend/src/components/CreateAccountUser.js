@@ -73,6 +73,8 @@ class CreateAccountUser extends React.Component {
   };
 
   handleSubmit = () => {
+    console.log();
+    
     if (this.state.password != this.state.passwordRepeated) {
       return;
     }
@@ -93,7 +95,23 @@ class CreateAccountUser extends React.Component {
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!" + this.context.token);
-        axios
+        if (this.props.match.params.uniqueId === undefined) { //Used for pilot test
+          axios
+          .post("/auth/newAccountsDirect", {
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password,
+          })
+          .then(res => {
+            if (res.status === 200) {
+              this.setState({ userCreated: true });
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+        } else {
+          axios
           .post("/auth/newAccounts", {
             name: this.state.name,
             email: this.state.email,
@@ -108,6 +126,8 @@ class CreateAccountUser extends React.Component {
           .catch(err => {
             console.log(err);
           });
+        }
+        
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
           if (!valid) {

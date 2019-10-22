@@ -40,7 +40,7 @@ export const Routes = () => {
   } else {
     profilePic =
       localStorage.getItem("profilePic") === null ||
-      localStorage.getItem("profilePic") === ""
+        localStorage.getItem("profilePic") === ""
         ? null
         : JSON.parse(localStorage.getItem("profilePic"));
   }
@@ -85,6 +85,10 @@ export const Routes = () => {
 
       <Route
         path="/user/create/:uniqueId"
+        component={CreateAccountUserPage}
+      ></Route>
+      <Route
+        path="/user/create/"
         component={CreateAccountUserPage}
       ></Route>
       <Route
