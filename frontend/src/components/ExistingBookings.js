@@ -27,7 +27,7 @@ const ExistingBookings = props => {
     return (
         <Table fixed >
             <Table.Header>
-                <Table.Row onHover={() => console.log("test")}>
+                <Table.Row>
                     <Table.HeaderCell>Venue</Table.HeaderCell>
                     <Table.HeaderCell>Start</Table.HeaderCell>
                     <Table.HeaderCell>End</Table.HeaderCell>

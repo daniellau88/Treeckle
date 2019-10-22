@@ -95,7 +95,7 @@ const EventCard = props => {
                 <Icon name='heart' />
                 Withdraw
                       </Button>
-              <Label as='a' basic color='blue' pointing='left' style={{
+              <Label  basic color='blue' pointing='left' style={{
                 "border-bottom-right-radius": "1.1rem",
                 "border-top-right-radius": "1.1rem"
               }}>
@@ -111,7 +111,7 @@ const EventCard = props => {
                   <Icon name="heart" />
                   Sign up
               </Button>
-                <Label as="a" basic color="red" pointing="left" style={{ "border-bottom-right-radius": "1.1rem" }}>
+                <Label  basic color="red" pointing="left" style={{ "border-bottom-right-radius": "1.1rem" }}>
                   {pax}
                 </Label>
               </Button>
