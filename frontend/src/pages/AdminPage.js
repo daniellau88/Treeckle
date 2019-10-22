@@ -26,7 +26,9 @@ class AdminPage extends React.Component {
 
   // 0 => pending, 1 => approved, 2 => rejected, 3 => cancelled
   retrieveRequest(status) {
-    return Axios.get(`api/rooms/bookings/all/${status}`);
+    return Axios.get(`api/rooms/bookings/all/${status}`, {
+      headers: { Authorization: `Bearer ${this.context.token}` }
+    });
   }
 
   retrieveAllRequests() {
@@ -38,11 +40,21 @@ class AdminPage extends React.Component {
     ]).then(
       Axios.spread(
         (
-          pendingRequests,
-          approvedRequests,
-          rejectedRequests,
-          cancelledRequests
+          pendingRequestsResponse,
+          approvedRequestsResponse,
+          rejectedRequestsResponse,
+          cancelledRequestsResponses
         ) => {
+          const pendingRequests = pendingRequestsResponse.data;
+          const approvedRequests = approvedRequestsResponse.data;
+          const rejectedRequests = rejectedRequestsResponse.data;
+          const cancelledRequests = cancelledRequestsResponses.data;
+          console.log(
+            pendingRequests,
+            approvedRequests,
+            rejectedRequests,
+            cancelledRequests
+          );
           const allRequests = [
             ...pendingRequests,
             ...approvedRequests,
@@ -99,8 +111,9 @@ class AdminPage extends React.Component {
       end,
       description,
       createdDate,
-      status
+      approved
     } = data;
+    const status = approved;
     const row = (
       <Table.Row>
         <Table.Cell>{createdByName}</Table.Cell>
@@ -114,7 +127,7 @@ class AdminPage extends React.Component {
           <Popup
             trigger={this.renderStatusButton(status)}
             on="click"
-            content={<Button color="red" icon="Cancel" />}
+            content={<Button color="red" icon="cancel" />}
             position="right center"
           />
         </Table.Cell>
