@@ -16,6 +16,15 @@ const CarousellCards = props => {
       "http://www.nusinvest.com/wp-content/uploads/2016/03/General-poster.jpg"
   };
 
+  const eventTwo = {
+    title: "Clubbing",
+    desc: "party",
+    date: "yesterday Night",
+    location: "zouk Hall",
+    image:
+      "https://weezevent.com/wp-content/uploads/2019/01/12145054/organiser-soiree.jpg"
+  };
+
 
   return (
     <div class="scrollmenu">
@@ -23,10 +32,16 @@ const CarousellCards = props => {
         <EventCard event={eventOne} />
       </a>
       <a>
+        <EventCard event={eventTwo} />
+      </a>
+      <a>
         <EventCard event={eventOne} />
       </a>
       <a>
         <EventCard event={eventOne} />
+      </a>
+      <a>
+        <EventCard event={eventTwo} />
       </a>
       <a>
         <EventCard event={eventOne} />
