@@ -71,7 +71,7 @@ class StatusButton extends React.Component {
               this.updateBookingRequest(1);
               this.togglePopup();
             }}
-            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
+            style={{ margin: "0.25rem 0" }}
           />
         )}
         {!this.props.cancellable && (status === 1 || status === 2) && (
@@ -82,7 +82,7 @@ class StatusButton extends React.Component {
               this.updateBookingRequest(0);
               this.togglePopup();
             }}
-            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
+            style={{ margin: "0.25rem 0" }}
           />
         )}
         {!this.props.cancellable && status !== 2 && (
@@ -93,7 +93,7 @@ class StatusButton extends React.Component {
               this.updateBookingRequest(2);
               this.togglePopup();
             }}
-            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
+            style={{ margin: "0.25rem 0" }}
           />
         )}
         {this.props.cancellable && (
@@ -104,7 +104,7 @@ class StatusButton extends React.Component {
               this.updateBookingRequest(3);
               this.togglePopup();
             }}
-            style={{ marginBlockStart: "0.1rem", marginBlockEnd: "0.1rem" }}
+            style={{ margin: "0.25rem 0" }}
           />
         )}
       </div>
