@@ -78,9 +78,7 @@ class LoginDivider extends React.Component {
               const name = res.data.name;
               const profilePic = res.data.profilePic.data;
               const role = res.data.role;
-              console.log(token, name, role);
               this.context.setUser(token, name, profilePic, role);
-              //console.log("Updated!", this.context.state);
             }
           })
           .catch(err => {

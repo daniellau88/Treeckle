@@ -19,6 +19,18 @@ const EventsPage = props => {
         <br /><br />
         <br /><br />
 
+        <br /><br />
+        <Header style={{ margin: "1em 1em" }}>Upcoming Events</Header>
+        <CarousellCards />
+        <br /><br />
+        <br /><br />
+
+        <br /><br />
+        <Header style={{ margin: "1em 1em" }}>Events you've signed up for</Header>
+        <CarousellCards />
+        <br /><br />
+        <br /><br />
+
         <div style={{ margin: "auto 10vw" }}>
           <Header style={{ margin: "1em 1em" }}>Your Created Events</Header>
           <EventList />
