@@ -22,6 +22,11 @@ export const toTimeString = date => {
   return lightFormat(date, TIME_FORMAT);
 };
 
+// gives the date and time string representation of js Date object (milliseconds).
+export const toDateTimeString = date => {
+  return toDateString(date) + " " + toTimeString(date);
+};
+
 // checks if the date is today or in the future.
 export const isTodayOrFuture = date => {
   return isToday(date) || isFuture(date);

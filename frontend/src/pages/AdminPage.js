@@ -1,15 +1,22 @@
 import React from "react";
 import { Context } from "../contexts/UserProvider";
-import { Container, Button, Icon, Menu } from "semantic-ui-react";
+import { Container, Menu } from "semantic-ui-react";
 import CreateAccountAdmin from "../components/CreateAccountAdmin";
 import ReviewUsers from "../components/ReviewUsers";
+import BookingsTable from "../components/admin_venue_booking/BookingsTable";
 
 class AdminPage extends React.Component {
   static contextType = Context;
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      allRequests: [],
+      pendingRequests: [],
+      approvedRequests: [],
+      rejectedRequests: [],
+      cancelledRequests: []
+    };
   }
 
   render() {
@@ -17,27 +24,28 @@ class AdminPage extends React.Component {
       <main className="admin-page">
         <Menu size="huge"></Menu>
         <br />
-        <br/>
+        <br />
         <Container>
           <h1>Booking requests</h1>
+          <BookingsTable />
         </Container>
-        <br/>
-        <br/>
-        <br/>
+        <br />
+        <br />
+        <br />
         <Container>
           <h1>Create accounts</h1>
           <CreateAccountAdmin />
         </Container>
-        <br/>
-        <br/>
-        <br/>
+        <br />
+        <br />
+        <br />
         <Container>
           <h1>Review accounts</h1>
-          <ReviewUsers/>
+          <ReviewUsers />
         </Container>
-        <br/>
-        <br/>
-        <br/>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }
