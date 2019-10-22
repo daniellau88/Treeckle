@@ -2,12 +2,12 @@
      User Global Variables
 *******************************/
 
-@pageBackground    : #ffd477;
+@pageBackground    : #EAC77C;
 @primaryColor      : #202922;
 @secondaryColor    : #2c4a66;
 @headerFont        : 'Montserrat', 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @pageFont          : 'Montserrat', 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @fontSmoothing     : antialiased;
 
-@defaultBorderRadius: 1.25rem;
+@defaultBorderRadius: 1.1rem;
 @placeholderBackground: #FFFFFF;

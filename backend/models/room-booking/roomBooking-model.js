@@ -28,6 +28,18 @@ const roomBookingSchema = new schema({
         required: true,
         unique: false
     },
+    createdDate: {
+        type: Date,
+        required: true,
+        unique: false,
+        default: Date.now
+    },
+    comments: {
+        type: [String],
+        required: false,
+        unique: false,
+        default: []
+    },
     approved: {
         type: Number,
         required: true,
