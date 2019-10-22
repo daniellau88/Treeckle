@@ -117,6 +117,7 @@ class BookVenueForm extends React.Component {
         </Card.Content>
         <Card.Content style={{ flexGrow: 0 }}>
           <Button
+            primary
             fluid
             disabled={!this.areValidFields() || this.state.success}
             onClick={this.toggleConfirmation}
