@@ -25,6 +25,15 @@ const CarousellCards = props => {
       "https://weezevent.com/wp-content/uploads/2019/01/12145054/organiser-soiree.jpg"
   };
 
+  const eventThree = {
+    title: "Reading",
+    desc: "lets read togher",
+    date: "tmr Night",
+    location: "library hall Hall",
+    image:
+      "http://www.orlandonorthsports.com/assets/images/placeholders/placeholder-event.png"
+  };
+
 
   return (
     <div class="scrollmenu">
@@ -38,10 +47,16 @@ const CarousellCards = props => {
         <EventCard event={eventOne} />
       </a>
       <a>
+        <EventCard event={eventThree} />
+      </a>
+      <a>
         <EventCard event={eventOne} />
       </a>
       <a>
         <EventCard event={eventTwo} />
+      </a>
+      <a>
+        <EventCard event={eventThree} />
       </a>
       <a>
         <EventCard event={eventOne} />
