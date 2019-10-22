@@ -19,7 +19,8 @@ module.exports = {
         accountsAll: "accountsAll",
         accountsSelf: "accountsSelf",
         RoomsManagement: "RoomsManagement",
-        BookingRequestsManagement: "BookingRequestsManagement"
+        BookingRequestsManagement: "BookingRequestsManagement",
+        emailReceiptsConfig: "emailReceiptsConfig"
     },
     actions: {
         create: "create",

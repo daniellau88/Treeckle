@@ -27,6 +27,10 @@ const permissionSchema = new schema({
        BookingRequestsManagement: {
            type: Map,
            of: Boolean
+       },
+       emailReceiptsConfig: {
+           type: Map,
+           of: Boolean
        }
 });
 
@@ -39,7 +43,8 @@ const configurePermissions = async () => {
         accountsAll: {},
         accountsSelf: {},
         RoomsManagement: {},
-        BookingRequestsManagement: {}
+        BookingRequestsManagement: {},
+        emailReceiptsConfig: {}
     });
 
     const organiser = new Permissions({
@@ -48,7 +53,8 @@ const configurePermissions = async () => {
         accountsAll: {},
         accountsSelf: {},
         RoomsManagement: {},
-        BookingRequestsManagement: {}
+        BookingRequestsManagement: {},
+        emailReceiptsConfig: {}
     });
 
     const resident = new Permissions({
@@ -57,7 +63,8 @@ const configurePermissions = async () => {
         accountsAll: {},
         accountsSelf: {},
         RoomsManagement: {},
-        BookingRequestsManagement: {}
+        BookingRequestsManagement: {},
+        emailReceiptsConfig: {}
     });
 
     try {
@@ -89,6 +96,11 @@ const configurePermissions = async () => {
         admin.BookingRequestsManagement.set("update", true);
         admin.BookingRequestsManagement.set("delete", false);
 
+        admin.emailReceiptsConfig.set("create", true);
+        admin.emailReceiptsConfig.set("read", true);
+        admin.emailReceiptsConfig.set("update", true);
+        admin.emailReceiptsConfig.set("delete", false);
+
         //Organiser configuration
         organiser.accountCreationRequest.set("create", false);
         organiser.accountCreationRequest.set("read", false);
@@ -117,6 +129,11 @@ const configurePermissions = async () => {
         organiser.BookingRequestsManagement.set("update", false);
         organiser.BookingRequestsManagement.set("delete", false);
 
+        organiser.emailReceiptsConfig.set("create", false);
+        organiser.emailReceiptsConfig.set("read", false);
+        organiser.emailReceiptsConfig.set("update", false);
+        organiser.emailReceiptsConfig.set("delete", false);
+
         //Resident configuration
         resident.accountCreationRequest.set("create", false);
         resident.accountCreationRequest.set("read", false);
@@ -144,6 +161,11 @@ const configurePermissions = async () => {
         resident.BookingRequestsManagement.set("cancelSelf", true);
         resident.BookingRequestsManagement.set("update", false);
         resident.BookingRequestsManagement.set("delete", false);
+
+        resident.emailReceiptsConfig.set("create", false);
+        resident.emailReceiptsConfig.set("read", false);
+        resident.emailReceiptsConfig.set("update", false);
+        resident.emailReceiptsConfig.set("delete", false);
 
         await admin.save();
         await organiser.save();
