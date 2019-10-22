@@ -15,7 +15,11 @@ function App() {
   if (contextValue.token !== -1 && contextValue.token !== -2) {
     token = localStorage.getItem("token");
     name = localStorage.getItem("name");
-    profilePic = localStorage.getItem("profilePic");
+    profilePic =
+      localStorage.getItem("profilePic") === null ||
+      localStorage.getItem("profilePic") === ""
+        ? null
+        : JSON.parse(localStorage.getItem("profilePic"));
     role = localStorage.getItem("role");
   }
 
@@ -27,24 +31,21 @@ function App() {
   React.useEffect(() => {
     localStorage.setItem("token", token);
     localStorage.setItem("name", name);
-    localStorage.setItem("profilePic", profilePic);
+    localStorage.setItem("profilePic", JSON.stringify(profilePic));
     localStorage.setItem("role", role);
     if (contextValue.token !== -1 && contextValue.token !== -2) {
       contextValue.setUser(token, name, profilePic, role);
-      //console.log("Updated!", contextValue);
     }
   }, []);
 
   return (
-    <UserProvider>
-      <Context.Consumer>
-        {(token, name, profilePic, role) => (
-          <Router>
-            <Routes />
-          </Router>
-        )}
-      </Context.Consumer>
-    </UserProvider>
+    <Context.Consumer>
+      {(token, name, profilePic, role) => (
+        <Router>
+          <Routes />
+        </Router>
+      )}
+    </Context.Consumer>
   );
 }
 
