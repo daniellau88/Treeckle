@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import placeholderDP from "../images/avatar.png";
 import { Context } from "../contexts/UserProvider";
 import axios from "axios";
@@ -76,80 +77,86 @@ class ProfileCard extends React.Component {
 
   render() {
     return (
-      <Grid stackable>
-        <Grid.Row>
-          <Grid.Column computer={4} tablet={8}>
-            <Responsive as={Segment} basic minWidth={750}>
-              <Popup
-                trigger={
-                  <Image
-                    src={`data:image/jpeg;base64,${getBase64IntArray(
-                      this.context.profilePic
-                    )}`}
-                    size="medium"
-                    circular
-                    bordered
-                    style={{ cursor: "pointer" }}
-                  />
-                }
-                content={
-                  <div>
-                    <Button
-                      animated="fade"
-                      onClick={() => this.fileInputRef.current.click()}
-                    >
-                      <Button.Content hidden>
-                        <Icon name="camera" />
-                      </Button.Content>
-                      <Button.Content visible>
-                        Upload Profile Picture
-                      </Button.Content>
-                    </Button>
-                    <input
-                      ref={this.fileInputRef}
-                      type="file"
-                      hidden
-                      onChange={this.fileChange}
+      <Segment placeholder background={"#fcfcfc"}>
+        <Grid stackable>
+          <Grid.Row>
+            <Grid.Column computer={4} tablet={8}>
+              <Responsive as={Segment} basic minWidth={750}>
+                <Popup
+                  trigger={
+                    <Image
+                      src={`data:image/jpeg;base64,${getBase64IntArray(
+                        this.context.profilePic
+                      )}`}
+                      size="medium"
+                      circular
+                      bordered
+                      style={{ cursor: "pointer", background: "#ffffff" }}
                     />
-                  </div>
-                }
-                on={"click"}
-                position="bottom center"
-              />
-            </Responsive>
-          </Grid.Column>
+                  }
+                  content={
+                    <div>
+                      <Button
+                        animated="fade"
+                        onClick={() => this.fileInputRef.current.click()}
+                      >
+                        <Button.Content hidden>
+                          <Icon name="camera" />
+                        </Button.Content>
+                        <Button.Content visible>
+                          Upload Profile Picture
+                        </Button.Content>
+                      </Button>
+                      <input
+                        ref={this.fileInputRef}
+                        type="file"
+                        hidden
+                        onChange={this.fileChange}
+                      />
+                    </div>
+                  }
+                  on={"click"}
+                  position="bottom center"
+                />
+              </Responsive>
+            </Grid.Column>
 
-          <Grid.Column computer={12} tablet={8} stretched>
-            <Grid columns={1}>
-              <Grid.Column stretched>
-                <Segment basic compact size="huge">
-                  <Header size={"huge"}>{this.context.name}</Header>
-                  <p style={{ fontSize: "0.75em", color: "#656565" }}>
-                    <br />
-                    <strong>Role: </strong>
-                    {this.context.role}
-                  </p>
-                </Segment>
-                <Segment basic compact></Segment>
-                <Segment basic compact>
-                  <Button.Group vertical>
-                    <Button
-                      content="View My Bookings"
-                      icon="book"
-                      labelPosition="left"
-                    />
-                    <Button
-                      content="View My Events"
-                      icon="calendar"
-                      labelPosition="left"
-                    />
-                  </Button.Group>
-                </Segment>
-              </Grid.Column>
-            </Grid>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+            <Grid.Column computer={12} tablet={8} stretched>
+              <Grid columns={1}>
+                <Grid.Column stretched>
+                  <Segment basic compact size="huge">
+                    <Header size={"huge"}>{this.context.name}</Header>
+                    <p style={{ fontSize: "0.75em" }}>
+                      <br />
+                      <strong>Role: </strong>
+                      {this.context.role}
+                    </p>
+                  </Segment>
+                  <Segment basic compact></Segment>
+                  <Segment basic compact>
+                    <Button.Group vertical>
+                      <Button
+                        content="View My Bookings"
+                        icon="book"
+                        labelPosition="left"
+                        as={Link}
+                        to={"/bookings"}
+                      />
+                      <Button
+                        content="View My Events"
+                        icon="calendar"
+                        labelPosition="left"
+                        as={Link}
+                        to={"/events"}
+                      />
+                    </Button.Group>
+                  </Segment>
+                </Grid.Column>
+              </Grid>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Segment>
     );
   }
 }
