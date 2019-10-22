@@ -15,7 +15,10 @@ function App() {
   if (contextValue.token !== -1 && contextValue.token !== -2) {
     token = localStorage.getItem("token");
     name = localStorage.getItem("name");
-    profilePic = JSON.parse(localStorage.getItem("profilePic"));
+    profilePic =
+      localStorage.getItem("profilePic") === null
+        ? null
+        : JSON.parse(localStorage.getItem("profilePic"));
     role = localStorage.getItem("role");
   }
 
