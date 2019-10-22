@@ -39,7 +39,8 @@ export const Routes = () => {
     localStorage.setItem("profilePic", JSON.stringify(profilePic));
   } else {
     profilePic =
-      localStorage.getItem("profilePic") === null
+      localStorage.getItem("profilePic") === null ||
+      localStorage.getItem("profilePic") === ""
         ? null
         : JSON.parse(localStorage.getItem("profilePic"));
   }

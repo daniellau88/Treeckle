@@ -16,7 +16,8 @@ function App() {
     token = localStorage.getItem("token");
     name = localStorage.getItem("name");
     profilePic =
-      localStorage.getItem("profilePic") === null
+      localStorage.getItem("profilePic") === null ||
+      localStorage.getItem("profilePic") === ""
         ? null
         : JSON.parse(localStorage.getItem("profilePic"));
     role = localStorage.getItem("role");
