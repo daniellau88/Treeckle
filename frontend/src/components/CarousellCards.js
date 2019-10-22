@@ -3,8 +3,19 @@ import EventCard from "./EventCard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./CarousellCards.css";
+import { Button } from "semantic-ui-react";
 
-const CarousellCards = props => {
+const CarousellCards = () => {
+
+  let ref = React.createRef();
+
+  const handleClick = () => {
+    console.log(ref);
+    // ref.current.scrollIntoView({
+    //   behavior: 'smooth',
+    //   block: 'start',
+    };
+
 
   const eventOne = {
     title: "Investment",
@@ -36,31 +47,37 @@ const CarousellCards = props => {
 
 
   return (
-    <div class="scrollmenu">
-      <a>
-        <EventCard event={eventOne} />
-      </a>
-      <a>
-        <EventCard event={eventTwo} />
-      </a>
-      <a>
-        <EventCard event={eventOne} />
-      </a>
-      <a>
-        <EventCard event={eventThree} />
-      </a>
-      <a>
-        <EventCard event={eventOne} />
-      </a>
-      <a>
-        <EventCard event={eventTwo} />
-      </a>
-      <a>
-        <EventCard event={eventThree} />
-      </a>
-      <a>
-        <EventCard event={eventOne} />
-      </a>
+    <div>
+      <div class="scrollmenu" id="content">
+        <a>
+          <EventCard event={eventOne} />
+        </a>
+        <a>
+          <EventCard event={eventTwo} />
+        </a>
+        <a>
+          <EventCard event={eventOne} />
+        </a>
+        <a>
+          <EventCard event={eventThree} />
+        </a>
+        <a>
+          <EventCard event={eventOne} />
+        </a>
+        <a>
+          <EventCard event={eventTwo} ref={ref} />
+        </a>
+        <a>
+          <EventCard event={eventThree} />
+        </a>
+        <a>
+          <EventCard event={eventOne} />
+        </a>
+      </div>
+      <div>
+        <Button id="left-button" floated='left' onClick={null}>Left</Button>
+        <Button floated='right' onClick={handleClick}>Right</Button>
+      </div>
     </div>
   );
 };
