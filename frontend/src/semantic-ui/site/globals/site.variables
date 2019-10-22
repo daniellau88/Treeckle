@@ -11,3 +11,6 @@
 
 @defaultBorderRadius: 1.1rem;
 @placeholderBackground: #FFFFFF;
+@disabledTextColor: rgba(0, 0, 0, 0.7);
+@inputPlaceholderColor: lighten(@inputColor, 30);
+@inputPlaceholderFocusColor: lighten(@inputColor, 20);

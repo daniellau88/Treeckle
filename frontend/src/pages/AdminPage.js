@@ -3,7 +3,11 @@ import { Context } from "../contexts/UserProvider";
 import { Container, Menu } from "semantic-ui-react";
 import CreateAccountAdmin from "../components/CreateAccountAdmin";
 import ReviewUsers from "../components/ReviewUsers";
+<<<<<<< Updated upstream
 import BookingsTable from "../components/admin_venue_booking/BookingsTable";
+=======
+import AdminConfig from "../components/AdminConfig";
+>>>>>>> Stashed changes
 
 class AdminPage extends React.Component {
   static contextType = Context;
@@ -35,6 +39,13 @@ class AdminPage extends React.Component {
         <Container>
           <h1>Create accounts</h1>
           <CreateAccountAdmin />
+        </Container>
+        <br />
+        <br />
+        <br />
+        <Container>
+          <h1>Admin Configuration</h1>
+          <AdminConfig />
         </Container>
         <br />
         <br />
