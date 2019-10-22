@@ -13,6 +13,10 @@ import ResetPasswordForm from "./pages/authentication/ResetPassword";
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
 
+function notNull(param) {
+  return param !== null && param !== "";
+}
+
 export const Routes = () => {
   const contextValue = useContext(Context);
 
@@ -20,10 +24,27 @@ export const Routes = () => {
   let name = contextValue.name;
   let profilePic = contextValue.profilePic;
   let role = contextValue.role;
-  localStorage.setItem("token", token);
-  localStorage.setItem("name", name);
-  localStorage.setItem("profilePic", profilePic);
-  localStorage.setItem("role", role);
+
+  if (notNull(token)) {
+    localStorage.setItem("token", token);
+  } else {
+    token = localStorage.getItem("token");
+  }
+  if (notNull(name)) {
+    localStorage.setItem("name", name);
+  } else {
+    name = localStorage.getItem("name");
+  }
+  if (notNull(profilePic)) {
+    localStorage.setItem("profilePic", JSON.stringify(profilePic));
+  } else {
+    profilePic = JSON.parse(localStorage.getItem("profilePic"));
+  }
+  if (notNull(role)) {
+    localStorage.setItem("role", role);
+  } else {
+    role = localStorage.getItem("role");
+  }
 
   return (
     <div>
