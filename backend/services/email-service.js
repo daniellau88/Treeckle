@@ -17,22 +17,40 @@ class EmailService {
 constructor() {
     this.emailClient = nodemailer.createTransport(transport)
 }
-sendText(to, subject, html) {
-    return new Promise((resolve, reject) => {
-    this.emailClient.sendMail({
-        from: 'Admin admin@treeckle.com',
-        to,
-        subject,
-        html
-    }, (err, info) => {
-        if (err) {
-        reject(err)
-        } else {
-        resolve(info)
-        }
-    })
-    })
-}
+    sendText(to, subject, html) {
+        return new Promise((resolve, reject) => {
+        this.emailClient.sendMail({
+            from: 'Admin admin@treeckle.com',
+            to,
+            subject,
+            html
+        }, (err, info) => {
+            if (err) {
+            reject(err)
+            } else {
+            resolve(info)
+            }
+        })
+        })
+    }
+
+    sendTextWithCC(to, cc, subject, html) {
+        return new Promise((resolve, reject) => {
+            this.emailClient.sendMail({
+                from: 'Admin admin@treeckle.com',
+                to,
+                subject,
+                cc,
+                html
+            }, (err, info) => {
+                if (err) {
+                reject(err)
+                } else {
+                resolve(info)
+                }
+            })
+        })
+    }
 }
 
 module.exports = new EmailService()

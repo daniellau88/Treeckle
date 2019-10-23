@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/room-booking/roomBooking-model');
 const User = require('../../models/authentication/user-model');
 const Room = require('../../models/room-booking/rooms-model');
+const EmailReceiptsConfig = require('../../models/emailReceiptsConfig-model');
 const {isPermitted} = require('../../services/auth-service');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
@@ -208,19 +209,19 @@ router.patch('/manage', jsonParser, [
                 if (!result) {
                     res.sendStatus(403);
                 } else {
-                    const conflictDocs = await rejectOverlaps(req, relevantReq.roomId, relevantReq.start, relevantReq.end);
+                    const conflictDocs = await rejectOverlaps(req, result.roomId, result.start, result.end);
                     await RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.approved }).lean();
                     if (conflictDocs.error === 1) {
                         res.status(500).send("Database Error");
                     } else {
                         const responseObject = conflictDocs.overlaps.filter((elem) => {
-                            return elem.toString() !== relevantReq._id.toString();
+                            return elem.toString() !== result._id.toString();
                         });
                         res.send(responseObject);
                     }
                 }
             })
-            .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
+            .catch(error => (error.name === "CastError")? res.sendStatus(400) : res.status(500).send("Database Error"));
 
         } else if (req.body.approved === constants.approvalStates.rejected) {
             RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.rejected }).lean()
@@ -301,11 +302,32 @@ router.post('/', jsonParser, [
                 const roomBooking = RoomBooking.byTenant(req.user.residence);
                 const roomBookingInstance = new roomBooking(newBookingRequest);
                 roomBookingInstance.save()
-                .then((result, error) => {
+                .then(async (result, error) => {
                     if (error) {
                         res.status(500).send("Database Error");
                     } else {
                         res.sendStatus(200);
+                        const userDatum = await User.findById(req.user.userId).lean();
+                        const roomDatum = await Room.byTenant(req.user.residence).findById(req.body.roomId).lean();
+                        const carbonCopyDatum = await EmailReceiptsConfig.findOne({}).lean();
+
+                        let thisUserName = null;
+                        let roomName = null;
+                        let carbonCopy = null;
+
+                        if (userDatum) {
+                            userName = userDatum.name;
+                        }
+
+                        if (roomDatum) {
+                            roomName  = roomDatum.name;
+                        }
+
+                        if (carbonCopyDatum) {
+                            carbonCopy = carbonCopyDatum.email;
+                        }
+
+
                     };
                 });
             }
