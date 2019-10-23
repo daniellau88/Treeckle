@@ -26,7 +26,7 @@ class VenueAvailabilityCard extends React.Component {
     this.renderBodyRow = this.renderBodyRow.bind(this);
     this.onStartDateChange = this.onStartDateChange.bind(this);
     this.updateAvailabilityOptions = this.updateAvailabilityOptions.bind(this);
-    this.handleBookingButtonClick = this.handleBookingButtonClick.bind(this);
+    this.confirmBookingPeriod = this.confirmBookingPeriod.bind(this);
     this.handleEditButtonClick = this.handleEditButtonClick.bind(this);
     this.handleOnNextDay = this.handleOnNextDay.bind(this);
     this.handleOnPreviousDay = this.handleOnPreviousDay.bind(this);
@@ -36,12 +36,16 @@ class VenueAvailabilityCard extends React.Component {
     this.setState({ startDateTime });
   }
 
+  async onEndDateTimeChange(endDateTime) {
+    this.setState({ endDateTime });
+  }
+
   async handleRowClick(time) {
     console.log(time);
     if (!this.state.startDateTime) {
       this.onStartDateTimeChange(time).then(this.updateAvailabilityOptions);
     } else if (!this.state.endDateTime) {
-      this.setState({ endDateTime: time });
+      this.onEndDateTimeChange(time).then(this.confirmBookingPeriod);
     }
   }
 
@@ -123,7 +127,7 @@ class VenueAvailabilityCard extends React.Component {
     }
   }
 
-  handleBookingButtonClick(event, data) {
+  confirmBookingPeriod(event, data) {
     const bookingPeriod = {
       venue: this.props.venue,
       start: this.state.startDateTime.getTime(),
@@ -270,9 +274,6 @@ class VenueAvailabilityCard extends React.Component {
               style={{ marginBottom: "1em" }}
             >
               Edit booking period
-            </Button>
-            <Button primary fluid onClick={this.handleBookingButtonClick}>
-              Proceed to booking form
             </Button>
           </Card.Content>
         )}
