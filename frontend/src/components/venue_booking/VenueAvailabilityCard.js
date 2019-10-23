@@ -174,6 +174,7 @@ class VenueAvailabilityCard extends React.Component {
                 <DatePicker
                   placeholder="Select date"
                   onDateChange={this.onStartDateChange}
+                  disabled={this.state.endDateTime !== null}
                 />
               </Form.Field>
               {this.state.startDateTime && (
@@ -252,6 +253,7 @@ class VenueAvailabilityCard extends React.Component {
                   content="Previous day"
                   disabled={!isAfter(this.state.endDate, this.state.startDate)}
                   onClick={this.handleOnPreviousDay}
+                  secondary
                 />
                 <Button
                   style={{ width: "48%" }}
@@ -261,6 +263,7 @@ class VenueAvailabilityCard extends React.Component {
                   icon="right chevron"
                   content="Next day"
                   onClick={this.handleOnNextDay}
+                  secondary
                 />
               </div>
             )}
@@ -272,6 +275,7 @@ class VenueAvailabilityCard extends React.Component {
               fluid
               onClick={this.handleEditButtonClick}
               style={{ marginBottom: "1em" }}
+              secondary
             >
               Edit booking period
             </Button>
