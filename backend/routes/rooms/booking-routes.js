@@ -444,4 +444,29 @@ router.post('/', jsonParser, [
         }
     });
 
+//Admin: Test endpoint to delete booking requests by Id
+router.delete('/', jsonParser, [
+    body("bookingId").exists()
+    ], async (req, res) => {
+        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.delete);
+
+        //Check for input errors
+        const errors = validationResult(req);
+        if (!permitted) {
+            res.sendStatus(401);
+        } else if (!errors.isEmpty()) {
+            res.status(422).json({ errors: errors.array() });
+        } else {
+            RoomBooking.byTenant(req.user.residence).deleteOne({_id: req.body.bookingId})
+            .then(result => {
+                if (result.deletedCount > 0) {
+                    res.sendStatus(200);
+                } else {
+                    res.sendStatus(404);
+                }
+            })
+            .catch(err => res.sendStatus(500));
+        }
+})
+
 module.exports = router;
