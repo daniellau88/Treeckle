@@ -1,10 +1,13 @@
 import React, { useContext } from "react";
 import "./App.css";
 import { BrowserRouter as Router } from "react-router-dom";
-import UserProvider, { Context } from "./contexts/UserProvider";
+import ReactGA from "react-ga";
+import { Context } from "./contexts/UserProvider";
 import { Routes } from "./routes"; // where we are going to specify our routes
 
 function App() {
+  ReactGA.initialize("UA-150749063-1");
+  ReactGA.pageview("/homepage");
   const contextValue = useContext(Context);
 
   let token = contextValue.token;

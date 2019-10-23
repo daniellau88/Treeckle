@@ -1,4 +1,5 @@
 import React from "react";
+import ReactGA from "react-ga";
 import { Context } from "../contexts/UserProvider";
 import { Container, Menu } from "semantic-ui-react";
 import CreateAccountAdmin from "../components/CreateAccountAdmin";
@@ -8,9 +9,11 @@ import AdminConfig from "../components/AdminConfig";
 
 class AdminPage extends React.Component {
   static contextType = Context;
-
   constructor(props) {
     super(props);
+
+    ReactGA.pageview("/admin");
+
     this.state = {
       allRequests: [],
       pendingRequests: [],
