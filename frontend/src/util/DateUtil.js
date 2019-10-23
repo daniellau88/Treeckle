@@ -1,4 +1,11 @@
-import { set, lightFormat, isFuture, isToday } from "date-fns";
+import {
+  set,
+  lightFormat,
+  isFuture,
+  isToday,
+  isEqual,
+  isWithinInterval
+} from "date-fns";
 import { DATE_FORMAT_DELIMIT_HYPHEN, TIME_FORMAT } from "./Constants";
 
 // combines date from one js Date object with time from
@@ -30,4 +37,18 @@ export const toDateTimeString = date => {
 // checks if the date is today or in the future.
 export const isTodayOrFuture = date => {
   return isToday(date) || isFuture(date);
+};
+
+// checks if dateTime is within start and end
+export const isWithinIntervalBoundary = (
+  dateTime,
+  interval,
+  isStartInclusive,
+  isEndInclusive
+) => {
+  return (
+    isWithinInterval(dateTime, interval) &&
+    (isStartInclusive || !isEqual(dateTime, interval.start)) &&
+    (isEndInclusive || !isEqual(dateTime, interval.end))
+  );
 };

@@ -1,11 +1,6 @@
-import {
-  lightFormat,
-  addMinutes,
-  isWithinInterval,
-  isAfter,
-  isSameDay
-} from "date-fns";
+import { lightFormat, addMinutes, isAfter, isSameDay } from "date-fns";
 import { TIME_FORMAT, DAY_MINUTES, TIME_INTERVAL } from "./Constants";
+import { isWithinIntervalBoundary } from "./DateUtil";
 
 const createAvailabilityOptions = (time = new Date(0, 0), initial = null) => {
   const defaultAvailabilityOptions = [];
@@ -28,6 +23,8 @@ export const getUpdatedAvailabilityOptions = (
 ) => {
   var availabilityOptions = createAvailabilityOptions(date, true);
 
+  const isStart = startDateTime === null;
+
   for (let i = 0; i < bookedSlots.length; i++) {
     let interval = {
       start: bookedSlots[i].startDate,
@@ -37,16 +34,20 @@ export const getUpdatedAvailabilityOptions = (
       return {
         time: period.time,
         timeFormat: lightFormat(period.time, TIME_FORMAT),
-        available: isWithinInterval(period.time, interval)
+        available: isWithinIntervalBoundary(
+          period.time,
+          interval,
+          isStart,
+          !isStart
+        )
           ? false
           : period.available
       };
     });
   }
 
-  if (startDateTime && isSameDay(startDateTime, date)) {
+  if (isSameDay(startDateTime, date)) {
     availabilityOptions = availabilityOptions.filter(period => {
-      console.log(period.time, startDateTime);
       return isAfter(period.time, startDateTime);
     });
   }
