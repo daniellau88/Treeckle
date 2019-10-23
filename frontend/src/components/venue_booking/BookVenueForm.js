@@ -77,9 +77,12 @@ class BookVenueForm extends React.Component {
       .then(() => {
         const description = "Contact number: ".concat(
           this.state.contactNumber,
-          "<br/>",
+          "\nNumber of participants: ",
+          this.state.numParticipants,
+          "\nBooking purpose: ",
           this.state.purpose
         );
+        console.log(description);
         const data = {
           roomId: this.props.bookingPeriod.venue.roomId,
           description: description,
@@ -137,6 +140,7 @@ class BookVenueForm extends React.Component {
               type="number"
               iconPosition="left"
               onChange={this.onContactNumberChange}
+              required
             />
             <Form.Input
               label="Expected number of attendees/participants"
@@ -144,6 +148,7 @@ class BookVenueForm extends React.Component {
               type="number"
               iconPosition="left"
               onChange={this.onNumParticipantsChange}
+              required
             />
             <Form.TextArea
               rows={8}
@@ -151,6 +156,7 @@ class BookVenueForm extends React.Component {
               placeholder="Briefly describe the purpose for this booking..."
               onChange={this.onPurposeChange}
               disabled={this.state.success}
+              required
             />
           </Form>
         </Card.Content>
