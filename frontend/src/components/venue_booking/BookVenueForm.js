@@ -2,6 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Card, Form, Button, Confirm } from "semantic-ui-react";
 import { Context } from "../../contexts/UserProvider";
+import "../../styles/BookVenueForm.scss";
 
 const SUCCESS_MSG = "Booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG = "The requested booking period is unavailable.";
@@ -17,6 +18,8 @@ class BookVenueForm extends React.Component {
 
     this.state = this.getInitialState();
 
+    this.onContactNumberChange = this.onContactNumberChange.bind(this);
+    this.onNumParticipantsChange = this.onNumParticipantsChange.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
     this.onSubmitting = this.onSubmitting.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
@@ -26,6 +29,8 @@ class BookVenueForm extends React.Component {
   getInitialState() {
     const initialState = {
       confirming: false,
+      contactNumber: 0,
+      numParticipants: 0,
       purpose: "",
       success: false
     };
@@ -39,12 +44,27 @@ class BookVenueForm extends React.Component {
 
   // all fields cannot be empty
   areValidFields() {
-    return this.props.bookingPeriod && this.state.purpose;
+    return (
+      this.props.bookingPeriod &&
+      this.state.purpose &&
+      this.state.contactNumber > 0 &&
+      this.state.numParticipants > 0
+    );
   }
 
   onPurposeChange(event, { value }) {
     console.log("Booking purpose changed:", value);
     this.setState({ purpose: value });
+  }
+
+  onContactNumberChange(event, { value }) {
+    console.log("Contact number changed:", value);
+    this.setState({ contactNumber: value });
+  }
+
+  onNumParticipantsChange(event, { value }) {
+    console.log("Number of participants changed:", value);
+    this.setState({ numParticipants: value });
   }
 
   async onSubmitting() {
@@ -55,9 +75,14 @@ class BookVenueForm extends React.Component {
   handleOnSubmit() {
     this.onSubmitting()
       .then(() => {
+        const description = "Contact number: ".concat(
+          this.state.contactNumber,
+          "<br/>",
+          this.state.purpose
+        );
         const data = {
           roomId: this.props.bookingPeriod.venue.roomId,
-          description: this.state.purpose,
+          description: description,
           start: this.props.bookingPeriod.start,
           end: this.props.bookingPeriod.end
         };
@@ -106,6 +131,20 @@ class BookVenueForm extends React.Component {
         </Card.Content>
         <Card.Content style={{ flexGrow: 0 }}>
           <Form>
+            <Form.Input
+              label="Contact number"
+              icon="phone"
+              type="number"
+              iconPosition="left"
+              onChange={this.onContactNumberChange}
+            />
+            <Form.Input
+              label="Expected number of attendees/participants"
+              icon="users"
+              type="number"
+              iconPosition="left"
+              onChange={this.onNumParticipantsChange}
+            />
             <Form.TextArea
               rows={8}
               label="Booking purpose"
