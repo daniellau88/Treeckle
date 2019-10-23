@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const RoomBooking = require('../../models/room-booking/roomBooking-model');
 const User = require('../../models/authentication/user-model');
 const Room = require('../../models/room-booking/rooms-model');
-const EmailReceiptsConfig = require('../../models/emailReceiptsConfig-model');
+const EmailService = require('../../services/email-service');
 const {isPermitted} = require('../../services/auth-service');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
@@ -307,27 +307,25 @@ router.post('/', jsonParser, [
                         res.status(500).send("Database Error");
                     } else {
                         res.sendStatus(200);
-                        const userDatum = await User.findById(req.user.userId).lean();
-                        const roomDatum = await Room.byTenant(req.user.residence).findById(req.body.roomId).lean();
-                        const carbonCopyDatum = await EmailReceiptsConfig.findOne({}).lean();
+                        if (EmailService.isEmailRequired(req.body.end)) {
+                            const {userName, userEmail, roomName, carbonCopy} = await EmailService.getEmailDataForBR(req.user.userId, req.body.roomId, req.user.residence);
 
-                        let thisUserName = null;
-                        let roomName = null;
-                        let carbonCopy = null;
-
-                        if (userDatum) {
-                            userName = userDatum.name;
+                            EmailService.sendSwitcher(userName, userEmail, carbonCopy,
+                               "Your booking request has been created",
+                               `<p>Dear ${userName}, a new booking request has been created from your account.</p>
+                                <p>Please refer to the details below.</p>
+                                <br>
+                                <p>Your name: ${userName}</p>
+                                <p>Room name: ${roomName}</p>
+                                <p>Booked at: ${result.createdDate.toString()}</p>
+                                <p>Start date/time: ${new Date(req.body.start).toString()}</p>
+                                <p>End date/time: ${new Date(req.body.end).toString()}</p>
+                                <p>Reason for booking: ${req.body.description}</p>
+                                <br>
+                                <p>Yours Sincerely,</p> 
+                                <p>Treeckle Team</p>`
+                            );
                         }
-
-                        if (roomDatum) {
-                            roomName  = roomDatum.name;
-                        }
-
-                        if (carbonCopyDatum) {
-                            carbonCopy = carbonCopyDatum.email;
-                        }
-
-
                     };
                 });
             }

@@ -145,7 +145,8 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
                     `<p>Dear User, please proceed with account creation using the following link:</p>
                     <p>${constants.baseURI}/${constants.createURI}/${id}</p>
                     <p>We look forward to having you in our community!</p>
-                    <p>Yours Sincerely,\n Treeckle Team</p>`)
+                    <p>Yours Sincerely,</p>
+                    <p>Treeckle Team</p>`)
                 .then(() => {
                     res.sendStatus(200);
                 }).catch(() => {
