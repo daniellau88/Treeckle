@@ -5,6 +5,12 @@ module.exports = {
         rejected: 2,
         cancelled: 3
     },
+    approvalStatesStringMap: {
+        0: "Pending",
+        1: "Approved",
+        2: "Rejected",
+        3: "Cancelled"
+    },
     //baseURI: "https://www.treeckle.com",
     baseURI: "http://localhost:3000",
     resetURI: "auth/resetAttempt",

@@ -184,7 +184,33 @@ router.patch('/', jsonParser, [
         res.status(422).json({ errors: errors.array() });
     } else {
         RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.id, createdBy: req.user.userId }, { approved: constants.approvalStates.cancelled }).lean()
-        .then(result => (result)? res.sendStatus(200): res.sendStatus(403))
+        .then(async result => {
+            if (result) {
+                res.sendStatus(200);
+                if (EmailService.isEmailRequired(result.end)) {
+                    const {userName, userEmail, roomName, carbonCopy} = await EmailService.getEmailDataForBR(req.user.userId, result.roomId, req.user.residence);
+
+                    EmailService.sendSwitcher(userName, userEmail, carbonCopy,
+                        "Your booking request has been cancelled",
+                        `<p>Dear ${userName}, you have initiated a cancellation of your booking request. Please refer to the details below.</p>
+                         <br>
+                         <p>Your contact: ${userName} / ${userEmail}</p>
+                         <p>Room name: ${roomName}</p>
+                         <p>Booked at: ${result.createdDate.toString()}</p>
+                         <p>Start date/time: ${new Date(result.start).toString()}</p>
+                         <p>End date/time: ${new Date(result.end).toString()}</p>
+                         <p>Reason for booking: ${result.description}</p>
+                         <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]}</p>
+                         <p>Current Status: ${constants.approvalStatesStringMap[constants.approvalStates.cancelled]}</p>
+                         <br>
+                         <p>Yours Sincerely,</p> 
+                         <p>Treeckle Team</p>`
+                     );
+                } else {
+                    res.sendStatus(403);
+                }
+            }
+        })
         .catch(error => (error.name === 'CastError')? res.sendStatus(400) : res.status(500).send("Database Error"));
     }
 })
@@ -312,15 +338,15 @@ router.post('/', jsonParser, [
 
                             EmailService.sendSwitcher(userName, userEmail, carbonCopy,
                                "Your booking request has been created",
-                               `<p>Dear ${userName}, a new booking request has been created from your account.</p>
-                                <p>Please refer to the details below.</p>
+                               `<Please>Dear ${userName}, a new booking request has been created from your account. Please refer to the details below.</p>
                                 <br>
-                                <p>Your name: ${userName}</p>
+                                <p>Your contact: ${userName} / ${userEmail}</p>
                                 <p>Room name: ${roomName}</p>
                                 <p>Booked at: ${result.createdDate.toString()}</p>
                                 <p>Start date/time: ${new Date(req.body.start).toString()}</p>
                                 <p>End date/time: ${new Date(req.body.end).toString()}</p>
                                 <p>Reason for booking: ${req.body.description}</p>
+                                <p>Current Status: ${constants.approvalStatesStringMap[result.approved]}</p>
                                 <br>
                                 <p>Yours Sincerely,</p> 
                                 <p>Treeckle Team</p>`
