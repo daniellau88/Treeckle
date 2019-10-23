@@ -6,14 +6,14 @@ import "../../styles/DatePicker.scss";
 const DatePicker = props => {
   return (
     <SemanticDatepicker
-      clearable
+      clearable={!props.disabled}
       allowOnlyNumbers
       format="DD-MM-YYYY"
       placeholder={props.placeholder}
       onDateChange={props.onDateChange}
-      disabled={props.disabled}
       clearOnSameDateClick={false}
       filterDate={date => isTodayOrFuture(date)}
+      readOnly={props.disabled}
     />
   );
 };
