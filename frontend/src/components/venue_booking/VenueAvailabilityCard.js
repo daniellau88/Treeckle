@@ -7,7 +7,7 @@ import { Context } from "../../contexts/UserProvider";
 import { getUpdatedAvailabilityOptions } from "../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../util/Constants";
 import { toTimeString, toDateString } from "../../util/DateUtil";
-import { isAfter, subDays, addDays, addMinutes } from "date-fns";
+import { isAfter, subDays, addDays } from "date-fns";
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
@@ -32,12 +32,16 @@ class VenueAvailabilityCard extends React.Component {
     this.handleOnPreviousDay = this.handleOnPreviousDay.bind(this);
   }
 
-  handleRowClick(time) {
+  async onStartDateTimeChange(startDateTime) {
+    this.setState({ startDateTime });
+  }
+
+  async handleRowClick(time) {
     console.log(time);
     if (!this.state.startDateTime) {
-      this.setState({ startDateTime: time });
+      this.onStartDateTimeChange(time).then(this.updateAvailabilityOptions);
     } else if (!this.state.endDateTime) {
-      this.setState({ endDateTime: addMinutes(time, 30) });
+      this.setState({ endDateTime: time });
     }
   }
 
@@ -107,6 +111,7 @@ class VenueAvailabilityCard extends React.Component {
           const bookedSlots = response.data;
           const availabilityOptions = getUpdatedAvailabilityOptions(
             this.state.endDate,
+            this.state.startDateTime,
             bookedSlots
           );
           this.setState({ availabilityOptions });
@@ -127,8 +132,16 @@ class VenueAvailabilityCard extends React.Component {
     this.props.renderBookingForm(bookingPeriod);
   }
 
+  async onEdit() {
+    this.setState({
+      endDate: this.state.startDate,
+      startDateTime: null,
+      endDateTime: null
+    });
+  }
+
   handleEditButtonClick(event, data) {
-    this.setState({ endDateTime: null });
+    this.onEdit().then(this.updateAvailabilityOptions);
   }
 
   handleOnPreviousDay(event, data) {
@@ -256,7 +269,7 @@ class VenueAvailabilityCard extends React.Component {
               onClick={this.handleEditButtonClick}
               style={{ marginBottom: "1em" }}
             >
-              Edit end time
+              Edit booking period
             </Button>
             <Button primary fluid onClick={this.handleBookingButtonClick}>
               Proceed to booking form

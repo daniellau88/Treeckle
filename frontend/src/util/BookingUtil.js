@@ -1,4 +1,10 @@
-import { lightFormat, addMinutes, isWithinInterval } from "date-fns";
+import {
+  lightFormat,
+  addMinutes,
+  isWithinInterval,
+  isAfter,
+  isSameDay
+} from "date-fns";
 import { TIME_FORMAT, DAY_MINUTES, TIME_INTERVAL } from "./Constants";
 
 const createAvailabilityOptions = (time = new Date(0, 0), initial = null) => {
@@ -9,13 +15,17 @@ const createAvailabilityOptions = (time = new Date(0, 0), initial = null) => {
       timeFormat: lightFormat(time, TIME_FORMAT), // time in string
       available: initial
     };
-    defaultAvailabilityOptions.push(period);
     time = addMinutes(time, TIME_INTERVAL);
+    defaultAvailabilityOptions.push(period);
   }
   return defaultAvailabilityOptions;
 };
 
-export const getUpdatedAvailabilityOptions = (date, bookedSlots) => {
+export const getUpdatedAvailabilityOptions = (
+  date,
+  startDateTime,
+  bookedSlots
+) => {
   var availabilityOptions = createAvailabilityOptions(date, true);
 
   for (let i = 0; i < bookedSlots.length; i++) {
@@ -31,6 +41,13 @@ export const getUpdatedAvailabilityOptions = (date, bookedSlots) => {
           ? false
           : period.available
       };
+    });
+  }
+
+  if (startDateTime && isSameDay(startDateTime, date)) {
+    availabilityOptions = availabilityOptions.filter(period => {
+      console.log(period.time, startDateTime);
+      return isAfter(period.time, startDateTime);
     });
   }
   return availabilityOptions;
