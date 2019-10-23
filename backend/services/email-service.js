@@ -3,6 +3,8 @@ const mailgunTransport = require('nodemailer-mailgun-transport');
 const keys = require('../config/keys');
 const User = require('../models/authentication/user-model');
 const Room = require('../models/room-booking/rooms-model');
+const constants = require('../config/constants');
+const RoomBooking = require('../models/room-booking/roomBooking-model');
 const EmailReceiptsConfig = require('../models/emailReceiptsConfig-model');
 
 // Configure transport options
@@ -104,6 +106,31 @@ constructor() {
 
     isEmailRequired(end) {
         return Date.now() < end;
+    }
+
+    async sendRejectionByRequestId(bookingRequestId, residence) {
+        try {
+            const booking = await RoomBooking.byTenant(residence).findOne({ _id: bookingRequestId }).lean();
+            const { userName, userEmail, roomName, carbonCopy } = await this.getEmailDataForBR(booking.createdBy, booking.roomId, residence);
+            
+            this.sendSwitcher(userName, userEmail, carbonCopy,
+                "Your booking request has been updated",
+                `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
+                <p>Your contact: ${userName} / ${userEmail}</p>
+                <p>Room name: ${roomName}</p>
+                <p>Booked at: ${booking.createdDate.toString()}</p>
+                <p>Start date/time: ${new Date(booking.start).toString()}</p>
+                <p>End date/time: ${new Date(booking.end).toString()}</p>
+                <p>Reason for booking: ${booking.description}</p>
+                <p>Previous Status: ${constants.approvalStatesStringMap[booking.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.rejected]}</b></p>
+                <br>
+                <p>Yours Sincerely,</p> 
+                <p>Treeckle Team</p>`
+            );
+            
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
 

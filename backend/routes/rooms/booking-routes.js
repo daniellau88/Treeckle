@@ -244,6 +244,35 @@ router.patch('/manage', jsonParser, [
                             return elem.toString() !== result._id.toString();
                         });
                         res.send(responseObject);
+
+                        //Send user approved email
+                        if (EmailService.isEmailRequired(result.end)) {
+                            try {
+                                const affectedUser = await User.findOne({_id: result.createdBy}).lean();
+                                const {userName, userEmail, roomName, carbonCopy} = await EmailService.getEmailDataForBR(affectedUser._id, result.roomId, affectedUser.residence);
+            
+                                EmailService.sendSwitcher(userName, userEmail, carbonCopy,
+                                    "Your booking request has been updated",
+                                    `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
+                                    <p>Your contact: ${userName} / ${userEmail}</p>
+                                    <p>Room name: ${roomName}</p>
+                                    <p>Booked at: ${result.createdDate.toString()}</p>
+                                    <p>Start date/time: ${new Date(result.start).toString()}</p>
+                                    <p>End date/time: ${new Date(result.end).toString()}</p>
+                                    <p>Reason for booking: ${result.description}</p>
+                                    <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.approved]}</b></p>
+                                    <br>
+                                    <p>Yours Sincerely,</p> 
+                                    <p>Treeckle Team</p>`
+                                );
+
+                                for (const component of responseObject) {
+                                    await EmailService.sendRejectionByRequestId(component, req.user.residence);
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        }
                     }
                 }
             })
@@ -251,12 +280,70 @@ router.patch('/manage', jsonParser, [
 
         } else if (req.body.approved === constants.approvalStates.rejected) {
             RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.rejected }).lean()
-            .then(result => (result)? res.sendStatus(200) : res.sendStatus(403))
+            .then(async result => {
+                if (result) {
+                    res.sendStatus(200);
+                    if (EmailService.isEmailRequired(result.end)) {
+                        try {
+                            const affectedUser = await User.findOne({_id: result.createdBy}).lean();
+                            const {userName, userEmail, roomName, carbonCopy} = await EmailService.getEmailDataForBR(affectedUser._id, result.roomId, affectedUser.residence);
+        
+                            EmailService.sendSwitcher(userName, userEmail, carbonCopy,
+                                "Your booking request has been updated",
+                                `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
+                                <p>Your contact: ${userName} / ${userEmail}</p>
+                                <p>Room name: ${roomName}</p>
+                                <p>Booked at: ${result.createdDate.toString()}</p>
+                                <p>Start date/time: ${new Date(result.start).toString()}</p>
+                                <p>End date/time: ${new Date(result.end).toString()}</p>
+                                <p>Reason for booking: ${result.description}</p>
+                                <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.rejected]}</b></p>
+                                <br>
+                                <p>Yours Sincerely,</p> 
+                                <p>Treeckle Team</p>`
+                            );
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                } else {
+                    res.sendStatus(403);
+                }
+            })
             .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
             
         } else if (req.body.approved === constants.approvalStates.pending) {
             RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.pending }).lean()
-            .then(result => (result)? res.sendStatus(200) : res.sendStatus(403))
+            .then(async result => {
+                if (result) {
+                    res.sendStatus(200);
+                    if (EmailService.isEmailRequired(result.end)) {
+                        try {
+                            const affectedUser = await User.findOne({_id: result.createdBy}).lean();
+                            const {userName, userEmail, roomName, carbonCopy} = await EmailService.getEmailDataForBR(affectedUser._id, result.roomId, affectedUser.residence);
+        
+                            EmailService.sendSwitcher(userName, userEmail, carbonCopy,
+                                "Your booking request has been updated",
+                                `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
+                                <p>Your contact: ${userName} / ${userEmail}</p>
+                                <p>Room name: ${roomName}</p>
+                                <p>Booked at: ${result.createdDate.toString()}</p>
+                                <p>Start date/time: ${new Date(result.start).toString()}</p>
+                                <p>End date/time: ${new Date(result.end).toString()}</p>
+                                <p>Reason for booking: ${result.description}</p>
+                                <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.pending]}</b></p>
+                                <br>
+                                <p>Yours Sincerely,</p> 
+                                <p>Treeckle Team</p>`
+                            );
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                } else {
+                    res.sendStatus(403);
+                }
+            })
             .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
 
         } else {
@@ -338,8 +425,7 @@ router.post('/', jsonParser, [
 
                             EmailService.sendSwitcher(userName, userEmail, carbonCopy,
                                "Your booking request has been created",
-                               `<Please>Dear ${userName}, a new booking request has been created from your account. Please refer to the details below.</p>
-                                <br>
+                               `<p>Dear ${userName}, a new booking request has been created from your account. Please refer to the details below.</p>
                                 <p>Your contact: ${userName} / ${userEmail}</p>
                                 <p>Room name: ${roomName}</p>
                                 <p>Booked at: ${result.createdDate.toString()}</p>

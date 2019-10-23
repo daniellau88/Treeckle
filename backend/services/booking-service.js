@@ -34,13 +34,14 @@ const checkPotentialOverlaps = async (req, roomId, start, end) => {
     }
     
     try {
-        const resp = await RoomBooking.byTenant(req.user.residence).find({
-            roomId: roomId, 
-            approved: {"$ne": constants.approvalStates.rejected},
-            approved: {"$ne": constants.approvalStates.cancelled},  //approved != rejected and != cancelled 
-            start: {"$lt": end},
-            end: {"$gt": start},
-        }).lean();
+        const resp = await RoomBooking.byTenant(req.user.residence).find(
+            {$and: [
+                { roomId: { $eq : roomId }},
+                { approved: { $ne : constants.approvalStates.rejected  }},
+                { approved: { $ne : constants.approvalStates.cancelled }},
+                { start: { $lt : end }},
+                { end: { $gt: start }}
+            ]}).lean();
 
         resp.forEach((doc) => {
             returnObject.overlaps.push(doc._id);
@@ -58,21 +59,23 @@ const rejectOverlaps = async (req, roomId, start, end) => {
     }
     
     try {
-        const resp = await RoomBooking.byTenant(req.user.residence).find({
-            roomId: roomId, 
-            approved: {"$ne": constants.approvalStates.rejected},
-            approved: {"$ne": constants.approvalStates.cancelled}, 
-            start: {"$lt": end},
-            end: {"$gt": start},
-        }).lean();
+        const resp = await RoomBooking.byTenant(req.user.residence).find(
+            {$and: [
+                { roomId: { $eq : roomId }},
+                { approved: { $ne : constants.approvalStates.rejected  }},
+                { approved: { $ne : constants.approvalStates.cancelled }},
+                { start: { $lt : end }},
+                { end: { $gt: start }}
+            ]}).lean();
 
-        await RoomBooking.byTenant(req.user.residence).updateMany({
-            roomId: roomId,
-            approved: {"$ne": constants.approvalStates.rejected},
-            approved: {"$ne": constants.approvalStates.cancelled},  
-            start: {"$lt": end},
-            end: {"$gt": start},
-        }, {"$set" : {approved: constants.approvalStates.rejected}}).lean();
+        await RoomBooking.byTenant(req.user.residence).updateMany(
+            {$and: [
+                { roomId: { $eq : roomId }},
+                { approved: { $ne : constants.approvalStates.rejected  }},
+                { approved: { $ne : constants.approvalStates.cancelled }},
+                { start: { $lt : end }},
+                { end: { $gt: start }}
+            ]}, {"$set" : {approved: constants.approvalStates.rejected}}).lean();
 
         resp.forEach((doc) => {
             returnObject.overlaps.push(doc._id);
