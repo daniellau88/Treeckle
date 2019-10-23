@@ -94,7 +94,7 @@ const configurePermissions = async () => {
         admin.BookingRequestsManagement.set("read", true);
         admin.BookingRequestsManagement.set("cancelSelf", true);
         admin.BookingRequestsManagement.set("update", true);
-        admin.BookingRequestsManagement.set("delete", false);
+        admin.BookingRequestsManagement.set("delete", true);
 
         admin.emailReceiptsConfig.set("create", true);
         admin.emailReceiptsConfig.set("read", true);
