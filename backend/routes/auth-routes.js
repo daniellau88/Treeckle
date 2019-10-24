@@ -3,6 +3,7 @@ const User = require('../models/authentication/user-model');
 const CreateAccount = require('../models/authentication/createAccount-model');
 const PasswordReset = require('../models/authentication/passwordReset-model');
 const constants = require('../config/constants');
+const keys = require('../config/keys');
 const {isPermitted, signJWT} = require('../services/auth-service');
 const fastCsv = require('fast-csv');
 const path = require('path');
@@ -143,7 +144,7 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
             } else {
                 EmailService.sendText(req.body.email, 'Account Creation for Treeckle',
                     `<p>Dear User, please proceed with account creation using the following link:</p>
-                    <p>${constants.baseURI}/${constants.createURI}/${id}</p>
+                    <p>${keys.baseURI}/${constants.createURI}/${id}</p>
                     <p>We look forward to having you in our community!</p>
                     <p>Yours Sincerely,</p>
                     <p>Treeckle Team</p>`)
@@ -195,7 +196,7 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
 
                     promises.push(EmailService.sendText(acceptedRows[i][0], 'Account Creation for Treeckle',
                     `<p>Dear User, please proceed with account creation using the following link:</p>
-                    <p>${constants.baseURI}/${constants.createURI}/${id}</p>
+                    <p>${keys.baseURI}/${constants.createURI}/${id}</p>
                     <p>We look forward to having you in our community!</p>
                     <p>Yours Sincerely,\n Treeckle Team</p>`));
                 }
@@ -273,7 +274,7 @@ router.post('/resetAccount', jsonParser, [
         await EmailService.sendText(req.body.email, 'Password Reset for Treeckle', 
             `<p>Dear User,</p>
             <p>We have received a request to reset your password.</p>
-            <p>Click <a href="${constants.baseURI}/${constants.resetURI}/${uniqueURIcomponent}">here</a> to reset your password</p>
+            <p>Click <a href="${keys.baseURI}/${constants.resetURI}/${uniqueURIcomponent}">here</a> to reset your password</p>
             <br>
             <p>If this request was not initiated by you, kindly ignore this email.</p>
             <p>Yours Sincerely,</p>
