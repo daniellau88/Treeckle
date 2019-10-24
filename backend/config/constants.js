@@ -11,8 +11,6 @@ module.exports = {
         2: "Rejected",
         3: "Cancelled"
     },
-    //baseURI: "https://www.treeckle.com",
-    baseURI: "http://localhost:3000",
     resetURI: "auth/resetAttempt",
     createURI: "auth/newAccounts",
     roles: {
