@@ -140,7 +140,7 @@ class CreateAccountUser extends React.Component {
     return (
       this.state.name &&
       this.state.email &&
-      this.state.password &&
+      this.state.password.length >= 8 &&
       this.state.password === this.state.passwordRepeated
     );
   }
@@ -203,11 +203,20 @@ class CreateAccountUser extends React.Component {
                 onChange={this.handleChange}
                 disabled={userCreated}
               />
-              {!userCreated &&
-                password &&
-                (password === passwordRepeated
-                  ? "Passwords match"
-                  : "Passwords don't match")}
+
+              {!userCreated && password && password.length < 8 && (
+                <div style={{ color: "red" }}>
+                  Password is less than 8 characters
+                </div>
+              )}
+
+              {!userCreated && password && passwordRepeated && (
+                <div style={{ color: "red" }}>
+                  {password === passwordRepeated
+                    ? "Passwords match"
+                    : "Passwords don't match"}
+                </div>
+              )}
 
               <Button
                 content={userCreated ? "User Created" : "Create"}
