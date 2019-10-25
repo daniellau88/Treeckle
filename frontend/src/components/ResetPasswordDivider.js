@@ -109,7 +109,7 @@ class ResetPasswordDivider extends React.Component {
           )
           .then(res => {
             if (res.status === 200) {
-              this.props.history.push("/");
+              window.location.replace("/");
             }
           })
           .catch(err => {
