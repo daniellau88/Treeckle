@@ -63,6 +63,7 @@ class UserAccountsTable extends React.Component {
             name={name}
             email={email}
             updateTable={this.retrieveAccounts}
+            role={role}
           />
           <DeleteUserButton email={email} updateTable={this.retrieveAccounts} />
         </Table.Cell>
