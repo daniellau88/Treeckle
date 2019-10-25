@@ -73,7 +73,7 @@ class CreateBookingRequest extends React.Component {
               renderBookingForm={this.renderBookingForm}
             />
           ) : (
-            <Card style={{ boxShadow: "none", backgroundColor: "#EAC77C" }} />
+            <Card style={{ boxShadow: "none", backgroundColor: "#2c4a66" }} />
           )}
           {this.state.bookingPeriod ? (
             <BookVenueForm
@@ -82,7 +82,7 @@ class CreateBookingRequest extends React.Component {
               toggleStatusBar={this.toggleStatusBar}
             />
           ) : (
-            <Card style={{ boxShadow: "none", backgroundColor: "#EAC77C" }} />
+            <Card style={{ boxShadow: "none", backgroundColor: "#2c4a66" }} />
           )}
         </div>
       </div>

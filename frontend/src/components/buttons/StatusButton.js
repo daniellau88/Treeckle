@@ -40,7 +40,13 @@ class StatusButton extends React.Component {
         statusLabel = "Unknown";
     }
 
-    return <Button color={color} content={statusLabel} />;
+    return (
+      <Button
+        color={color}
+        content={statusLabel}
+        disabled={statusLabel === "Cancelled"}
+      />
+    );
   }
 
   updateBookingRequest(newStatus) {

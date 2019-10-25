@@ -3,8 +3,6 @@
 *******************************/
 
 @pageBackground    : #2c4a66;
-@primaryColor      : #202922;
-@secondaryColor    : #2c4a66;
 @headerFont        : 'Montserrat', 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @pageFont          : 'Montserrat', 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @fontSmoothing     : antialiased;

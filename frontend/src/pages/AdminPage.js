@@ -30,22 +30,14 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
-<<<<<<< Updated upstream
-          <h1>Booking Requests</h1>
-=======
-          <h1 style={{ color: "#FDFDFD" }}>Booking requests</h1>
->>>>>>> Stashed changes
+          <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
           <BookingsTable />
         </Container>
         <br />
         <br />
         <br />
         <Container>
-<<<<<<< Updated upstream
-          <h1>Create Accounts</h1>
-=======
-          <h1 style={{ color: "#FDFDFD" }}>Create accounts</h1>
->>>>>>> Stashed changes
+          <h1 style={{ color: "#FDFDFD" }}>Create Accounts</h1>
           <CreateAccountAdmin />
         </Container>
         <br />
@@ -59,13 +51,8 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
-<<<<<<< Updated upstream
-          <h1>User Accounts</h1>
+          <h1 style={{ color: "#FDFDFD" }}>User Accounts</h1>
           <UserAccountsTable />
-=======
-          <h1 style={{ color: "#FDFDFD" }}>Review accounts</h1>
-          <ReviewUsers />
->>>>>>> Stashed changes
         </Container>
         <br />
         <br />

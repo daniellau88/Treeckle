@@ -4,12 +4,10 @@ import { Card, Form, Button, Confirm } from "semantic-ui-react";
 import { Context } from "../../contexts/UserProvider";
 import "../../styles/BookVenueForm.scss";
 
-const SUCCESS_MSG = "Booking request has been successfully made.";
-const OVERLAP_CONFLICT_MSG = "The requested booking period is unavailable.";
-const UNAUTHORIZED_MSG =
-  "Unauthorized. Current session may have already expired.";
-const UNKNOWN_ERROR_MSG =
-  "An unknown error has occurred. Please visit subbash.com to resolve the issue.";
+const SUCCESS_MSG = "Your booking request has been successfully made.";
+const OVERLAP_CONFLICT_MSG =
+  "Your requested booking period is unavailable. Please amend your booking period.";
+const UNKNOWN_ERROR_MSG = "An unknown error has occurred.";
 
 class BookVenueForm extends React.Component {
   static contextType = Context;
@@ -101,7 +99,8 @@ class BookVenueForm extends React.Component {
                 msg = OVERLAP_CONFLICT_MSG;
                 break;
               case 401:
-                msg = UNAUTHORIZED_MSG;
+                alert("Your current session has expired. Please log in again.");
+                this.context.resetUser();
                 break;
               default:
                 msg = UNKNOWN_ERROR_MSG;
