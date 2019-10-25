@@ -2,7 +2,8 @@ import React from "react";
 import axios from "axios";
 import { Placeholder, Table } from "semantic-ui-react";
 import { Context } from "../contexts/UserProvider";
-import { DeleteUserButton, ChangeRoleButton } from "./buttons";
+import ChangeRoleButton from "./buttons/ChangeRoleButton";
+import DeleteUserButton from "./buttons/DeleteUserButton";
 
 class UserAccountsTable extends React.Component {
   static contextType = Context;
@@ -17,7 +18,7 @@ class UserAccountsTable extends React.Component {
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
-    this.retrieveAllRequests = this.retrieveAllRequests.bind(this);
+    this.retrieveAccounts = this.retrieveAccounts.bind(this);
   }
 
   componentDidMount() {
@@ -58,8 +59,12 @@ class UserAccountsTable extends React.Component {
         <Table.Cell>{email}</Table.Cell>
         <Table.Cell>{role}</Table.Cell>
         <Table.Cell textAlign="right">
-          <ChangeRoleButton />
-          <DeleteUserButton />
+          <ChangeRoleButton
+            name={name}
+            email={email}
+            updateTable={this.retrieveAccounts}
+          />
+          <DeleteUserButton email={email} updateTable={this.retrieveAccounts} />
         </Table.Cell>
       </Table.Row>
     );

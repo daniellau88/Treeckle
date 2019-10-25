@@ -3,7 +3,7 @@ import ReactGA from "react-ga";
 import { Context } from "../contexts/UserProvider";
 import { Container, Menu } from "semantic-ui-react";
 import CreateAccountAdmin from "../components/CreateAccountAdmin";
-import ReviewUsers from "../components/ReviewUsers";
+import UserAccountsTable from "../components/UserAccountsTable";
 import BookingsTable from "../components/admin_venue_booking/BookingsTable";
 import AdminConfig from "../components/AdminConfig";
 
@@ -30,14 +30,14 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
-          <h1>Booking requests</h1>
+          <h1>Booking Requests</h1>
           <BookingsTable />
         </Container>
         <br />
         <br />
         <br />
         <Container>
-          <h1>Create accounts</h1>
+          <h1>Create Accounts</h1>
           <CreateAccountAdmin />
         </Container>
         <br />
@@ -51,8 +51,8 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
-          <h1>Review accounts</h1>
-          <ReviewUsers />
+          <h1>User Accounts</h1>
+          <UserAccountsTable />
         </Container>
         <br />
         <br />

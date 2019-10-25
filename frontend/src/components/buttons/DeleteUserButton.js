@@ -18,7 +18,8 @@ class DeleteUserButton extends React.Component {
     const data = {
       email: this.props.email
     };
-    Axios.delete("api/accounts", data, {
+    Axios.delete("api/accounts", {
+      data: data,
       headers: { Authorization: `Bearer ${this.context.token}` }
     })
       .then(response => {
@@ -42,11 +43,11 @@ class DeleteUserButton extends React.Component {
   render() {
     return (
       <Popup
-        trigger={
-          <Button basic color="red" icon="close"/>
-        }
+        trigger={<Button basic color="red" icon="close" />}
         on="click"
-        content={<Button color="red" content="Delete user" onClick={this.deleteUser}}
+        content={
+          <Button color="red" content="Delete user" onClick={this.deleteUser} />
+        }
         position="bottom center"
         open={this.state.isOpen}
         onOpen={this.togglePopup}

@@ -62,18 +62,17 @@ class ChangeRoleButton extends React.Component {
             style={{ margin: "0.25rem 0" }}
           />
         )}
-        {role !==
-          "Resident"(
-            <Button
-              secondary
-              content="Make Resident"
-              onClick={() => {
-                this.updateRole("Resident");
-                this.togglePopup();
-              }}
-              style={{ margin: "0.25rem 0" }}
-            />
-          )}
+        {role !== "Resident" && (
+          <Button
+            secondary
+            content="Make Resident"
+            onClick={() => {
+              this.updateRole("Resident");
+              this.togglePopup();
+            }}
+            style={{ margin: "0.25rem 0" }}
+          />
+        )}
       </div>
     );
   }
