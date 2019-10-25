@@ -105,7 +105,7 @@ class CreateAccountAdmin extends React.Component {
             <Form onSubmit={this.handleSubmit}>
               <Form.Input
                 error={emailError}
-                icon="user"
+                icon="mail"
                 iconPosition="left"
                 placeholder="Email"
                 name="email"
