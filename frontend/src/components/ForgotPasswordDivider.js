@@ -87,7 +87,7 @@ class ForgotPasswordDivider extends React.Component {
             </p>
             <Form onSubmit={this.handleSubmit}>
               <Form.Input
-                icon="user"
+                icon="mail"
                 iconPosition="left"
                 placeholder="Email"
                 name="email"
