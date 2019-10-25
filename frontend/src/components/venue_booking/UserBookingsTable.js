@@ -5,17 +5,13 @@ import { Table } from "semantic-ui-react";
 import StatusButton from "../common/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
 
-class BookingsTable extends React.Component {
+class UserBookingsTable extends React.Component {
   static contextType = Context;
 
   constructor(props) {
     super(props);
     this.state = {
-      allRequests: [],
-      pendingRequests: [],
-      approvedRequests: [],
-      rejectedRequests: [],
-      cancelledRequests: []
+      bookings: []
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
@@ -23,63 +19,22 @@ class BookingsTable extends React.Component {
   }
 
   componentDidMount() {
-    this.retrieveAllRequests();
+    this.retrieveBookings();
   }
 
-  // 0 => pending, 1 => approved, 2 => rejected, 3 => cancelled
-  retrieveRequest(status) {
-    return Axios.get(`api/rooms/bookings/all/${status}`, {
+  retrieveBookings() {
+    Axios.get("api/rooms/bookings", {
       headers: { Authorization: `Bearer ${this.context.token}` }
+    }).then(response => {
+      if (response.status === 200) {
+        this.setState({ bookings: response.data });
+      }
     });
-  }
-
-  retrieveAllRequests() {
-    Axios.all([
-      this.retrieveRequest(0),
-      this.retrieveRequest(1),
-      this.retrieveRequest(2),
-      this.retrieveRequest(3)
-    ]).then(
-      Axios.spread(
-        (
-          pendingRequestsResponse,
-          approvedRequestsResponse,
-          rejectedRequestsResponse,
-          cancelledRequestsResponses
-        ) => {
-          const pendingRequests = pendingRequestsResponse.data;
-          const approvedRequests = approvedRequestsResponse.data;
-          const rejectedRequests = rejectedRequestsResponse.data;
-          const cancelledRequests = cancelledRequestsResponses.data;
-          console.log(
-            pendingRequests,
-            approvedRequests,
-            rejectedRequests,
-            cancelledRequests
-          );
-          const allRequests = [
-            ...pendingRequests,
-            ...approvedRequests,
-            ...rejectedRequests,
-            ...cancelledRequests
-          ];
-          this.setState({
-            allRequests,
-            pendingRequests,
-            approvedRequests,
-            rejectedRequests,
-            cancelledRequests
-          });
-        }
-      )
-    );
   }
 
   renderBodyRow(data, index) {
     console.log(data);
     const {
-      createdByName,
-      createdByEmail,
       roomName,
       start,
       end,
@@ -92,9 +47,6 @@ class BookingsTable extends React.Component {
     const [contactNum, numParticipants, purpose] = description.split("\n");
     const row = (
       <Table.Row>
-        <Table.Cell>{createdByName}</Table.Cell>
-        <Table.Cell>{createdByEmail}</Table.Cell>
-        <Table.Cell>{contactNum}</Table.Cell>
         <Table.Cell>{roomName}</Table.Cell>
         <Table.Cell>{toDateTimeString(start)}</Table.Cell>
         <Table.Cell>{toDateTimeString(end)}</Table.Cell>
@@ -104,9 +56,9 @@ class BookingsTable extends React.Component {
         <Table.Cell>
           <StatusButton
             status={status}
-            cancellable={false}
+            cancellable={true}
             bookingId={bookingId}
-            updateTable={this.retrieveAllRequests}
+            updateTable={this.retrieveBookings}
           />
         </Table.Cell>
       </Table.Row>
@@ -119,9 +71,6 @@ class BookingsTable extends React.Component {
       <Table
         headerRow={
           <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Contact number</Table.HeaderCell>
             <Table.HeaderCell>Venue</Table.HeaderCell>
             <Table.HeaderCell>Start</Table.HeaderCell>
             <Table.HeaderCell>End</Table.HeaderCell>
@@ -138,4 +87,4 @@ class BookingsTable extends React.Component {
   }
 }
 
-export default BookingsTable;
+export default UserBookingsTable;
