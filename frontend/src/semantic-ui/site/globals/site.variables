@@ -2,14 +2,14 @@
      User Global Variables
 *******************************/
 
-@pageBackground    : #EAC77C;
+@pageBackground    : #2c4a66;
 @primaryColor      : #202922;
 @secondaryColor    : #2c4a66;
 @headerFont        : 'Montserrat', 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @pageFont          : 'Montserrat', 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @fontSmoothing     : antialiased;
 
-@defaultBorderRadius: 1.1rem;
+@defaultBorderRadius: 0.5rem;
 @placeholderBackground: #FFFFFF;
 @disabledTextColor: rgba(0, 0, 0, 0.7);
 @inputPlaceholderColor: lighten(@inputColor, 30);

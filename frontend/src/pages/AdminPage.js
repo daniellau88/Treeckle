@@ -30,29 +30,42 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
+<<<<<<< Updated upstream
           <h1>Booking Requests</h1>
+=======
+          <h1 style={{ color: "#FDFDFD" }}>Booking requests</h1>
+>>>>>>> Stashed changes
           <BookingsTable />
         </Container>
         <br />
         <br />
         <br />
         <Container>
+<<<<<<< Updated upstream
           <h1>Create Accounts</h1>
+=======
+          <h1 style={{ color: "#FDFDFD" }}>Create accounts</h1>
+>>>>>>> Stashed changes
           <CreateAccountAdmin />
         </Container>
         <br />
         <br />
         <br />
         <Container>
-          <h1>Admin Configuration</h1>
+          <h1 style={{ color: "#FDFDFD" }}>Admin Configuration</h1>
           <AdminConfig />
         </Container>
         <br />
         <br />
         <br />
         <Container>
+<<<<<<< Updated upstream
           <h1>User Accounts</h1>
           <UserAccountsTable />
+=======
+          <h1 style={{ color: "#FDFDFD" }}>Review accounts</h1>
+          <ReviewUsers />
+>>>>>>> Stashed changes
         </Container>
         <br />
         <br />
