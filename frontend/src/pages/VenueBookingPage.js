@@ -21,6 +21,7 @@ const VenueBookingPage = props => {
             {creating ? "Cancel booking creation" : "Create new booking"}
           </Button.Content>
         </Button>
+        <h1 style={{ color: "#FDFDFD" }}>My Bookings</h1>
         {!creating ? <UserBookingsTable /> : <CreateBookingRequest />}
       </Container>
     </main>
