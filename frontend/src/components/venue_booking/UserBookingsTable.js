@@ -2,7 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
 import { Table } from "semantic-ui-react";
-import StatusButton from "../common/StatusButton";
+import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
 
 class UserBookingsTable extends React.Component {

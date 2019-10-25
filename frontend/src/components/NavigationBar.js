@@ -25,9 +25,7 @@ class NavigationBar extends React.Component {
   }
 
   handleSignOut() {
-    localStorage.clear();
-    this.context.setUser("", "", "", "");
-    window.location.replace("/");
+    this.context.resetUser();
   }
 
   render() {

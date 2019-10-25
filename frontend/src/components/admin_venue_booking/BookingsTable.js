@@ -2,7 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
 import { Table } from "semantic-ui-react";
-import StatusButton from "../common/StatusButton";
+import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
 
 class BookingsTable extends React.Component {
@@ -76,7 +76,6 @@ class BookingsTable extends React.Component {
   }
 
   renderBodyRow(data, index) {
-    console.log(data);
     const {
       createdByName,
       createdByEmail,

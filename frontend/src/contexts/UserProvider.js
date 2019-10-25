@@ -7,6 +7,7 @@ class UserProvider extends React.Component {
     super(props);
     this.state = { token: "", name: "", profilePic: "", role: "" };
     this.setUser = this.setUser.bind(this);
+    this.resetUser = this.resetUser.bind(this);
   }
 
   setUser(token, name, profilePic, role) {
@@ -18,6 +19,12 @@ class UserProvider extends React.Component {
     });
   }
 
+  resetUser() {
+    localStorage.clear();
+    this.setUser("", "", "", "");
+    window.location.replace("/");
+  }
+
   render() {
     return (
       <Context.Provider
@@ -26,7 +33,8 @@ class UserProvider extends React.Component {
           name: this.state.name,
           profilePic: this.state.profilePic,
           role: this.state.role,
-          setUser: this.setUser
+          setUser: this.setUser,
+          resetUser: this.resetUser
         }}
       >
         {this.props.children}
