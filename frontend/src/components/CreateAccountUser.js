@@ -1,36 +1,27 @@
 import React from "react";
 import { withRouter } from "react-router";
 import logo from "../images/treeckle_startup.png";
-import axios from "axios";
+import Axios from "axios";
 import * as yup from "yup";
 import { Context } from "../contexts/UserProvider";
-import {
-  Button,
-  Divider,
-  Form,
-  Grid,
-  Segment,
-  Image,
-  Header,
-  Message
-} from "semantic-ui-react";
+import { Button, Form, Grid, Segment, Image, Header } from "semantic-ui-react";
 
 class CreateAccountUser extends React.Component {
   static contextType = Context;
-  state = {
-    name: "",
-    email: "",
-    password: "",
-    passwordRepeated: "",
-    submittedEmail: "",
-    submittedPassword: "",
-    emailError: null,
-    passwordError: null,
-    userCreated: false
-  };
-
   constructor(props) {
     super(props);
+
+    this.state = {
+      name: "",
+      email: "",
+      password: "",
+      passwordRepeated: "",
+      submittedEmail: "",
+      submittedPassword: "",
+      emailError: null,
+      passwordError: null,
+      userCreated: false
+    };
   }
 
   InputSchema = yup.object().shape({
@@ -68,7 +59,7 @@ class CreateAccountUser extends React.Component {
       })
   });
 
-  handleChange = (e, { name, value }) => {
+  handleChange = (event, { name, value }) => {
     this.setState({ [name]: value });
   };
 
@@ -97,12 +88,11 @@ class CreateAccountUser extends React.Component {
         console.log("yell hea!" + this.context.token);
         if (this.props.match.params.uniqueId === undefined) {
           //Used for pilot test
-          axios
-            .post("/auth/newAccountsDirect", {
-              name: this.state.name,
-              email: this.state.email,
-              password: this.state.password
-            })
+          Axios.post("/auth/newAccountsDirect", {
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password
+          })
             .then(res => {
               if (res.status === 200) {
                 this.setState({ userCreated: true });
@@ -112,13 +102,12 @@ class CreateAccountUser extends React.Component {
               console.log(err);
             });
         } else {
-          axios
-            .post("/auth/newAccounts", {
-              name: this.state.name,
-              email: this.state.email,
-              password: this.state.password,
-              uniqueURIcomponent: this.props.match.params.uniqueId
-            })
+          Axios.post("/auth/newAccounts", {
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password,
+            uniqueURIcomponent: this.props.match.params.uniqueId
+          })
             .then(res => {
               if (res.status === 200) {
                 this.setState({ userCreated: true });
@@ -147,6 +136,15 @@ class CreateAccountUser extends React.Component {
     });
   };
 
+  areValidFields() {
+    return (
+      this.state.name &&
+      this.state.email &&
+      this.state.password &&
+      this.state.password === this.state.passwordRepeated
+    );
+  }
+
   render() {
     const {
       name,
@@ -156,7 +154,8 @@ class CreateAccountUser extends React.Component {
       submittedEmail,
       submittedPassword,
       emailError,
-      passwordError
+      passwordError,
+      userCreated
     } = this.state;
     return (
       <Segment placeholder>
@@ -171,6 +170,7 @@ class CreateAccountUser extends React.Component {
                 name="name"
                 value={name}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
               <Form.Input
                 error={emailError}
@@ -180,6 +180,7 @@ class CreateAccountUser extends React.Component {
                 name="email"
                 value={email}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
               <Form.Input
                 error={passwordError}
@@ -190,6 +191,7 @@ class CreateAccountUser extends React.Component {
                 name="password"
                 value={password}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
               <Form.Input
                 icon="lock"
@@ -199,28 +201,30 @@ class CreateAccountUser extends React.Component {
                 name="passwordRepeated"
                 value={passwordRepeated}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
-              {this.state.password == ""
-                ? null
-                : this.state.password == this.state.passwordRepeated
-                ? "passwords match"
-                : "passwords don't match"}
+              {!userCreated &&
+                password &&
+                (password === passwordRepeated
+                  ? "Passwords match"
+                  : "Passwords don't match")}
 
               <Button
-                content={this.state.userCreated ? "User Created" : "Create"}
-                primary
+                content={userCreated ? "User Created" : "Create"}
+                primary={!userCreated}
+                secondary={userCreated}
                 style={{ minWidth: "210px", margin: "1em auto" }}
-                disabled={this.state.password !== this.state.passwordRepeated}
+                disabled={!this.areValidFields() || userCreated}
               />
             </Form>
-            {this.state.userCreated ? (
-              <button
-                class="ui fluid button"
+            {this.state.userCreated && (
+              <Button
+                fluid
+                content="Login here"
                 onClick={() => this.props.history.push("/")}
-              >
-                Login here
-              </button>
-            ) : null}
+                primary
+              />
+            )}
           </Grid.Column>
           <Grid.Column
             verticalAlign="middle"
@@ -237,8 +241,6 @@ class CreateAccountUser extends React.Component {
             />
           </Grid.Column>
         </Grid>
-
-        {/* <Divider vertical></Divider> */}
       </Segment>
     );
   }

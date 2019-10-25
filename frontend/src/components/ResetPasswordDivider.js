@@ -4,32 +4,25 @@ import { Context } from "../contexts/UserProvider";
 import { withRouter } from "react-router";
 import axios from "axios";
 import * as yup from "yup";
-import {
-  Button,
-  Divider,
-  Form,
-  Grid,
-  Segment,
-  Image,
-  Header
-} from "semantic-ui-react";
+import { Button, Form, Grid, Segment, Image, Header } from "semantic-ui-react";
 
 class ResetPasswordDivider extends React.Component {
   static contextType = Context;
-  state = {
-    name: "",
-    email: "",
-    password: "",
-    passwordRepeated: "",
-    submittedEmail: "",
-    submittedPassword: "",
-    emailError: null,
-    passwordError: null,
-    userCreated: false
-  };
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      name: "",
+      email: "",
+      password: "",
+      passwordRepeated: "",
+      submittedEmail: "",
+      submittedPassword: "",
+      emailError: null,
+      passwordError: null,
+      userCreated: false
+    };
   }
 
   InputSchema = yup.object().shape({
