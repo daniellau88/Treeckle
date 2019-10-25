@@ -15,7 +15,7 @@ class UserBookingsTable extends React.Component {
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
-    this.retrieveAllRequests = this.retrieveAllRequests.bind(this);
+    this.retrieveBookings = this.retrieveBookings.bind(this);
   }
 
   componentDidMount() {
@@ -26,6 +26,7 @@ class UserBookingsTable extends React.Component {
     Axios.get("api/rooms/bookings", {
       headers: { Authorization: `Bearer ${this.context.token}` }
     }).then(response => {
+      console.log(response);
       if (response.status === 200) {
         this.setState({ bookings: response.data });
       }
@@ -80,7 +81,7 @@ class UserBookingsTable extends React.Component {
             <Table.HeaderCell>Status</Table.HeaderCell>
           </Table.Row>
         }
-        tableData={this.state.allRequests}
+        tableData={this.state.bookings}
         renderBodyRow={this.renderBodyRow}
       />
     );

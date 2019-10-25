@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactGA from "react-ga";
 import CreateBookingRequest from "../components/venue_booking/CreateBookingRequest";
 import { Container, Button, Icon, Menu } from "semantic-ui-react";
-import ExistingBookings from "../components/ExistingBookings";
+import UserBookingsTable from "../components/venue_booking/UserBookingsTable";
 
 const VenueBookingPage = props => {
   ReactGA.pageview("/bookings");
@@ -13,22 +13,15 @@ const VenueBookingPage = props => {
       <Menu size="huge"></Menu>
       <br />
       <Container>
-        {!creating ? (
-          <Button fluid animated="fade" onClick={() => setCreating(!creating)}>
-            <Button.Content visible>
-              <Icon name="add" />
-            </Button.Content>
-            <Button.Content hidden>Create new booking</Button.Content>
-          </Button>
-        ) : (
-          <Button fluid animated="fade" onClick={() => setCreating(!creating)}>
-            <Button.Content visible>
-              <Icon name="close" />
-            </Button.Content>
-            <Button.Content hidden>Cancel booking creation</Button.Content>
-          </Button>
-        )}
-        {!creating ? <ExistingBookings /> : <CreateBookingRequest />}
+        <Button fluid animated="fade" onClick={() => setCreating(!creating)}>
+          <Button.Content visible>
+            <Icon name={creating ? "close" : "add"} />
+          </Button.Content>
+          <Button.Content hidden>
+            {creating ? "Cancel booking creation" : "Create new booking"}
+          </Button.Content>
+        </Button>
+        {!creating ? <UserBookingsTable /> : <CreateBookingRequest />}
       </Container>
     </main>
   );
