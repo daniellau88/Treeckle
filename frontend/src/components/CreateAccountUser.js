@@ -210,6 +210,7 @@ class CreateAccountUser extends React.Component {
                 content={this.state.userCreated ? "User Created" : "Create"}
                 primary
                 style={{ minWidth: "210px", margin: "1em auto" }}
+                disabled={this.state.password !== this.state.passwordRepeated}
               />
             </Form>
             {this.state.userCreated ? (

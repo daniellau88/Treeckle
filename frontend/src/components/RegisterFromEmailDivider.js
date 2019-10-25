@@ -164,7 +164,7 @@ class RegisterFromEmailDivider extends React.Component {
               />
               <Form.Input
                 error={emailError}
-                icon="user"
+                icon="mail"
                 iconPosition="left"
                 placeholder="Email"
                 name="email"

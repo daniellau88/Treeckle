@@ -100,7 +100,7 @@ class StatusButton extends React.Component {
             style={{ margin: "0.25rem 0" }}
           />
         )}
-        {!this.props.cancellable && status !== 2 && (
+        {!this.props.cancellable && (status === 0 || status === 1) && (
           <Button
             color="red"
             content="Reject"
