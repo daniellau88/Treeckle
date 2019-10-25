@@ -13,6 +13,7 @@ import ResetPasswordForm from "./pages/authentication/ResetPassword";
 import RegisterFromEmailForm from "./pages/authentication/RegisterFromEmail";
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
+import { DEVELOPMENT_VIEW } from "./DevelopmentView";
 
 function notNull(param) {
   return param !== null && param !== "";
@@ -57,14 +58,11 @@ export const Routes = () => {
       {token !== "" && token !== -1 && token !== -2 && (
         <Route path="/dashboard" component={Dashboard}></Route>
       )}
-      {token !== "" && token !== -1 && token !== -2 && (
+      {token !== "" && token !== -1 && token !== -2 && DEVELOPMENT_VIEW && (
         <Route path="/events" component={EventsPage}></Route>
       )}
       {token !== "" && token !== -1 && token !== -2 && (
         <Route path="/bookings" component={VenueBookingPage}></Route>
-      )}
-      {token !== "" && token !== -1 && token !== -2 && (
-        <Route path="/admin/create" component={CreateAccountAdminPage}></Route>
       )}
       {token !== "" && token !== -1 && token !== -2 && (
         <Route path="/profile" component={ProfilePage}></Route>

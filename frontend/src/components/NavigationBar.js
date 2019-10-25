@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import logo from "../images/treeckle_logo.png";
 import { Context } from "../contexts/UserProvider";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
+import { DEVELOPMENT_VIEW } from "../DevelopmentView";
 
 function getBase64IntArray(arr) {
   let TYPED_ARRAY = new Uint8Array(arr);
@@ -68,14 +69,16 @@ class NavigationBar extends React.Component {
             content="Dashboard"
             onClick={this.handleItemClick}
           />
-          <Menu.Item
-            as={Link}
-            to="/events"
-            name="events"
-            active={activeItem === "events"}
-            content="Events"
-            onClick={this.handleItemClick}
-          />
+          {DEVELOPMENT_VIEW && (
+            <Menu.Item
+              as={Link}
+              to="/events"
+              name="events"
+              active={activeItem === "events"}
+              content="Events"
+              onClick={this.handleItemClick}
+            />
+          )}
           <Menu.Item
             as={Link}
             to="/bookings"
@@ -95,28 +98,30 @@ class NavigationBar extends React.Component {
             />
           )}
           <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
-            <Dropdown
-              icon={
-                <Icon
-                  name="bell outline"
-                  size="large"
-                  style={{ margin: "0" }}
-                />
-              }
-              direction="left"
-              floating
-              className="link item"
-            >
-              <Dropdown.Menu>
-                <Dropdown.Item>Notification 1</Dropdown.Item>
-                <Dropdown.Item>Notification 2</Dropdown.Item>
-                <Dropdown.Item>Notification 3</Dropdown.Item>
-                <Dropdown.Item>Notification 4</Dropdown.Item>
-                <Dropdown.Item>Notification 5</Dropdown.Item>
-                <Dropdown.Item>Notification 6</Dropdown.Item>
-                <Dropdown.Item>Notification 7</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+            {DEVELOPMENT_VIEW && (
+              <Dropdown
+                icon={
+                  <Icon
+                    name="bell outline"
+                    size="large"
+                    style={{ margin: "0" }}
+                  />
+                }
+                direction="left"
+                floating
+                className="link item"
+              >
+                <Dropdown.Menu>
+                  <Dropdown.Item>Notification 1</Dropdown.Item>
+                  <Dropdown.Item>Notification 2</Dropdown.Item>
+                  <Dropdown.Item>Notification 3</Dropdown.Item>
+                  <Dropdown.Item>Notification 4</Dropdown.Item>
+                  <Dropdown.Item>Notification 5</Dropdown.Item>
+                  <Dropdown.Item>Notification 6</Dropdown.Item>
+                  <Dropdown.Item>Notification 7</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            )}
             <Dropdown
               trigger={
                 <Image

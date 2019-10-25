@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import placeholderDP from "../images/avatar.png";
 import { Context } from "../contexts/UserProvider";
 import axios from "axios";
 import {
@@ -13,6 +12,7 @@ import {
   Icon,
   Popup
 } from "semantic-ui-react";
+import { DEVELOPMENT_VIEW } from "../DevelopmentView";
 
 function getBase64IntArray(arr) {
   let TYPED_ARRAY = new Uint8Array(arr);
@@ -142,13 +142,15 @@ class ProfileCard extends React.Component {
                         as={Link}
                         to={"/bookings"}
                       />
-                      <Button
-                        content="View My Events"
-                        icon="calendar"
-                        labelPosition="left"
-                        as={Link}
-                        to={"/events"}
-                      />
+                      {DEVELOPMENT_VIEW && (
+                        <Button
+                          content="View My Events"
+                          icon="calendar"
+                          labelPosition="left"
+                          as={Link}
+                          to={"/events"}
+                        />
+                      )}
                     </Button.Group>
                   </Segment>
                 </Grid.Column>
