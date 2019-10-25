@@ -59,6 +59,21 @@ class StatusButton extends React.Component {
     });
   }
 
+  cancelBookingRequest() {
+    const data = {
+      id: this.props.bookingId
+    };
+    Axios.patch("api/rooms/bookings", data, {
+      headers: { Authorization: `Bearer ${this.context.token}` }
+    }).then(response => {
+      console.log(response);
+      if (response.status === 200) {
+        console.log("test");
+        this.props.updateTable();
+      }
+    });
+  }
+
   renderOptions() {
     const status = this.props.status;
     return (
@@ -101,7 +116,7 @@ class StatusButton extends React.Component {
             color="red"
             content="Cancel"
             onClick={() => {
-              this.updateBookingRequest(3);
+              this.cancelBookingRequest();
               this.togglePopup();
             }}
             style={{ margin: "0.25rem 0" }}
