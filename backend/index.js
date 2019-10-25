@@ -11,14 +11,11 @@ const passportSetup = require("./config/passport-setup");
 const authRoutes = require("./routes/auth-routes");
 const apiRoutes = require("./routes/api-routes");
 
-const cors = require("cors"); //remove in production
-
 const app = express();
 const path = require("path");
 const port = 3000;
 
 //Initialize
-app.use(cors()); //remove in production
 app.use(passport.initialize());
 //configurePermissions();
 
