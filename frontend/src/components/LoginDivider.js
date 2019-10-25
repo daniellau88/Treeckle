@@ -129,7 +129,7 @@ class LoginDivider extends React.Component {
               <Form.Input
                 transparent
                 error={emailError}
-                icon="email"
+                icon="mail"
                 iconPosition="left"
                 placeholder="Email"
                 name="email"

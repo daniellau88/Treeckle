@@ -140,6 +140,7 @@ class StatusButton extends React.Component {
         open={this.state.isOpen}
         onOpen={this.togglePopup}
         onClose={this.togglePopup}
+        disabled={this.props.status === 3}
       />
     );
   }
