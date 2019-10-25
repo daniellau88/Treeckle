@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { Context } from "./contexts/UserProvider";
 import NavigationBar from "./components/NavigationBar";
 import Dashboard from "./pages/Dashboard";
@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginForm from "./pages/authentication/Login";
 import ForgotPasswordForm from "./pages/authentication/ForgotPassword";
 import ResetPasswordForm from "./pages/authentication/ResetPassword";
+import RegisterFromEmailForm from "./pages/authentication/RegisterFromEmail";
 import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
 
@@ -40,7 +41,7 @@ export const Routes = () => {
   } else {
     profilePic =
       localStorage.getItem("profilePic") === null ||
-        localStorage.getItem("profilePic") === ""
+      localStorage.getItem("profilePic") === ""
         ? null
         : JSON.parse(localStorage.getItem("profilePic"));
   }
@@ -87,12 +88,13 @@ export const Routes = () => {
         path="/user/create/:uniqueId"
         component={CreateAccountUserPage}
       ></Route>
-      <Route
-        path="/user/create/"
-        component={CreateAccountUserPage}
-      ></Route>
+      <Route path="/user/create/" component={CreateAccountUserPage}></Route>
       <Route
         path="/auth/newAccounts/:uniqueId"
+        component={RegisterFromEmailForm}
+      ></Route>
+      <Route
+        path="/auth/resetAttempt/:uniqueId"
         component={ResetPasswordForm}
       ></Route>
     </div>
