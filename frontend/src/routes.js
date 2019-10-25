@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import { Context } from "./contexts/UserProvider";
 import NavigationBar from "./components/NavigationBar";
 import Dashboard from "./pages/Dashboard";
@@ -97,6 +97,11 @@ export const Routes = () => {
         path="/auth/resetAttempt/:uniqueId"
         component={ResetPasswordForm}
       ></Route>
+      {token !== "" &&
+        token !== -1 &&
+        token !== -2 &&
+        token !== null &&
+        window.location.pathname === "/" && <Redirect to={"/dashboard"} />}
     </div>
   );
 };

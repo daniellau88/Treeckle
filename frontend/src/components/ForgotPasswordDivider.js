@@ -55,7 +55,7 @@ class ForgotPasswordDivider extends React.Component {
               alert(
                 "An email to reset your password has been sent to your account."
               );
-              this.props.history.push("/");
+              window.location.replace("/");
             }
           })
           .catch(err => {
