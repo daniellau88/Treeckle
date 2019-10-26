@@ -26,79 +26,54 @@ class BookingsTable extends React.Component {
     this.retrieveAllRequests();
   }
 
-  // 0 => pending, 1 => approved, 2 => rejected, 3 => cancelled
   retrieveRequest(status) {
-    return Axios.get(`api/rooms/bookings/all/${status}`, {
+    Axios.get(`api/rooms/bookings/all/${status}`, {
       headers: { Authorization: `Bearer ${this.context.token}` }
     });
   }
 
   retrieveAllRequests() {
-    Axios.all([
-      this.retrieveRequest(0),
-      this.retrieveRequest(1),
-      this.retrieveRequest(2),
-      this.retrieveRequest(3)
-    ]).then(
-      Axios.spread(
-        (
-          pendingRequestsResponse,
-          approvedRequestsResponse,
-          rejectedRequestsResponse,
-          cancelledRequestsResponses
-        ) => {
-          const pendingRequests = pendingRequestsResponse.data;
-          const approvedRequests = approvedRequestsResponse.data;
-          const rejectedRequests = rejectedRequestsResponse.data;
-          const cancelledRequests = cancelledRequestsResponses.data;
-          console.log(
-            pendingRequests,
-            approvedRequests,
-            rejectedRequests,
-            cancelledRequests
-          );
-          const allRequests = [
-            ...pendingRequests,
-            ...approvedRequests,
-            ...rejectedRequests,
-            ...cancelledRequests
-          ];
-          this.setState({
-            allRequests,
-            pendingRequests,
-            approvedRequests,
-            rejectedRequests,
-            cancelledRequests
-          });
+    Axios.get(`api/rooms/bookings/all?limit=100`, {
+      headers: { Authorization: `Bearer ${this.context.token}` }
+    })
+      .then(response => {
+        if (response.status === 200) {
+          this.setState({ allRequests: response.data.bookings });
         }
-      )
-    );
+      })
+      .catch(({ response }) => {
+        if (response.status === 401) {
+          alert("Your current session has expired. Please log in again.");
+          this.context.resetUser();
+        }
+      });
   }
 
   renderBodyRow(data, index) {
     const {
       createdByName,
       createdByEmail,
+      contactNumber,
       roomName,
       start,
       end,
+      expectedAttendees,
       description,
       createdDate,
       approved,
       bookingId
     } = data;
     const status = approved;
-    const [contactNum, numParticipants, purpose] = description.split("\n");
     const row = (
       <Table.Row>
         <Table.Cell>{createdByName}</Table.Cell>
         <Table.Cell>{createdByEmail}</Table.Cell>
-        <Table.Cell>{contactNum}</Table.Cell>
+        <Table.Cell>{contactNumber}</Table.Cell>
         <Table.Cell>{roomName}</Table.Cell>
         <Table.Cell>{toDateTimeString(start)}</Table.Cell>
         <Table.Cell>{toDateTimeString(end)}</Table.Cell>
-        <Table.Cell>{numParticipants}</Table.Cell>
-        <Table.Cell>{purpose}</Table.Cell>
+        <Table.Cell>{expectedAttendees}</Table.Cell>
+        <Table.Cell>{description}</Table.Cell>
         <Table.Cell>{toDateTimeString(createdDate)}</Table.Cell>
         <Table.Cell>
           <StatusButton
