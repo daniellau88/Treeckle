@@ -29,16 +29,28 @@ router.post('/', jsonParser, [
     const event = Event.byTenant(req.user.residence);
     const eventInstance = new event(newEvent);
 
-    eventInstance.save()
-        .then(async (result, error) => {
-            if (error) {
-                res.status(500).send("Database Error");
+    Event.byTenant(req.user.residence).findOne({ eventDate: req.body.date, createdBy: req.user.userId, title: req.body.title })
+        .then(async relevantReq => {
+            if (relevantReq) {
+                res.sendStatus(400); //already exists
             } else {
-                res.send({
-                    done: result
-                });
-            };
-        });
+                eventInstance.save()
+                    .then(async (result, error) => {
+                        if (error) {
+                            res.status(500).send("Database Error");
+                        } else {
+                            res.send({
+                                done: result
+                            });
+                        };
+                    });
+            }
+        })
+        .catch(err => {
+            res.sendStatus(400);
+        })
+
+
 
 
 });
@@ -66,20 +78,31 @@ router.post('/all', jsonParser, [
         });
 });
 
-//Admin: Test endpoint to delete booking requests by Id
+//delete event by title
 router.delete('/', jsonParser, [
     body("title").exists()
 ], async (req, res) => {
 
-    Event.byTenant(req.user.residence).deleteOne({ title: req.body.title })
-        .then(result => {
-            if (result.deletedCount > 0) {
-                res.sendStatus(200);
+    Event.byTenant(req.user.residence).findOne({ title: req.body.title, createdBy: req.user.userId })
+        .then(async relevantReq => {
+            if (!relevantReq) {
+                res.sendStatus(400);
             } else {
-                res.sendStatus(404);
+                Event.byTenant(req.user.residence).deleteOne({ title: req.body.title })
+                    .then(result => {
+                        if (result.deletedCount > 0) {
+                            res.sendStatus(200);
+                        } else {
+                            res.sendStatus(404);
+                        }
+                    })
+                    .catch(err => res.sendStatus(500));
             }
         })
-        .catch(err => res.sendStatus(500));
+        .catch(err => {
+            res.sendStatus(400);
+        })
+
 
 })
 
