@@ -3,11 +3,12 @@ import Axios from "axios";
 import { Card, Form, Button, Confirm } from "semantic-ui-react";
 import { Context } from "../../contexts/UserProvider";
 import "../../styles/BookVenueForm.scss";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 const SUCCESS_MSG = "Your booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG =
   "Your requested booking period is unavailable. Please amend your booking period.";
-const UNKNOWN_ERROR_MSG = "An unknown error has occurred.";
+const UNKNOWN_ERROR_MSG = "An unknown error has occurred. Please try again.";
 
 class BookVenueForm extends React.Component {
   static contextType = Context;
@@ -51,17 +52,17 @@ class BookVenueForm extends React.Component {
   }
 
   onPurposeChange(event, { value }) {
-    console.log("Booking purpose changed:", value);
+    CONSOLE_LOGGING && console.log("Booking purpose changed:", value);
     this.setState({ purpose: value });
   }
 
   onContactNumberChange(event, { value }) {
-    console.log("Contact number changed:", value);
+    CONSOLE_LOGGING && console.log("Contact number changed:", value);
     this.setState({ contactNumber: value });
   }
 
   onNumParticipantsChange(event, { value }) {
-    console.log("Number of participants changed:", value);
+    CONSOLE_LOGGING && console.log("Number of participants changed:", value);
     this.setState({ numParticipants: value });
   }
 
@@ -85,14 +86,15 @@ class BookVenueForm extends React.Component {
           headers: { Authorization: `Bearer ${this.context.token}` }
         })
           .then(response => {
-            console.log("POST response:", response);
+            CONSOLE_LOGGING && console.log("POST form submission:", response);
             if (response.status === 200) {
               this.setState({ success: true });
               this.props.renderStatusBar(true, SUCCESS_MSG);
             }
           })
           .catch(({ response }) => {
-            console.log("Error response:", response);
+            CONSOLE_LOGGING &&
+              console.log("POST form submission error:", response);
             var msg;
             switch (response.status) {
               case 400:

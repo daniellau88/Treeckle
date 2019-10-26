@@ -1,9 +1,10 @@
 import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
-import { Table } from "semantic-ui-react";
+import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class BookingsTable extends React.Component {
   static contextType = Context;
@@ -12,10 +13,7 @@ class BookingsTable extends React.Component {
     super(props);
     this.state = {
       allRequests: [],
-      pendingRequests: [],
-      approvedRequests: [],
-      rejectedRequests: [],
-      cancelledRequests: []
+      isLoading: true
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
@@ -26,22 +24,22 @@ class BookingsTable extends React.Component {
     this.retrieveAllRequests();
   }
 
-  retrieveRequest(status) {
-    Axios.get(`api/rooms/bookings/all/${status}`, {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    });
-  }
-
   retrieveAllRequests() {
     Axios.get(`api/rooms/bookings/all?limit=100`, {
       headers: { Authorization: `Bearer ${this.context.token}` }
     })
       .then(response => {
+        CONSOLE_LOGGING && console.log("GET all booking requests:", response);
         if (response.status === 200) {
-          this.setState({ allRequests: response.data.bookings });
+          this.setState({
+            allRequests: response.data.bookings,
+            isLoading: false
+          });
         }
       })
       .catch(({ response }) => {
+        CONSOLE_LOGGING &&
+          console.log("GET all booking requests error:", response);
         if (response.status === 401) {
           alert("Your current session has expired. Please log in again.");
           this.context.resetUser();
@@ -89,7 +87,7 @@ class BookingsTable extends React.Component {
   }
 
   render() {
-    return (
+    return this.state.allRequests.length > 0 ? (
       <Table
         headerRow={
           <Table.Row>
@@ -108,6 +106,10 @@ class BookingsTable extends React.Component {
         tableData={this.state.allRequests}
         renderBodyRow={this.renderBodyRow}
       />
+    ) : (
+      <Segment textAlign="center" size="huge" loading={this.state.isLoading}>
+        There are currently no booking requests
+      </Segment>
     );
   }
 }

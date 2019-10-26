@@ -8,6 +8,7 @@ import { getUpdatedAvailabilityOptions } from "../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../util/Constants";
 import { toTimeString, toDateString } from "../../util/DateUtil";
 import { isAfter, subDays, addDays } from "date-fns";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;
@@ -41,10 +42,11 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   async handleRowClick(time) {
-    console.log(time);
     if (!this.state.startDateTime) {
+      CONSOLE_LOGGING && console.log("Start date/time selected:", time);
       this.onStartDateTimeChange(time).then(this.updateAvailabilityOptions);
     } else if (!this.state.endDateTime) {
+      CONSOLE_LOGGING && console.log("End date/time selected:", time);
       this.onEndDateTimeChange(time).then(this.confirmBookingPeriod);
     }
   }
@@ -77,11 +79,11 @@ class VenueAvailabilityCard extends React.Component {
 
   async updateEndDateChange(endDate) {
     this.setState({ endDate });
-    console.log(this.state);
   }
 
   onStartDateChange(startDate) {
     if (startDate !== this.state.startDate) {
+      CONSOLE_LOGGING && console.log("Start date changed:", startDate);
       this.updateStartDateChange(startDate).then(
         this.updateAvailabilityOptions
       );
@@ -89,6 +91,7 @@ class VenueAvailabilityCard extends React.Component {
   }
 
   onEndDateChange(endDate) {
+    CONSOLE_LOGGING && console.log("End date changed:", endDate);
     this.updateEndDateChange(endDate).then(this.updateAvailabilityOptions);
   }
 
@@ -109,19 +112,28 @@ class VenueAvailabilityCard extends React.Component {
         {
           headers: { Authorization: `Bearer ${this.context.token}` }
         }
-      ).then(response => {
-        console.log("GET room bookings:", response);
-        if (response.status === 200) {
-          const bookedSlots = response.data;
-          const availabilityOptions = getUpdatedAvailabilityOptions(
-            this.state.endDate,
-            this.state.startDateTime,
-            bookedSlots
-          );
-          this.setState({ availabilityOptions });
-          console.log("Availability options updated:", availabilityOptions);
-        }
-      });
+      )
+        .then(response => {
+          CONSOLE_LOGGING && console.log("GET room bookings:", response);
+          if (response.status === 200) {
+            const bookedSlots = response.data;
+            const availabilityOptions = getUpdatedAvailabilityOptions(
+              this.state.endDate,
+              this.state.startDateTime,
+              bookedSlots
+            );
+            this.setState({ availabilityOptions });
+            CONSOLE_LOGGING &&
+              console.log("Availability options updated:", availabilityOptions);
+          }
+        })
+        .catch(({ response }) => {
+          CONSOLE_LOGGING && console.log("GET room bookings error:", response);
+          if (response.status === 401) {
+            alert("Your current session has expired. Please log in again.");
+            this.context.resetUser();
+          }
+        });
     } else {
       this.setState({ availabilityOptions: [] });
     }

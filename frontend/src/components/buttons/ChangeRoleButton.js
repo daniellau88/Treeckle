@@ -2,6 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class ChangeRoleButton extends React.Component {
   static contextType = Context;
@@ -23,12 +24,14 @@ class ChangeRoleButton extends React.Component {
       headers: { Authorization: `Bearer ${this.context.token}` }
     })
       .then(response => {
-        console.log("PATCH user role", response);
+        CONSOLE_LOGGING && console.log("PATCH update user role", response);
         if (response.status === 200) {
           this.props.updateTable();
         }
       })
       .catch(({ response }) => {
+        CONSOLE_LOGGING &&
+          console.log("PATCH update user role error", response);
         if (response.status === 401) {
           alert("Your current session has expired. Please log in again.");
           this.context.resetUser();

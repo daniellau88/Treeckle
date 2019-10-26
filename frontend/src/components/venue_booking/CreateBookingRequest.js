@@ -4,6 +4,7 @@ import VenueAvailabilityCard from "./VenueAvailabilityCard";
 import BookVenueForm from "./BookVenueForm";
 import StatusBar from "./StatusBar";
 import { Card } from "semantic-ui-react";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class CreateBookingRequest extends React.Component {
   constructor(props) {
@@ -26,12 +27,12 @@ class CreateBookingRequest extends React.Component {
 
   renderVenueAvailabilityCard(venue) {
     this.setState({ venue, bookingPeriod: null, status: null });
-    console.log("Selected venue:", venue);
+    CONSOLE_LOGGING && console.log("Selected venue:", venue);
   }
 
   renderBookingForm(bookingPeriod) {
     this.setState({ bookingPeriod });
-    console.log("Selected booking period:", bookingPeriod);
+    CONSOLE_LOGGING && console.log("Selected booking period:", bookingPeriod);
   }
 
   toggleStatusBar(submitting) {
@@ -44,7 +45,7 @@ class CreateBookingRequest extends React.Component {
       message: message
     };
     this.setState({ status });
-    console.log("Status:", status);
+    CONSOLE_LOGGING && console.log("Status:", status);
   }
 
   render() {
