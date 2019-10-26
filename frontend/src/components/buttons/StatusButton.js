@@ -2,6 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class StatusButton extends React.Component {
   static contextType = Context;
@@ -56,13 +57,20 @@ class StatusButton extends React.Component {
     };
     Axios.patch("api/rooms/bookings/manage", data, {
       headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      console.log(response);
-      if (response.status === 200) {
-        console.log("test");
-        this.props.updateTable();
-      }
-    });
+    })
+      .then(response => {
+        CONSOLE_LOGGING && console.log("PATCH update status:", response);
+        if (response.status === 200) {
+          this.props.updateTable();
+        }
+      })
+      .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("PATCH update status error:", response);
+        if (response.status === 401) {
+          alert("Your current session has expired. Please log in again.");
+          this.context.resetUser();
+        }
+      });
   }
 
   cancelBookingRequest() {
@@ -71,13 +79,20 @@ class StatusButton extends React.Component {
     };
     Axios.patch("api/rooms/bookings", data, {
       headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      console.log(response);
-      if (response.status === 200) {
-        console.log("test");
-        this.props.updateTable();
-      }
-    });
+    })
+      .then(response => {
+        CONSOLE_LOGGING && console.log("PATCH cancel booking:", response);
+        if (response.status === 200) {
+          this.props.updateTable();
+        }
+      })
+      .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("PATCH cancel booking error:", response);
+        if (response.status === 401) {
+          alert("Your current session has expired. Please log in again.");
+          this.context.resetUser();
+        }
+      });
   }
 
   renderOptions() {

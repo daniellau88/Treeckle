@@ -4,6 +4,7 @@ import { Placeholder, Table } from "semantic-ui-react";
 import { Context } from "../contexts/UserProvider";
 import ChangeRoleButton from "./buttons/ChangeRoleButton";
 import DeleteUserButton from "./buttons/DeleteUserButton";
+import { CONSOLE_LOGGING } from "../DevelopmentView";
 
 class UserAccountsTable extends React.Component {
   static contextType = Context;
@@ -31,7 +32,7 @@ class UserAccountsTable extends React.Component {
         headers: { Authorization: `Bearer ${this.context.token}` }
       })
       .then(response => {
-        console.log("GET all accounts", response);
+        CONSOLE_LOGGING && console.log("GET all accounts", response);
         if (response.status === 200) {
           const { createdAccounts, pendingAccounts } = response.data;
           const allAccounts = [...createdAccounts, ...pendingAccounts];

@@ -4,6 +4,7 @@ import { Context } from "../../contexts/UserProvider";
 import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class UserBookingsTable extends React.Component {
   static contextType = Context;
@@ -28,11 +29,13 @@ class UserBookingsTable extends React.Component {
       headers: { Authorization: `Bearer ${this.context.token}` }
     })
       .then(response => {
+        CONSOLE_LOGGING && console.log("GET own bookings:", response);
         if (response.status === 200) {
           this.setState({ bookings: response.data, isLoading: false });
         }
       })
       .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("GET own bookings error:", response);
         if (response.status === 401) {
           alert("Your current session has expired. Please log in again.");
           this.context.resetUser();
