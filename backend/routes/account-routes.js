@@ -6,7 +6,7 @@ const { isPermitted } = require('../services/auth-service');
 const User = require('../models/authentication/user-model');
 const CreateAccount = require('../models/authentication/createAccount-model');
 const upload = multer({ limits: {fileSize: constants.profilePicSizeLimit} });
-const { body, validationResult } = require('express-validator');
+const { body, query, validationResult } = require('express-validator');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -31,42 +31,65 @@ router.put('/profilePicture', upload.single('profilePicture'), async (req, res) 
 });
 
 //Admin: Get all pending and created users under their RC
-router.get('/', async (req, res) => {
-    const permittedOne = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.read);
-    const permittedTwo = await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.read);
+router.get('/', [
+    query('pending').optional().isBoolean().toBoolean(),
+    query('created').optional().isBoolean().toBoolean()
+] ,async (req, res) => {
+    const pending = (req.query.pending == undefined)? true : req.query.pending;
+    const created = (req.query.created == undefined)? true : req.query.created;
+
+    const permittedOne = (pending)? await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.read) : true;
+    const permittedTwo = (created)? await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.read) : true;
 
     if (!permittedOne || !permittedTwo) {
         res.sendStatus(401);
     } else {
         try {
-            let created = [];
-            let pending = [];
-            const createdDocuments = await User.find({residence: req.user.residence}).lean();
-            const pendingDocuments = await CreateAccount.find({residence: req.user.residence}).lean();
+            let results = [];
 
-            for (createdDocument of createdDocuments) {
-                if (req.user.userId != createdDocument._id) {
-                    created.push({
-                        name: createdDocument.name,
-                        email: createdDocument.email,
-                        role: createdDocument.role
+            if (pending) {
+                const pendingDocuments = await CreateAccount.find({residence: req.user.residence}, 'name email role').lean();
+       
+                for (pendingDocument of pendingDocuments) {
+                    results.push({
+                        name: "",
+                        email: pendingDocument.email,
+                        role: pendingDocument.role
                     });
                 }
             }
 
-            for (pendingDocument of pendingDocuments) {
-                pending.push({
-                    name: "",
-                    email: pendingDocument.email,
-                    role: pendingDocument.role
-                });
+            if (created) {
+                const createdDocuments = await User.find({residence: req.user.residence}, 'name email role').lean();
+            
+                for (createdDocument of createdDocuments) {
+                    if (req.user.userId != createdDocument._id) {
+                        results.push({
+                            name: createdDocument.name,
+                            email: createdDocument.email,
+                            role: createdDocument.role
+                        });
+                    }
+                }
             }
-            res.send({
-                createdAccounts: created,
-                pendingAccounts: pending
+
+            results.sort((a,b) => constants.roleSortPriority[b.role] - constants.roleSortPriority[a.role]);
+
+            results.sort((a,b) => {
+                const emailA = a.email.toUpperCase();
+                const emailB = b.email.toUpperCase();
+
+                if (emailA < emailB) {
+                    return -1;
+                } else if (emailA > emailB) {
+                    return 1;
+                } else {
+                    return 0;
+                }
             });
+            res.send(results);
         } catch(err) {
-            res.sendStatus(500);
+            res.status(500).send("Database Error");
         }
     }
 });
