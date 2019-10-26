@@ -5,7 +5,6 @@ import * as yup from "yup";
 import { Context } from "../contexts/UserProvider";
 import {
   Button,
-  Divider,
   Form,
   Grid,
   Segment,
@@ -108,7 +107,7 @@ class LoginDivider extends React.Component {
   };
 
   handleForgot() {
-    this.context.setUser(-2, "", "");
+    this.context.setUser(-2, null, null, null);
   }
 
   render() {

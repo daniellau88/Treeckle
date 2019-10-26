@@ -1,13 +1,11 @@
 import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
-import { Table } from "semantic-ui-react";
+import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
 
 class UserBookingsTable extends React.Component {
-  static contextType = Context;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -19,6 +17,7 @@ class UserBookingsTable extends React.Component {
   }
 
   componentDidMount() {
+    console.log(this.context);
     this.retrieveBookings();
   }
 
@@ -68,7 +67,7 @@ class UserBookingsTable extends React.Component {
   }
 
   render() {
-    return (
+    return this.state.bookings.length > 0 ? (
       <Table
         headerRow={
           <Table.Row>
@@ -84,8 +83,14 @@ class UserBookingsTable extends React.Component {
         tableData={this.state.bookings}
         renderBodyRow={this.renderBodyRow}
       />
+    ) : (
+      <Segment textAlign="center" size="huge">
+        You currently do not have any bookings
+      </Segment>
     );
   }
 }
+
+UserBookingsTable.contextType = Context;
 
 export default UserBookingsTable;

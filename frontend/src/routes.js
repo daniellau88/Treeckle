@@ -11,7 +11,6 @@ import LoginForm from "./pages/authentication/Login";
 import ForgotPasswordForm from "./pages/authentication/ForgotPassword";
 import ResetPasswordForm from "./pages/authentication/ResetPassword";
 import RegisterFromEmailForm from "./pages/authentication/RegisterFromEmail";
-import CreateAccountAdminPage from "./pages/authentication/CreateAccountAdminPage";
 import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
 import { DEVELOPMENT_VIEW } from "./DevelopmentView";
 

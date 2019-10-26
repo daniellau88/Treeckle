@@ -5,7 +5,13 @@ export const Context = React.createContext();
 class UserProvider extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { token: "", name: "", profilePic: "", role: "" };
+
+    this.state = {
+      token: localStorage.getItem("token"),
+      name: localStorage.getItem("name"),
+      profilePic: localStorage.getItem("profilePic"),
+      role: localStorage.getItem("role")
+    };
     this.setUser = this.setUser.bind(this);
     this.resetUser = this.resetUser.bind(this);
   }
@@ -21,7 +27,7 @@ class UserProvider extends React.Component {
 
   resetUser() {
     localStorage.clear();
-    this.setUser("", "", "", "");
+    this.setUser(null, null, null, null);
     window.location.replace("/");
   }
 
