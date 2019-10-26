@@ -1,9 +1,9 @@
 module.exports = {
     approvalStates: {
-        pending: 0,
-        approved: 1,
-        rejected: 2,
-        cancelled: 3
+        Pending: 0,
+        Approved: 1,
+        Rejected: 2,
+        Cancelled: 3
     },
     approvalStatesStringMap: {
         0: "Pending",

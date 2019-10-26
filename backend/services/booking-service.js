@@ -9,7 +9,7 @@ const checkApprovedOverlaps = async (req, roomId, start, end) => {
     
     try {
         const resp = await RoomBooking.byTenant(req.user.residence).find({
-            approved: constants.approvalStates.approved, 
+            approved: constants.approvalStates.Approved, 
             roomId: roomId, 
             start: {"$lt": end},
             end: {"$gt": start},
@@ -37,8 +37,8 @@ const checkPotentialOverlaps = async (req, roomId, start, end) => {
         const resp = await RoomBooking.byTenant(req.user.residence).find(
             {$and: [
                 { roomId: { $eq : roomId }},
-                { approved: { $ne : constants.approvalStates.rejected  }},
-                { approved: { $ne : constants.approvalStates.cancelled }},
+                { approved: { $ne : constants.approvalStates.Rejected  }},
+                { approved: { $ne : constants.approvalStates.Cancelled }},
                 { start: { $lt : end }},
                 { end: { $gt: start }}
             ]}).lean();
@@ -62,8 +62,8 @@ const rejectOverlaps = async (req, roomId, start, end) => {
         const resp = await RoomBooking.byTenant(req.user.residence).find(
             {$and: [
                 { roomId: { $eq : roomId }},
-                { approved: { $ne : constants.approvalStates.rejected  }},
-                { approved: { $ne : constants.approvalStates.cancelled }},
+                { approved: { $ne : constants.approvalStates.Rejected  }},
+                { approved: { $ne : constants.approvalStates.Cancelled }},
                 { start: { $lt : end }},
                 { end: { $gt: start }}
             ]}).lean();
@@ -71,11 +71,11 @@ const rejectOverlaps = async (req, roomId, start, end) => {
         await RoomBooking.byTenant(req.user.residence).updateMany(
             {$and: [
                 { roomId: { $eq : roomId }},
-                { approved: { $ne : constants.approvalStates.rejected  }},
-                { approved: { $ne : constants.approvalStates.cancelled }},
+                { approved: { $ne : constants.approvalStates.Rejected  }},
+                { approved: { $ne : constants.approvalStates.Cancelled }},
                 { start: { $lt : end }},
                 { end: { $gt: start }}
-            ]}, {"$set" : {approved: constants.approvalStates.rejected}}).lean();
+            ]}, {"$set" : {approved: constants.approvalStates.Rejected}}).lean();
 
         resp.forEach((doc) => {
             returnObject.overlaps.push(doc._id);
