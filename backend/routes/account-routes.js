@@ -16,7 +16,7 @@ router.put('/profilePicture', upload.single('profilePicture'), async (req, res) 
 
     if (!permitted) {
         res.sendStatus(401);
-    } else if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/png') {
+    } else if (!req.file || (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/png')) {
         res.sendStatus(400);
     } else {
         const profilePic = await imageThumbnail(req.file.buffer, { width: 300, height: 300, responseType:'buffer'});
