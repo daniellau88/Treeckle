@@ -2,6 +2,7 @@ import React from "react";
 import { Card, Button, Container, Accordion } from "semantic-ui-react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
+import { CONSOLE_LOGGING } from "../../DevelopmentView";
 
 class SelectVenueCard extends React.Component {
   static contextType = Context;
@@ -19,20 +20,28 @@ class SelectVenueCard extends React.Component {
   componentDidMount() {
     Axios.get("api/rooms/categories", {
       headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      console.log("GET categories response:", response);
-      if (response.status === 200) {
-        const categories = response.data.categories.map(category => {
-          return {
-            key: category,
-            title: category,
-            content: null
-          };
-        });
-        this.setState({ categories });
-        console.log("Categories updated", categories);
-      }
-    });
+    })
+      .then(response => {
+        CONSOLE_LOGGING && console.log("GET categories response:", response);
+        if (response.status === 200) {
+          const categories = response.data.categories.map(category => {
+            return {
+              key: category,
+              title: category,
+              content: null
+            };
+          });
+          this.setState({ categories });
+          CONSOLE_LOGGING && console.log("Categories updated", categories);
+        }
+      })
+      .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("GET categories error:", response);
+        if (response.status === 401) {
+          alert("Your current session has expired. Please log in again.");
+          this.context.resetUser();
+        }
+      });
   }
 
   handleOnCategoryClick(event, { active, content }) {
@@ -40,12 +49,20 @@ class SelectVenueCard extends React.Component {
       const selectedCategory = content;
       Axios.get(`api/rooms/categories/${selectedCategory}`, {
         headers: { Authorization: `Bearer ${this.context.token}` }
-      }).then(response => {
-        console.log("GET venues response:", response);
-        if (response.status === 200) {
-          this.updateCategory(selectedCategory, response.data);
-        }
-      });
+      })
+        .then(response => {
+          CONSOLE_LOGGING && console.log("GET venues response:", response);
+          if (response.status === 200) {
+            this.updateCategory(selectedCategory, response.data);
+          }
+        })
+        .catch(({ response }) => {
+          CONSOLE_LOGGING && console.log("GET venues error:", response);
+          if (response.status === 401) {
+            alert("Your current session has expired. Please log in again.");
+            this.context.resetUser();
+          }
+        });
     }
   }
 
@@ -61,7 +78,8 @@ class SelectVenueCard extends React.Component {
           };
     });
     this.setState({ categories, venues });
-    console.log("Categories and venues updated", categories, venues);
+    CONSOLE_LOGGING &&
+      console.log("Categories and venues updated", categories, venues);
   }
 
   renderVenues(category, venues) {

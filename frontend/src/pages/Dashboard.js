@@ -1,13 +1,37 @@
 import React from "react";
+import sampleSVG from "../images/SampleSVGImage.svg";
+import axios from "axios";
 import { Context } from "../contexts/UserProvider";
 import { Menu, Container } from "semantic-ui-react";
+import { srcToFile } from "../util/ValidationUtil";
 
 class Dashboard extends React.Component {
   static contextType = Context;
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.componentDidMount = this.componentDidMount.bind(this);
+  }
+
+  componentDidMount() {
+    srcToFile(sampleSVG, "test.svg", "image/svc").then(function(file) {
+      const data = new FormData();
+      data.append("profilePicture", file);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data"
+        }
+      };
+      axios.put("/api/accounts/profilePicture", data, config).catch(err => {
+        if (err.response.status === 401) {
+          console.log(err.response.status);
+          localStorage.clear();
+          window.location.reload();
+          window.location.replace("/");
+        }
+      });
+    });
   }
 
   render() {
