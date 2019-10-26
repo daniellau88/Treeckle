@@ -116,8 +116,9 @@ constructor() {
             this.sendSwitcher(userName, userEmail, carbonCopy,
                 "Your booking request has been updated",
                 `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
-                <p>Your contact: ${userName} / ${userEmail}</p>
+                <p>Your contact: ${userName} / ${userEmail} / ${booking.contactNumber}</p>
                 <p>Room name: ${roomName}</p>
+                <p>Expected number of attendees/participants: ${booking.expectedAttendees}</p>
                 <p>Booked at: ${booking.createdDate.toString()}</p>
                 <p>Start date/time: ${new Date(booking.start).toString()}</p>
                 <p>End date/time: ${new Date(booking.end).toString()}</p>
