@@ -1,18 +1,20 @@
 import React from "react";
-import sampleSVG from "../images/SampleSVGImage.svg";
-import axios from "axios";
+//import sampleSVG from "../images/SampleSVGImage.svg";
+//import axios from "axios";
 import { Context } from "../contexts/UserProvider";
 import { Menu, Container } from "semantic-ui-react";
-import { srcToFile } from "../util/ValidationUtil";
+//import { srcToFile } from "../util/ValidationUtil";
 
 class Dashboard extends React.Component {
   static contextType = Context;
 
   constructor(props) {
     super(props);
-    this.componentDidMount = this.componentDidMount.bind(this);
+
+    this.state = {};
   }
 
+  /*
   componentDidMount() {
     srcToFile(sampleSVG, "test.svg", "image/svc").then(function(file) {
       const data = new FormData();
@@ -33,6 +35,7 @@ class Dashboard extends React.Component {
       });
     });
   }
+  */
 
   render() {
     return (
@@ -41,7 +44,7 @@ class Dashboard extends React.Component {
         <br />
         <br />
         <Container style={{ color: "#FDFDFD" }}>
-          <h1>Welcome, {this.context.name}</h1>
+          <h1>Welcome, {this.context.name}!</h1>
           <h2>Head over to the "Bookings" tab to view/make bookings.</h2>
           <text>
             <strong>Note:</strong> Treeckle is currently in development as part

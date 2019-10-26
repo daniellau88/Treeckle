@@ -99,6 +99,10 @@ class AdminConfig extends React.Component {
           })
           .catch(err => {
             CONSOLE_LOGGING && console.log(err);
+            if (err.response.status === 401) {
+              alert("Your current session has expired. Please log in again.");
+              this.context.resetUser();
+            }
           });
       } else {
         this.setState({

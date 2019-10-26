@@ -3,15 +3,7 @@ import logo from "../images/treeckle_startup.png";
 import { Context } from "../contexts/UserProvider";
 import axios from "axios";
 import * as yup from "yup";
-import {
-  Button,
-  Divider,
-  Form,
-  Grid,
-  Segment,
-  Image,
-  Header
-} from "semantic-ui-react";
+import { Button, Form, Grid, Segment, Image, Header } from "semantic-ui-react";
 
 class ForgotPasswordDivider extends React.Component {
   static contextType = Context;
@@ -39,7 +31,6 @@ class ForgotPasswordDivider extends React.Component {
       submittedEmail: email,
       emailError: null
     });
-    console.log(this.state.email);
     let inputData = { email: this.state.email };
     const config = {
       headers: {
@@ -118,8 +109,6 @@ class ForgotPasswordDivider extends React.Component {
             />
           </Grid.Column>
         </Grid>
-
-        {/* <Divider vertical></Divider> */}
       </Segment>
     );
   }

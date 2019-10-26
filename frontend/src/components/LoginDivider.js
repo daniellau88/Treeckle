@@ -61,11 +61,9 @@ class LoginDivider extends React.Component {
       emailError: null,
       passwordError: null
     });
-    console.log(this.state.email, this.state.password);
     let inputData = { email: this.state.email, password: this.state.password };
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
-        console.log("yell hea!");
         axios
           .post("/auth/accounts", {
             email: this.state.email,
@@ -85,7 +83,6 @@ class LoginDivider extends React.Component {
             this.setState({
               invalidUserError: true
             });
-            console.log(err);
           });
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
@@ -181,8 +178,6 @@ class LoginDivider extends React.Component {
             />
           </Grid.Column>
         </Grid>
-
-        {/* <Divider vertical></Divider> */}
       </Segment>
     );
   }
