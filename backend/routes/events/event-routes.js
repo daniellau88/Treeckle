@@ -19,8 +19,12 @@ router.post('/', jsonParser, [
     //Check for input errors
 
     const newEvent = {
-        title: req.body.title
+        title: req.body.title,
+        createdBy: req.user.userId,
+        eventDate: req.body.date,
     };
+
+    console.log(req.body.title + "-" + req.body.date);
 
     const event = Event.byTenant(req.user.residence);
     const eventInstance = new event(newEvent);
@@ -43,7 +47,7 @@ router.post('/', jsonParser, [
 router.post('/all', jsonParser, [
 ], async (req, res) => {
     //Check for input errors
-    
+
     Event.byTenant(req.user.residence).find({}).lean()
         .then(async resp => {
             try {
@@ -61,5 +65,22 @@ router.post('/all', jsonParser, [
             res.status(500).send("Database Error");
         });
 });
+
+//Admin: Test endpoint to delete booking requests by Id
+router.delete('/', jsonParser, [
+    body("title").exists()
+], async (req, res) => {
+
+    Event.byTenant(req.user.residence).deleteOne({ title: req.body.title })
+        .then(result => {
+            if (result.deletedCount > 0) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(err => res.sendStatus(500));
+
+})
 
 module.exports = router;

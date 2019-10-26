@@ -5,7 +5,7 @@ const schema = mongoose.Schema;
 
 const roomBookingSchema = new schema({
     roomId: {
-        type: schema.Types.ObjectId,
+        type: String,
         required: true,
         unique: false
     },

@@ -30,13 +30,13 @@ const eventSchema = new schema({
     },
     createdBy: {
         type: schema.Types.ObjectId,
-        required: false,
+        required: true,
         unique: false
     },
     posterPath: {
         type: String,
         required: false,
-        unique: true
+        unique: false
     },
     venue: {
         type: String,
@@ -66,6 +66,7 @@ const eventSchema = new schema({
     }
 });
 
+eventSchema.index({eventDate: 1, title: 1}, {unique: true});
 eventSchema.plugin(mongoTenant);
 const Event = mongoose.model('event', eventSchema);
 module.exports = Event;
