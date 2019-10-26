@@ -11,6 +11,11 @@ module.exports = {
         2: "Rejected",
         3: "Cancelled"
     },
+    roleSortPriority: {
+        Resident: 0,
+        Organiser: 1,
+        Admin: 2
+    },
     resetURI: "auth/resetAttempt",
     createURI: "auth/newAccounts",
     roles: {
