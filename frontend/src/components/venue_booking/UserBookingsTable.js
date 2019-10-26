@@ -24,12 +24,18 @@ class UserBookingsTable extends React.Component {
   retrieveBookings() {
     Axios.get("api/rooms/bookings", {
       headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      console.log(response);
-      if (response.status === 200) {
-        this.setState({ bookings: response.data });
-      }
-    });
+    })
+      .then(response => {
+        console.log(response);
+        if (response.status === 200) {
+          this.setState({ bookings: response.data });
+        }
+      })
+      .catch(error => {
+        if (error.response.status === 401) {
+          this.context.resetUser();
+        }
+      });
   }
 
   renderBodyRow(data, index) {

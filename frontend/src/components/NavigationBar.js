@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../images/treeckle_logo.png";
+import sampleSVG from "../images/SampleSVGImage.svg";
+import axios from "axios";
 import { Context } from "../contexts/UserProvider";
-import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
+import { Image, Menu, Dropdown, Icon, Dimmer, Loader } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW } from "../DevelopmentView";
+import { srcToFile } from "../util/ValidationUtil";
 
 function getBase64IntArray(arr) {
   let TYPED_ARRAY = new Uint8Array(arr);
@@ -19,6 +22,26 @@ class NavigationBar extends React.Component {
     this.state = {};
     this.handleItemClick = this.handleItemClick.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
+  }
+
+  componentDidMount() {
+    srcToFile(sampleSVG, "test.svg", "image/svc").then(function(file) {
+      const data = new FormData();
+      data.append("profilePicture", file);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data"
+        }
+      };
+      axios.put("/api/accounts/profilePicture", data, config).catch(err => {
+        if (err.response.status === 401) {
+          console.log(err.response.status);
+          localStorage.clear();
+        }
+      });
+    });
   }
 
   handleItemClick(event, data) {

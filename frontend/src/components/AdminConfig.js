@@ -39,6 +39,9 @@ class AdminConfig extends React.Component {
       })
       .catch(err => {
         console.log(err);
+        if (err.response.status === 401) {
+          this.context.resetUser();
+        }
       });
   }
 
