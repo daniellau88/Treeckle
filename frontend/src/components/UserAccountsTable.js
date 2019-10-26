@@ -42,12 +42,6 @@ class UserAccountsTable extends React.Component {
             isLoading: false
           });
         }
-      })
-      .catch(({ response }) => {
-        if (response.status === 401) {
-          alert("Your current session has expired. Please log in again.");
-          this.context.resetUser();
-        }
       });
   }
 

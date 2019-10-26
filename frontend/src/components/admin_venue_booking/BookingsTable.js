@@ -1,7 +1,7 @@
 import React from "react";
 import Axios from "axios";
 import { Context } from "../../contexts/UserProvider";
-import { Table } from "semantic-ui-react";
+import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
 
@@ -12,10 +12,7 @@ class BookingsTable extends React.Component {
     super(props);
     this.state = {
       allRequests: [],
-      pendingRequests: [],
-      approvedRequests: [],
-      rejectedRequests: [],
-      cancelledRequests: []
+      isLoading: true
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
@@ -38,7 +35,10 @@ class BookingsTable extends React.Component {
     })
       .then(response => {
         if (response.status === 200) {
-          this.setState({ allRequests: response.data.bookings });
+          this.setState({
+            allRequests: response.data.bookings,
+            isLoading: false
+          });
         }
       })
       .catch(({ response }) => {
@@ -89,7 +89,7 @@ class BookingsTable extends React.Component {
   }
 
   render() {
-    return (
+    return this.state.allRequests.length > 0 ? (
       <Table
         headerRow={
           <Table.Row>
@@ -108,6 +108,10 @@ class BookingsTable extends React.Component {
         tableData={this.state.allRequests}
         renderBodyRow={this.renderBodyRow}
       />
+    ) : (
+      <Segment textAlign="center" size="huge" loading={this.state.isLoading}>
+        There are currently no booking requests
+      </Segment>
     );
   }
 }

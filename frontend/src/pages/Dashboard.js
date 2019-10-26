@@ -15,6 +15,7 @@ class Dashboard extends React.Component {
       <main className="dashboard">
         <Menu size="huge"></Menu>
         <br />
+        <br />
         <Container style={{ color: "#FDFDFD" }}>
           <h1>Welcome, {this.context.name}</h1>
           <h2>Head over to the "Bookings" tab to view/make bookings.</h2>

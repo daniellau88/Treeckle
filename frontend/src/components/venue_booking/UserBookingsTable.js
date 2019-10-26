@@ -6,10 +6,13 @@ import StatusButton from "../buttons/StatusButton";
 import { toDateTimeString } from "../../util/DateUtil";
 
 class UserBookingsTable extends React.Component {
+  static contextType = Context;
+
   constructor(props) {
     super(props);
     this.state = {
-      bookings: []
+      bookings: [],
+      isLoading: true
     };
 
     this.renderBodyRow = this.renderBodyRow.bind(this);
@@ -17,23 +20,27 @@ class UserBookingsTable extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.context);
     this.retrieveBookings();
   }
 
   retrieveBookings() {
     Axios.get("api/rooms/bookings", {
       headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      console.log(response);
-      if (response.status === 200) {
-        this.setState({ bookings: response.data });
-      }
-    });
+    })
+      .then(response => {
+        if (response.status === 200) {
+          this.setState({ bookings: response.data, isLoading: false });
+        }
+      })
+      .catch(({ response }) => {
+        if (response.status === 401) {
+          alert("Your current session has expired. Please log in again.");
+          this.context.resetUser();
+        }
+      });
   }
 
   renderBodyRow(data, index) {
-    console.log(data);
     const {
       roomName,
       start,
@@ -84,13 +91,11 @@ class UserBookingsTable extends React.Component {
         renderBodyRow={this.renderBodyRow}
       />
     ) : (
-      <Segment textAlign="center" size="huge">
+      <Segment textAlign="center" size="big" loading={this.state.isLoading}>
         You currently do not have any bookings
       </Segment>
     );
   }
 }
-
-UserBookingsTable.contextType = Context;
 
 export default UserBookingsTable;
