@@ -73,11 +73,11 @@ class BookVenueForm extends React.Component {
   handleOnSubmit() {
     this.onSubmitting()
       .then(() => {
-        const description = `${this.state.contactNumber}\n${this.state.numParticipants}\n${this.state.purpose}`;
-        console.log(description);
         const data = {
           roomId: this.props.bookingPeriod.venue.roomId,
-          description: description,
+          description: this.state.purpose,
+          contactNumber: this.state.contactNumber,
+          expectedAttendees: this.state.numParticipants,
           start: this.props.bookingPeriod.start,
           end: this.props.bookingPeriod.end
         };

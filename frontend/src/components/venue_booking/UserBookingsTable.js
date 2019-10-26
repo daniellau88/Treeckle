@@ -38,20 +38,20 @@ class UserBookingsTable extends React.Component {
       roomName,
       start,
       end,
+      expectedAttendees,
       description,
       createdDate,
       approved,
       bookingId
     } = data;
     const status = approved;
-    const [contactNum, numParticipants, purpose] = description.split("\n");
     const row = (
       <Table.Row>
         <Table.Cell>{roomName}</Table.Cell>
         <Table.Cell>{toDateTimeString(start)}</Table.Cell>
         <Table.Cell>{toDateTimeString(end)}</Table.Cell>
-        <Table.Cell>{numParticipants}</Table.Cell>
-        <Table.Cell>{purpose}</Table.Cell>
+        <Table.Cell>{expectedAttendees}</Table.Cell>
+        <Table.Cell>{description}</Table.Cell>
         <Table.Cell>{toDateTimeString(createdDate)}</Table.Cell>
         <Table.Cell>
           <StatusButton
