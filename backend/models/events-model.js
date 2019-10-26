@@ -10,12 +10,12 @@ const eventSchema = new schema({
     },
     description: {
         type: String,
-        required: true,
+        required: false,
         unique: false
     },
     categories: {
         type: [String],
-        required: true,
+        required: false,
         unique: false
     },
     capacity: {
@@ -25,12 +25,12 @@ const eventSchema = new schema({
     },
     organizedBy: {
         type: String,
-        required: true,
+        required: false,
         unique: false
     },
     createdBy: {
         type: schema.Types.ObjectId,
-        required: true,
+        required: false,
         unique: false
     },
     posterPath: {
@@ -46,17 +46,17 @@ const eventSchema = new schema({
     creationDate: {
         type: Date,
         default: Date.now,
-        required: true,
+        required: false,
         unique: false
     },
     eventDate: {
         type: Date,
-        required: true,
+        required: false,
         unique: false
     },
     signupsAllowed: {
         type: Boolean,
-        required: true,
+        required: false,
         unique: false
     },
     attendees: {
