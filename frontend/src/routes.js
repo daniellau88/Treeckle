@@ -99,6 +99,13 @@ export const Routes = () => {
         token !== -2 &&
         token !== null &&
         window.location.pathname === "/" && <Redirect to={"/dashboard"} />}
+      {token === null &&
+        window.location.pathname !== "/" &&
+        window.location.pathname !== "/user/create" &&
+        (window.location.pathname.slice(0, 17) !== "/auth/newAccounts" ||
+          window.location.pathname.length < 19) &&
+        (window.location.pathname.slice(0, 18) !== "/auth/resetAttempt" ||
+          window.location.pathname.length < 20) && <Redirect to={"/"} />}
     </div>
   );
 };
