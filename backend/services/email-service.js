@@ -122,7 +122,7 @@ constructor() {
                 <p>Start date/time: ${new Date(booking.start).toString()}</p>
                 <p>End date/time: ${new Date(booking.end).toString()}</p>
                 <p>Reason for booking: ${booking.description}</p>
-                <p>Previous Status: ${constants.approvalStatesStringMap[booking.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.rejected]}</b></p>
+                <p>Previous Status: ${constants.approvalStatesStringMap[booking.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.Rejected]}</b></p>
                 <br>
                 <p>Yours Sincerely,</p> 
                 <p>Treeckle Team</p>`

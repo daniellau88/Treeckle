@@ -8,7 +8,7 @@ const {isPermitted} = require('../../services/auth-service');
 const mongoose = require('mongoose');
 const constants = require('../../config/constants');
 const { checkApprovedOverlaps, checkPotentialOverlaps, rejectOverlaps } = require('../../services/booking-service');
-const { sanitizeBody, sanitizeParam, param, body, validationResult } = require('express-validator');
+const { sanitizeBody, sanitizeParam, param, body, query, validationResult } = require('express-validator');
 
 const jsonParser = bodyParser.json();
 
@@ -64,7 +64,130 @@ router.get('/', async (req, res) => {
     }
 });
 
-//Admin: Get an array of all requests
+//Admin: retrieve all requests (paginated)
+router.get('/all', [
+    query("page").optional().isInt().toInt(),
+    query("limit").optional().isInt().toInt(),
+    query(constants.approvalStatesStringMap[0]).optional().isBoolean().toBoolean(),
+    query(constants.approvalStatesStringMap[1]).optional().isBoolean().toBoolean(),
+    query(constants.approvalStatesStringMap[2]).optional().isBoolean().toBoolean(),
+    query(constants.approvalStatesStringMap[3]).optional().isBoolean().toBoolean(),
+    query("startDateOnwards").optional().isInt().toInt(),
+    query("sortOrder").optional().isIn([-1, 1]).toInt()
+], async (req, res) => {
+    const errors = validationResult(req);
+    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.readAll);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return ;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+        return ;
+    }
+
+    let approvedStatusArray = Object.values(constants.approvalStatesStringMap);
+
+    for (queryParamName of Object.keys(req.query)) {
+        if (approvedStatusArray.includes(queryParamName) && !req.query[queryParamName]) {
+            approvedStatusArray = approvedStatusArray.filter(elem => {
+                return elem !== queryParamName;
+            });
+        }
+    }
+
+    const mappedStatus = approvedStatusArray.map(elem => {
+        return constants.approvalStates[elem];
+    })
+
+    const page = (req.query.page)? req.query.page : 1;
+    const limit = (req.query.limit)? req.query.limit : 10;
+    const startDateOnwards = (req.query.startDateOnwards)? new Date(req.query.startDateOnwards) : new Date(0);
+    const sortedBy = (req.query.sortOrder)? { createdDate : req.query.sortOrder } : { createdDate: 1 };
+
+    //Set up filter
+    let filter = {};
+    filter.approved = { $in : mappedStatus};
+    filter.start = { $gte: startDateOnwards};
+
+    const options = {
+        page: page,
+        limit: limit,
+        sort: sortedBy,
+        lean: true,
+        leanWithId: true
+    }
+
+    RoomBooking.byTenant(req.user.residence).paginate(filter, options)
+    .then (async resp => {
+        const idToUser = new Map();
+        const idToRoom = new Map();
+        const roomPromises = [];
+        const userPromises = [];
+
+        for (const response of resp.docs) {
+            if (!idToUser.has(response.createdBy.toString())) {
+                userPromises.push(User.findById(response.createdBy, { profilePic: 0 }).lean());
+                idToUser.set(response.createdBy.toString(), { name: null, email: null});
+            }
+
+            if (!idToRoom.has(response.roomId.toString())) {
+                roomPromises.push(Room.findById(response.roomId).lean());
+                idToRoom.set(response.roomId.toString(), { roomName: null });
+            }
+        }
+
+        try {
+            const mixedData = await Promise.all([userPromises, roomPromises].map(Promise.all, Promise));
+
+            mixedData[0].forEach(userDatum => {
+                if (userDatum) {
+                    idToUser.set(userDatum._id.toString(), { name: userDatum.name, email: userDatum.email });
+                }
+            });
+
+            mixedData[1].forEach(roomDatum => {
+                if (roomDatum) {
+                    idToRoom.set(roomDatum._id.toString(), { roomName: roomDatum.name });
+                }
+            });
+            
+            const sendToAdmin = {
+                totalBookings: resp.totalDocs,
+                totalPages: resp.totalPages,
+                currentPage: resp.page,
+                hasNextPage: resp.hasNextPage,
+                nextPage: resp.nextPage,
+                hasPreviousPage: resp.hasPrevPage,
+                previousPage: resp.prevPage,
+                bookings: []
+            }
+
+            resp.docs.forEach(request => {
+                sendToAdmin.bookings.push({
+                    bookingId: request._id,
+                    roomName: idToRoom.get(request.roomId.toString()).roomName,
+                    description: request.description,
+                    start: request.start.getTime(),
+                    end: request.end.getTime(),
+                    createdByName: idToUser.get(request.createdBy.toString()).name,
+                    createdByEmail: idToUser.get(request.createdBy.toString()).email,
+                    createdDate: request.createdDate.getTime(),
+                    comments: request.comments,
+                    approved: request.approved
+                });
+            });
+            res.send(sendToAdmin);
+        } catch (err) {
+            res.status(500).send("Database Error");
+        };
+    })
+    .catch (err => {
+        res.status(500).send("Database Error");
+    });
+});
+
+//Admin: Get an array of all requests by status
 router.get('/all/:status', [
     param('status').exists().isInt().toInt()
 ], async (req, res) => {
@@ -77,10 +200,10 @@ router.get('/all/:status', [
     } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
     } else if (![
-        constants.approvalStates.pending, 
-        constants.approvalStates.approved, 
-        constants.approvalStates.rejected,
-        constants.approvalStates.cancelled
+        constants.approvalStates.Pending, 
+        constants.approvalStates.Approved, 
+        constants.approvalStates.Rejected,
+        constants.approvalStates.Cancelled
     ].includes(req.params.status)) {
         res.status(422).json({ "ValueError": "invalid state" });
     } else {
@@ -183,7 +306,7 @@ router.patch('/', jsonParser, [
     } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
     } else {
-        RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.id, createdBy: req.user.userId }, { approved: constants.approvalStates.cancelled }).lean()
+        RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.id, createdBy: req.user.userId }, { approved: constants.approvalStates.Cancelled }).lean()
         .then(async result => {
             if (result) {
                 res.sendStatus(200);
@@ -201,7 +324,7 @@ router.patch('/', jsonParser, [
                          <p>End date/time: ${new Date(result.end).toString()}</p>
                          <p>Reason for booking: ${result.description}</p>
                          <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]}</p>
-                         <p>Current Status: ${constants.approvalStatesStringMap[constants.approvalStates.cancelled]}</p>
+                         <p>Current Status: ${constants.approvalStatesStringMap[constants.approvalStates.Cancelled]}</p>
                          <br>
                          <p>Yours Sincerely,</p> 
                          <p>Treeckle Team</p>`
@@ -229,14 +352,14 @@ router.patch('/manage', jsonParser, [
         } else if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
 
-        } else if (req.body.approved === constants.approvalStates.approved) {
-            RoomBooking.byTenant(req.user.residence).findOne({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }).lean()
+        } else if (req.body.approved === constants.approvalStates.Approved) {
+            RoomBooking.byTenant(req.user.residence).findOne({ _id:req.body.id, approved: {$ne : constants.approvalStates.Cancelled} }).lean()
             .then(async result => {
                 if (!result) {
                     res.sendStatus(403);
                 } else {
                     const conflictDocs = await rejectOverlaps(req, result.roomId, result.start, result.end);
-                    await RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.approved }).lean();
+                    await RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.Cancelled} }, { approved: constants.approvalStates.Approved }).lean();
                     if (conflictDocs.error === 1) {
                         res.status(500).send("Database Error");
                     } else {
@@ -260,7 +383,7 @@ router.patch('/manage', jsonParser, [
                                     <p>Start date/time: ${new Date(result.start).toString()}</p>
                                     <p>End date/time: ${new Date(result.end).toString()}</p>
                                     <p>Reason for booking: ${result.description}</p>
-                                    <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.approved]}</b></p>
+                                    <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.Approved]}</b></p>
                                     <br>
                                     <p>Yours Sincerely,</p> 
                                     <p>Treeckle Team</p>`
@@ -278,8 +401,8 @@ router.patch('/manage', jsonParser, [
             })
             .catch(error => (error.name === "CastError")? res.sendStatus(400) : res.status(500).send("Database Error"));
 
-        } else if (req.body.approved === constants.approvalStates.rejected) {
-            RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.rejected }).lean()
+        } else if (req.body.approved === constants.approvalStates.Rejected) {
+            RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.Cancelled} }, { approved: constants.approvalStates.Rejected }).lean()
             .then(async result => {
                 if (result) {
                     res.sendStatus(200);
@@ -297,7 +420,7 @@ router.patch('/manage', jsonParser, [
                                 <p>Start date/time: ${new Date(result.start).toString()}</p>
                                 <p>End date/time: ${new Date(result.end).toString()}</p>
                                 <p>Reason for booking: ${result.description}</p>
-                                <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.rejected]}</b></p>
+                                <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.Rejected]}</b></p>
                                 <br>
                                 <p>Yours Sincerely,</p> 
                                 <p>Treeckle Team</p>`
@@ -312,8 +435,8 @@ router.patch('/manage', jsonParser, [
             })
             .catch(error => (error.name === "CastError")? res.sendStatus(400) :res.status(500).send("Database Error"));
             
-        } else if (req.body.approved === constants.approvalStates.pending) {
-            RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.cancelled} }, { approved: constants.approvalStates.pending }).lean()
+        } else if (req.body.approved === constants.approvalStates.Pending) {
+            RoomBooking.byTenant(req.user.residence).findOneAndUpdate({ _id:req.body.id, approved: {$ne : constants.approvalStates.Cancelled} }, { approved: constants.approvalStates.Pending }).lean()
             .then(async result => {
                 if (result) {
                     res.sendStatus(200);
@@ -331,7 +454,7 @@ router.patch('/manage', jsonParser, [
                                 <p>Start date/time: ${new Date(result.start).toString()}</p>
                                 <p>End date/time: ${new Date(result.end).toString()}</p>
                                 <p>Reason for booking: ${result.description}</p>
-                                <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.pending]}</b></p>
+                                <p>Previous Status: ${constants.approvalStatesStringMap[result.approved]} &raquo; <b>New Status: ${constants.approvalStatesStringMap[constants.approvalStates.Pending]}</b></p>
                                 <br>
                                 <p>Yours Sincerely,</p> 
                                 <p>Treeckle Team</p>`
@@ -409,7 +532,7 @@ router.post('/', jsonParser, [
                     createdBy: req.user.userId,
                     start: req.body.start,
                     end: req.body.end,
-                    approved: constants.approvalStates.pending
+                    approved: constants.approvalStates.Pending
                 };
 
                 const roomBooking = RoomBooking.byTenant(req.user.residence);
