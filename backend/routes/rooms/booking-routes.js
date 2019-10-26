@@ -47,6 +47,8 @@ router.get('/', async (req, res) => {
                         bookingId: request._id,
                         roomName: idToRoom.get(request.roomId.toString()).roomName,
                         description: request.description,
+                        contactNumber: request.contactNumber,
+                        expectedAttendees: request.expectedAttendees,
                         start: request.start.getTime(),
                         end: request.end.getTime(),
                         createdDate: request.createdDate.getTime(),
@@ -168,6 +170,8 @@ router.get('/all', [
                     bookingId: request._id,
                     roomName: idToRoom.get(request.roomId.toString()).roomName,
                     description: request.description,
+                    contactNumber: request.contactNumber,
+                    expectedAttendees: request.expectedAttendees,
                     start: request.start.getTime(),
                     end: request.end.getTime(),
                     createdByName: idToUser.get(request.createdBy.toString()).name,
@@ -237,8 +241,9 @@ router.patch('/', jsonParser, [
                         "Your booking request has been cancelled",
                         `<p>Dear ${userName}, you have initiated a cancellation of your booking request. Please refer to the details below.</p>
                          <br>
-                         <p>Your contact: ${userName} / ${userEmail}</p>
+                         <p>Your contact: ${userName} / ${userEmail} / ${result.contactNumber}</p>
                          <p>Room name: ${roomName}</p>
+                         <p>Expected number of attendees/participants: ${result.expectedAttendees}</p>
                          <p>Booked at: ${result.createdDate.toString()}</p>
                          <p>Start date/time: ${new Date(result.start).toString()}</p>
                          <p>End date/time: ${new Date(result.end).toString()}</p>
@@ -297,8 +302,9 @@ router.patch('/manage', jsonParser, [
                                 EmailService.sendSwitcher(userName, userEmail, carbonCopy,
                                     "Your booking request has been updated",
                                     `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
-                                    <p>Your contact: ${userName} / ${userEmail}</p>
+                                    <p>Your contact: ${userName} / ${userEmail} / ${result.contactNumber}</p>
                                     <p>Room name: ${roomName}</p>
+                                    <p>Expected number of attendees/participants: ${result.expectedAttendees}</p>
                                     <p>Booked at: ${result.createdDate.toString()}</p>
                                     <p>Start date/time: ${new Date(result.start).toString()}</p>
                                     <p>End date/time: ${new Date(result.end).toString()}</p>
@@ -334,8 +340,9 @@ router.patch('/manage', jsonParser, [
                             EmailService.sendSwitcher(userName, userEmail, carbonCopy,
                                 "Your booking request has been updated",
                                 `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
-                                <p>Your contact: ${userName} / ${userEmail}</p>
+                                <p>Your contact: ${userName} / ${userEmail} / ${result.contactNumber}</p>
                                 <p>Room name: ${roomName}</p>
+                                <p>Expected number of attendees/participants: ${result.expectedAttendees}</p>
                                 <p>Booked at: ${result.createdDate.toString()}</p>
                                 <p>Start date/time: ${new Date(result.start).toString()}</p>
                                 <p>End date/time: ${new Date(result.end).toString()}</p>
@@ -368,8 +375,9 @@ router.patch('/manage', jsonParser, [
                             EmailService.sendSwitcher(userName, userEmail, carbonCopy,
                                 "Your booking request has been updated",
                                 `<p>Dear ${userName}, an administrator has updated your booking request. Please refer to the details below.</p>
-                                <p>Your contact: ${userName} / ${userEmail}</p>
+                                <p>Your contact: ${userName} / ${userEmail} / ${result.contactNumber}</p>
                                 <p>Room name: ${roomName}</p>
+                                <p>Expected number of attendees/participants: ${result.expectedAttendees}</p>
                                 <p>Booked at: ${result.createdDate.toString()}</p>
                                 <p>Start date/time: ${new Date(result.start).toString()}</p>
                                 <p>End date/time: ${new Date(result.end).toString()}</p>
@@ -426,6 +434,8 @@ router.get('/:roomId/:start-:end', [
 router.post('/', jsonParser, [
     body('roomId').exists(),
     body('description').exists(),
+    body('contactNumber').isInt(),
+    body('expectedAttendees').isInt(),
     body('start').exists().isInt(),
     body('end').exists().isInt(),
     ], sanitizeBody('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
@@ -449,6 +459,8 @@ router.post('/', jsonParser, [
                 const newBookingRequest = {
                     roomId: req.body.roomId,
                     description: req.body.description,
+                    contactNumber: req.body.contactNumber,
+                    expectedAttendees: req.body.expectedAttendees,
                     createdBy: req.user.userId,
                     start: req.body.start,
                     end: req.body.end,
@@ -469,8 +481,9 @@ router.post('/', jsonParser, [
                             EmailService.sendSwitcher(userName, userEmail, carbonCopy,
                                "Your booking request has been created",
                                `<p>Dear ${userName}, a new booking request has been created from your account. Please refer to the details below.</p>
-                                <p>Your contact: ${userName} / ${userEmail}</p>
+                                <p>Your contact: ${userName} / ${userEmail} / ${result.contactNumber}</p>
                                 <p>Room name: ${roomName}</p>
+                                <p>Expected number of attendees/participants: ${result.expectedAttendees}</p>
                                 <p>Booked at: ${result.createdDate.toString()}</p>
                                 <p>Start date/time: ${new Date(req.body.start).toString()}</p>
                                 <p>End date/time: ${new Date(req.body.end).toString()}</p>

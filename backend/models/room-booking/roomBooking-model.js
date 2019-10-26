@@ -19,6 +19,16 @@ const roomBookingSchema = new schema({
         required: true,
         unique: false
     },
+    contactNumber: {
+        type: Number,
+        required: true,
+        unique: false
+    },
+    expectedAttendees: {
+        type: Number,
+        required: true,
+        unique: false
+    },
     start: {
         type: Date,
         required: true,
