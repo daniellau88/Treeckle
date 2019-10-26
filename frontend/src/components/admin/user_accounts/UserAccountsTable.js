@@ -13,8 +13,6 @@ class UserAccountsTable extends React.Component {
     super(props);
     this.state = {
       allAccounts: [],
-      createdAccounts: [],
-      pendingAccounts: [],
       isLoading: true
     };
 
@@ -32,12 +30,8 @@ class UserAccountsTable extends React.Component {
     }).then(response => {
       CONSOLE_LOGGING && console.log("GET all accounts", response);
       if (response.status === 200) {
-        const { createdAccounts, pendingAccounts } = response.data;
-        const allAccounts = [...createdAccounts, ...pendingAccounts];
         this.setState({
-          allAccounts,
-          createdAccounts,
-          pendingAccounts,
+          allAccounts: response.data,
           isLoading: false
         });
       }
