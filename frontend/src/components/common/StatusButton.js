@@ -43,6 +43,7 @@ class StatusButton extends React.Component {
 
     return (
       <Button
+        fluid
         color={color}
         content={statusLabel}
         disabled={statusLabel === "Cancelled"}
