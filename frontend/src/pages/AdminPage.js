@@ -3,9 +3,9 @@ import ReactGA from "react-ga";
 import { Context } from "../contexts/UserProvider";
 import { Container, Menu } from "semantic-ui-react";
 import AccountCreation from "../components/admin/account_creation/AccountCreation";
-import UserAccountsTable from "../components/UserAccountsTable";
-import BookingsTable from "../components/admin_venue_booking/BookingsTable";
-import AdminConfig from "../components/AdminConfig";
+import UserAccountsTable from "../components/admin/user_accounts/UserAccountsTable";
+import BookingsTable from "../components/admin/venue_booking/BookingsTable";
+import AdminConfig from "../components/admin/config/AdminConfig";
 
 class AdminPage extends React.Component {
   static contextType = Context;

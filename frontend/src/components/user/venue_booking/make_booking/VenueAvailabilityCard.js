@@ -1,14 +1,14 @@
 import React from "react";
 import Axios from "axios";
 import { Card, Button, Form, Table } from "semantic-ui-react";
-import DatePicker from "./DatePicker";
-import "../../styles/VenueAvailabilityCard.scss";
-import { Context } from "../../contexts/UserProvider";
-import { getUpdatedAvailabilityOptions } from "../../util/BookingUtil";
-import { DAY_MILLISECONDS } from "../../util/Constants";
-import { toTimeString, toDateString } from "../../util/DateUtil";
+import DatePicker from "../../../common/DatePicker";
+import "../../../../styles/VenueAvailabilityCard.scss";
+import { Context } from "../../../../contexts/UserProvider";
+import { getUpdatedAvailabilityOptions } from "../../../../util/BookingUtil";
+import { DAY_MILLISECONDS } from "../../../../util/Constants";
+import { toTimeString, toDateString } from "../../../../util/DateUtil";
 import { isAfter, subDays, addDays } from "date-fns";
-import { CONSOLE_LOGGING } from "../../DevelopmentView";
+import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
 
 class VenueAvailabilityCard extends React.Component {
   static contextType = Context;

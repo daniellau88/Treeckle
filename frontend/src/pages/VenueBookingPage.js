@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import ReactGA from "react-ga";
-import CreateBookingRequest from "../components/venue_booking/CreateBookingRequest";
+import CreateBookingRequest from "../components/user/venue_booking/make_booking/CreateBookingRequest";
 import { Container, Button, Icon, Menu } from "semantic-ui-react";
-import UserBookingsTable from "../components/venue_booking/UserBookingsTable";
+import UserBookingsTable from "../components/user/venue_booking/view_bookings/UserBookingsTable";
 
 const VenueBookingPage = props => {
   ReactGA.pageview("/bookings");

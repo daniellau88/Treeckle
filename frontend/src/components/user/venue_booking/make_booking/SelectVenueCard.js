@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, Button, Container, Accordion } from "semantic-ui-react";
 import Axios from "axios";
-import { Context } from "../../contexts/UserProvider";
-import { CONSOLE_LOGGING } from "../../DevelopmentView";
+import { Context } from "../../../../contexts/UserProvider";
+import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
 
 class SelectVenueCard extends React.Component {
   static contextType = Context;

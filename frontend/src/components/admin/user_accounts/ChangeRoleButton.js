@@ -1,8 +1,8 @@
 import React from "react";
 import Axios from "axios";
-import { Context } from "../../contexts/UserProvider";
+import { Context } from "../../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
-import { CONSOLE_LOGGING } from "../../DevelopmentView";
+import { CONSOLE_LOGGING } from "../../../DevelopmentView";
 
 class ChangeRoleButton extends React.Component {
   static contextType = Context;

@@ -1,9 +1,9 @@
 import React from "react";
 import Axios from "axios";
 import { Card, Form, Button, Confirm } from "semantic-ui-react";
-import { Context } from "../../contexts/UserProvider";
-import "../../styles/BookVenueForm.scss";
-import { CONSOLE_LOGGING } from "../../DevelopmentView";
+import { Context } from "../../../../contexts/UserProvider";
+import "../../../../styles/BookVenueForm.scss";
+import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
 
 const SUCCESS_MSG = "Your booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG =

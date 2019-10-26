@@ -2,9 +2,9 @@ import React from "react";
 import SelectVenueCard from "./SelectVenueCard";
 import VenueAvailabilityCard from "./VenueAvailabilityCard";
 import BookVenueForm from "./BookVenueForm";
-import StatusBar from "./StatusBar";
+import StatusBar from "../../../common/StatusBar";
 import { Card } from "semantic-ui-react";
-import { CONSOLE_LOGGING } from "../../DevelopmentView";
+import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
 
 class CreateBookingRequest extends React.Component {
   constructor(props) {

@@ -1,8 +1,9 @@
 import React from "react";
 import axios from "axios";
 import * as yup from "yup";
-import { Context } from "../contexts/UserProvider";
+import { Context } from "../../../contexts/UserProvider";
 import { Button, Form, Segment } from "semantic-ui-react";
+import { CONSOLE_LOGGING } from "../../../DevelopmentView";
 
 class AdminConfig extends React.Component {
   static contextType = Context;
@@ -27,22 +28,14 @@ class AdminConfig extends React.Component {
         Authorization: `Bearer ${this.context.token}`
       }
     };
-    axios
-      .get("/api/emails", config)
-      .then(res => {
-        if (res.status === 200) {
-          this.setState({
-            currentEmail: res.data.email,
-            email: res.data.email
-          });
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        if (err.response.status === 401) {
-          this.context.resetUser();
-        }
-      });
+    axios.get("/api/emails", config).then(res => {
+      if (res.status === 200) {
+        this.setState({
+          currentEmail: res.data.email,
+          email: res.data.email
+        });
+      }
+    });
   }
 
   EmailSchema = yup.object().shape({
@@ -79,7 +72,7 @@ class AdminConfig extends React.Component {
       submittedEmail: email,
       emailError: null
     });
-    console.log(this.state.email);
+    CONSOLE_LOGGING && console.log(this.state.email);
     const config = {
       headers: {
         Authorization: `Bearer ${this.context.token}`
@@ -88,7 +81,7 @@ class AdminConfig extends React.Component {
     let inputData = { email: this.state.email };
     this.EmailSchema.isValid(inputData).then(valid => {
       if (valid) {
-        console.log("yell hea!");
+        CONSOLE_LOGGING && console.log("yell hea!");
         axios
           .put(
             "/api/emails",
@@ -105,7 +98,7 @@ class AdminConfig extends React.Component {
             }
           })
           .catch(err => {
-            console.log(err);
+            CONSOLE_LOGGING && console.log(err);
           });
       } else {
         this.setState({
@@ -126,10 +119,10 @@ class AdminConfig extends React.Component {
     return (
       <Segment placeholder>
         <Form error textAlign="center">
-          <p>
+          <text>
             The below email is assigned to receive receipts for the creation or
             change in status of all bookings.
-          </p>
+          </text>
           <Form.Input
             error={emailError}
             placeholder="CC Email"
