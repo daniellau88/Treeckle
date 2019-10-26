@@ -30,14 +30,14 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
-          <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
+          <h1 style={{ color: "#FDFDFD" }}>Booking requests</h1>
           <BookingsTable />
         </Container>
         <br />
         <br />
         <br />
         <Container>
-          <h1 style={{ color: "#FDFDFD" }}>Create Accounts</h1>
+          <h1 style={{ color: "#FDFDFD" }}>Create accounts</h1>
           <CreateAccountAdmin />
         </Container>
         <br />
@@ -51,7 +51,7 @@ class AdminPage extends React.Component {
         <br />
         <br />
         <Container>
-          <h1 style={{ color: "#FDFDFD" }}>User Accounts</h1>
+          <h1 style={{ color: "#FDFDFD" }}>Review accounts</h1>
           <UserAccountsTable />
         </Container>
         <br />
