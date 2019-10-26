@@ -448,6 +448,14 @@ router.post('/', jsonParser, [
         } else if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() });
         } else {
+            //Check existence of room
+            const relevantRoom = await Room.byTenant(req.user.residence).findById(req.body.roomId).lean();
+
+            if (!relevantRoom) {
+                res.sendStatus(404);
+                return ;
+            }
+            
             //Check for overlaps
             let responseObject = await checkApprovedOverlaps(req, req.body.roomId, req.body.start, req.body.end);
 
