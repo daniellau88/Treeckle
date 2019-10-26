@@ -42,37 +42,41 @@ class ProfileCard extends React.Component {
     this.setState({ file: e.target.files[0] }, () => {
       console.log("File chosen --->", this.state.file);
     });
-    const data = new FormData();
-    data.append("profilePicture", this.state.file);
-    let reader = new FileReader();
-    let newProfilePic;
-    reader.readAsDataURL(e.target.files[0]);
-    reader.onloadend = () => {
-      console.log(reader.result);
-      newProfilePic = getIntArrayBase64(reader.result.substring(22));
-    };
-    const config = {
-      headers: {
-        Authorization: `Bearer ${this.context.token}`,
-        "Content-Type": "multipart/form-data"
-      }
-    };
-    axios
-      .put("/api/accounts/profilePicture", data, config)
-      .then(res => {
-        if (res.status === 200) {
-          console.log("Success!");
-          this.context.setUser(
-            this.context.token,
-            this.context.name,
-            newProfilePic,
-            this.context.role
-          );
+    if (e.target.files[0].size >= 4000000) {
+      alert("Please ensure that the file size is below 4 MB.");
+    } else {
+      const data = new FormData();
+      data.append("profilePicture", e.target.files[0]);
+      let reader = new FileReader();
+      let newProfilePic;
+      reader.readAsDataURL(e.target.files[0]);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.context.token}`,
+          "Content-Type": "multipart/form-data"
         }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      };
+      reader.onloadend = () => {
+        console.log(reader.result);
+        newProfilePic = getIntArrayBase64(reader.result.substring(22));
+        axios
+          .put("/api/accounts/profilePicture", data, config)
+          .then(res => {
+            if (res.status === 200) {
+              console.log("Success!");
+              this.context.setUser(
+                this.context.token,
+                this.context.name,
+                newProfilePic,
+                this.context.role
+              );
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      };
+    }
   };
 
   render() {
@@ -104,7 +108,7 @@ class ProfileCard extends React.Component {
                           <Icon name="camera" />
                         </Button.Content>
                         <Button.Content visible>
-                          Upload Profile Picture
+                          Upload Profile Picture (PNG)
                         </Button.Content>
                       </Button>
                       <input
