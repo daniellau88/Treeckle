@@ -59,6 +59,7 @@ router.post("/newAccountsDirect", jsonParser, [
                     res.status(200).send({
                         message: "OK"
                     });
+                    await CreateAccount.deleteMany({email: req.body.email}).lean();
                 }
             });
         }
@@ -123,6 +124,14 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
     } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
     } else {
+        //Check if a registered user with the same email exists
+        const userExists = await User.findOne({email: req.body.email}).lean();
+        
+        if (userExists) {
+            res.sendStatus(400);
+            return ;
+        }
+
         //Generate a shortid
         const id = shortid.generate();
 
