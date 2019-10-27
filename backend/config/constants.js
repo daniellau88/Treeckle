@@ -34,7 +34,7 @@ module.exports = {
     },
     actions: {
         create: "create",
-        readSelf: "read",
+        readSelf: "readSelf",
         read: "read",
         updateSelf: "updateSelf",
         update: "update",

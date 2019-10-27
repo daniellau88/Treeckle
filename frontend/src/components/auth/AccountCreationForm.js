@@ -143,13 +143,14 @@ const AccountCreationForm = props => {
         <div style={{ color: "red" }}>Password is less than 8 characters</div>
       )}
 
-      {!userCreated && password && confirmPassword && (
-        <div style={{ color: "red" }}>
-          {password === confirmPassword
-            ? "Passwords match"
-            : "Passwords don't match"}
-        </div>
-      )}
+      {!userCreated &&
+        password &&
+        confirmPassword &&
+        (password === confirmPassword ? (
+          <div style={{ color: "green" }}>Passwords match</div>
+        ) : (
+          <div style={{ color: "red" }}>Passwords don't match</div>
+        ))}
 
       {invalidMessage && (
         <Message
@@ -159,16 +160,17 @@ const AccountCreationForm = props => {
         />
       )}
 
-      <Button
+      <Form.Button
         content={userCreated ? "User Created" : "Create"}
         primary={!userCreated}
         secondary={userCreated}
         fluid
         disabled={!areValidFields() || userCreated}
         type="submit"
+        style={{ marginTop: "1em" }}
       />
       {userCreated && (
-        <Button
+        <Form.Button
           fluid
           content="Login here"
           onClick={() => history.push("/")}

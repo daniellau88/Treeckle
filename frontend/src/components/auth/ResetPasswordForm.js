@@ -91,13 +91,14 @@ const ResetPasswordForm = props => {
         <div style={{ color: "red" }}>Password is less than 8 characters</div>
       )}
 
-      {!passwordChanged && password && confirmPassword && (
-        <div style={{ color: "red" }}>
-          {password === confirmPassword
-            ? "Passwords match"
-            : "Passwords don't match"}
-        </div>
-      )}
+      {!passwordChanged &&
+        password &&
+        confirmPassword &&
+        (password === confirmPassword ? (
+          <div style={{ color: "green" }}>Passwords match</div>
+        ) : (
+          <div style={{ color: "red" }}>Passwords don't match</div>
+        ))}
 
       {invalidMessage && (
         <Message
@@ -114,6 +115,7 @@ const ResetPasswordForm = props => {
         fluid
         disabled={!areValidFields() || passwordChanged}
         type="submit"
+        style={{ marginTop: "1em" }}
       />
       {passwordChanged && (
         <Button

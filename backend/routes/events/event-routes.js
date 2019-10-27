@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const creationRoutes = require('./creation-routes');
-const attendRoutes = require('./attend-routes');
+const galleryRoutes = require('./gallery-routes');
 const bodyParser = require('body-parser');
 const Event = require('../../models/events-model');
 const User = require('../../models/authentication/user-model');
+const shortId = require('shortid');
 const path = require('path');
 const constants = require('../../config/constants');
 const { isPermitted } = require('../../services/auth-service');
@@ -13,7 +14,6 @@ const multer = require('multer');
 const storage = multer.diskStorage({
     destination: 'public',
     filename: function (req, file, cb) {
-        //console.log("in middle ", req.body);
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     }
 })
@@ -22,83 +22,97 @@ const upload = multer({ storage: storage });
 
 const jsonParser = bodyParser.json();
 
-router.use('/attend', attendRoutes);
+router.use('/gallery', galleryRoutes);
 router.use('/create', creationRoutes);
 
-//Admin: Create new event
+//Organiser or above: Create new event
 router.post('/', jsonParser, [
-    body('title').exists()
+    body('title').exists().isString(),
+    body('categories').isArray(),
+    body('organisedBy').exists(),
+    body('capacity').optional().isInt().toInt(),
+    body('eventDate').isInt().toInt(),
+    body('signupsAllowed').isBoolean().toBoolean()
 ], async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.create);
+    
     //Check for input errors
+    const errors = validationResult(req);
+    
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        const newEvent = {
+            title: req.body.title,
+            description: req.body.description,
+            categories: req.body.categories,
+            capacity: req.body.capacity,
+            organisedBy: req.body.organisedBy,
+            createdBy: req.user.userId,
+            posterPath: "insertDefaultPicturePathHere", //to be updated
+            venue: req.body.venue,
+            eventDate: req.body.eventDate,
+            signupsAllowed: req.body.signupsAllowed,
+            attendees: [],
+            shortId: shortId.generate()
+        };
 
-    //Add to categories to a categories model
-
-    const newEvent = {
-        title: req.body.title,
-        description: req.body.description,
-        categories: req.body.categories,
-        capacity: req.body.capacity,
-        organisedBy: req.body.organisedBy,
-        venue: req.body.venue,
-        signupsAllowed: req.body.signupsAllowed,
-        attendees: [],
-        createdBy: req.user.userId,
-        eventDate: req.body.date,
-    };
-
-    //console.log(req.body.title + "-" + req.body.date);
-
-    const event = Event.byTenant(req.user.residence);
-    const eventInstance = new event(newEvent);
-
-    Event.byTenant(req.user.residence).findOne({ eventDate: req.body.date, createdBy: req.user.userId, title: req.body.title })
-        .then(async relevantReq => {
-            if (relevantReq) {
-                res.sendStatus(400); //already exists
-            } else {
-                eventInstance.save()
-                    .then(async (result, error) => {
-                        if (error) {
-                            res.status(500).send("Database Error");
-                        } else {
-                            res.send({
-                                done: result
-                            });
-                        };
-                    });
+        const EventModel = Event.byTenant(req.user.residence);
+        const eventInstance = new EventModel(newEvent);
+        eventInstance.save()
+        .then(result => {
+                const constructedResponse = {
+                    posterPath: result.posterPath,
+                    creationDate: result.creationDate.getTime(),
+                    shortId: result.shortId
+                }
+                res.send(constructedResponse);
             }
-        })
+        )
         .catch(err => {
-            res.sendStatus(400);
-        })
-
-
-
-
-});
-
-//Resident: View all events
-router.post('/all', jsonParser, [
-], async (req, res) => {
-    //Check for input errors
-
-    Event.byTenant(req.user.residence).find({}).lean()
-        .then(async resp => {
-            try {
-                const sendToUser = [];
-                resp.forEach(request => {
-                    sendToUser.push({
-                        request
-                    });
-                });
-                res.send(sendToUser);
-            } catch (err) {
-                res.status(500).send("Database Error");
-            }
-        }).catch(err => {
             res.status(500).send("Database Error");
         });
+    }
 });
+
+// Organiser and higher: Get self-created requests
+router.get('/', async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.readSelf);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return ;
+    }
+
+    Event.byTenant(req.user.residence).find({ createdBy: req.user.userId }, '-createdBy -__v -tenantId', {sort: {eventDate : 1}})
+    .populate('attendees', 'name').lean()
+    .then(results => {
+        const sendToUser = [];
+            results.forEach(doc => {
+                sendToUser.push({
+                    eventId: doc._id,
+                    title: doc.title,
+                    description: doc.description,
+                    categories: doc.categories,
+                    venue: doc.venue,
+                    capacity: doc.capacity,
+                    attendeesNames: doc.attendees.map(userDoc => userDoc.name),
+                    attendees: doc.attendees.length,
+                    organisedBy: doc.organisedBy,
+                    posterPath: doc.posterPath,
+                    eventDate: doc.eventDate.getTime(),
+                    signupsAllowed: doc.signupsAllowed,
+                    shortId: doc.shortId
+                });
+            });
+      res.send(sendToUser);  
+    })
+    .catch(error => {
+        res.status(500).send("Database Error");
+    })
+})
 
 //Resident: Set category tags
 router.post('/set/tags', jsonParser, [
