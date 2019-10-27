@@ -73,8 +73,6 @@ router.get('/', [
                 }
             }
 
-            results.sort((a,b) => constants.roleSortPriority[b.role] - constants.roleSortPriority[a.role]);
-
             results.sort((a,b) => {
                 const emailA = a.email.toUpperCase();
                 const emailB = b.email.toUpperCase();
@@ -87,6 +85,9 @@ router.get('/', [
                     return 0;
                 }
             });
+
+            results.sort((a,b) => constants.roleSortPriority[b.role] - constants.roleSortPriority[a.role]);
+            
             res.send(results);
         } catch(err) {
             res.status(500).send("Database Error");
