@@ -5,7 +5,7 @@ const Rooms = require('../../models/room-booking/rooms-model');
 
 //Resident and up: get list of categories
 router.get('/', async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.RoomsManagement, constants.actions.read);
+    const permitted = await isPermitted(req.user.role, constants.categories.roomsManagement, constants.actions.read);
     if (!permitted) {
         res.sendStatus(401);
     } else {
@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 
 //Resident and up: Get an array of room names, recommended capacity and ids belonging to a particular category
 router.get('/:category', async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.RoomsManagement, constants.actions.read);
+    const permitted = await isPermitted(req.user.role, constants.categories.roomsManagement, constants.actions.read);
 
     if (!permitted) {
         res.sendStatus(401);

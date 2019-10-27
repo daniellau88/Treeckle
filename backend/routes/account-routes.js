@@ -12,7 +12,7 @@ const jsonParser = bodyParser.json();
 
 //Resident & above: Update profile picture
 router.put('/profilePicture', upload.single('profilePicture'), async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.accountsSelf, constants.actions.update);
+    const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.updateSelf);
 
     if (!permitted) {
         res.sendStatus(401);
@@ -39,7 +39,7 @@ router.get('/', [
     const created = (req.query.created == undefined)? true : req.query.created;
 
     const permittedOne = (pending)? await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.read) : true;
-    const permittedTwo = (created)? await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.read) : true;
+    const permittedTwo = (created)? await isPermitted(req.user.role, constants.categories.accounts, constants.actions.read) : true;
 
     if (!permittedOne || !permittedTwo) {
         res.sendStatus(401);
@@ -103,7 +103,7 @@ router.patch('/', jsonParser, [
 ], async (req, res) => {
     const errors = validationResult(req);
     const permittedOne = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.update);
-    const permittedTwo = await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.update);
+    const permittedTwo = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.update);
 
     if (!permittedOne || !permittedTwo) {
         res.sendStatus(401);
@@ -138,7 +138,7 @@ router.delete('/', jsonParser, [
 ], async (req, res) => {
     const errors = validationResult(req);
     const permittedOne = await isPermitted(req.user.role, constants.categories.accountCreationRequest, constants.actions.delete);
-    const permittedTwo = await isPermitted(req.user.role, constants.categories.accountsAll, constants.actions.delete);
+    const permittedTwo = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.delete);
 
     if (!permittedOne || !permittedTwo) {
         res.sendStatus(401);

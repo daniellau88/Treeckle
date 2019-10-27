@@ -20,7 +20,7 @@ router.post('/', jsonParser, [
 ], async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
-    const permitted = await isPermitted(req.user.role, constants.categories.RoomsManagement, constants.actions.create);
+    const permitted = await isPermitted(req.user.role, constants.categories.roomsManagement, constants.actions.create);
 
     if (!permitted) {
         res.sendStatus(401);
@@ -61,7 +61,7 @@ router.patch('/', jsonParser, [
 ] , async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
-    const permitted = await isPermitted(req.user.role, constants.categories.RoomsManagement, constants.actions.update);
+    const permitted = await isPermitted(req.user.role, constants.categories.roomsManagement, constants.actions.update);
 
     if (!permitted) {
         res.sendStatus(401);
@@ -95,7 +95,7 @@ router.delete('/', jsonParser, [
 ], async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
-    const permitted = await isPermitted(req.user.role, constants.categories.RoomsManagement, constants.actions.delete);
+    const permitted = await isPermitted(req.user.role, constants.categories.roomsManagement, constants.actions.delete);
 
     if (!permitted) {
         res.sendStatus(401);
