@@ -1,15 +1,23 @@
-import React, { useEffect, useContext } from "react";
+import React from "react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { Context } from "../../contexts/UserProvider";
 
-const AuthLayoutResetState = props => {
-  const context = useContext(Context);
+class AuthLayoutResetState extends React.Component {
+  static contextType = Context;
 
-  useEffect(() => {
-    context.setUser(null, null, null, null);
-  });
+  constructor(props) {
+    super(props);
 
-  return <AuthLayout form={props.form} />;
-};
+    this.state = {};
+  }
+
+  componentDidMount() {
+    this.context.resetUser();
+  }
+
+  render() {
+    return <AuthLayout form={this.props.form} />;
+  }
+}
 
 export default AuthLayoutResetState;

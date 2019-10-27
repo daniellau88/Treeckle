@@ -1,49 +1,71 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import React from "react";
 
 export const Context = React.createContext();
 
-const UserProvider = props => {
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [name, setName] = useState(localStorage.getItem("name"));
-  const [profilePic, setProfilePic] = useState(
-    localStorage.getItem("profilePic")
-  );
-  const [role, setRole] = useState(localStorage.getItem("role"));
-  const history = useHistory();
+class UserProvider extends React.Component {
+  constructor(props) {
+    super(props);
 
-  const setUser = (token, name, profilePic, role) => {
-    setToken(token);
-    setName(name);
-    setProfilePic(profilePic);
-    setRole(role);
+    const token = localStorage.getItem("token");
+    const name = localStorage.getItem("name");
+    const profilePic = localStorage.getItem("profilePic");
+    const role = localStorage.getItem("role");
+
+    this.state = {
+      token: token,
+      name: name,
+      profilePic: profilePic ? JSON.parse(profilePic) : profilePic,
+      role: role
+    };
+    this.setUser = this.setUser.bind(this);
+    this.resetUser = this.resetUser.bind(this);
+    console.log(token === null, token === "null");
+    console.log(this.state);
+  }
+
+  setUser(token, name, profilePic, role) {
+    this.setState({
+      token: token,
+      name: name,
+      profilePic: profilePic,
+      role: role
+    });
 
     localStorage.setItem("token", token);
     localStorage.setItem("name", name);
-    localStorage.setItem("profilePic", profilePic);
+    localStorage.setItem(
+      "profilePic",
+      profilePic ? JSON.stringify(profilePic) : profilePic
+    );
     localStorage.setItem("role", role);
-  };
+  }
 
-  const resetUser = () => {
+  resetUser() {
+    this.setState({
+      token: null,
+      name: null,
+      profilePic: null,
+      role: null
+    });
     localStorage.clear();
-    setUser(null, null, null, null);
-    history.push("/");
-  };
+  }
 
-  return (
-    <Context.Provider
-      value={{
-        token: token,
-        name: name,
-        profilePic: profilePic,
-        role: role,
-        setUser: setUser,
-        resetUser: resetUser
-      }}
-    >
-      {props.children}
-    </Context.Provider>
-  );
-};
+  render() {
+    return (
+      <Context.Provider
+        value={{
+          token: this.state.token,
+          name: this.state.name,
+          profilePic: this.state.profilePic,
+          role: this.state.role,
+          setUser: this.setUser,
+          resetUser: this.resetUser
+        }}
+      >
+        {this.props.children}
+      </Context.Provider>
+    );
+  }
+}
 
 export default UserProvider;

@@ -27,25 +27,25 @@ class App extends React.Component {
   render() {
     const { token, role } = this.context;
     return (
-      <div>
-        {token !== "null" && <NavigationBar />}
+      <main>
+        {token !== null && <NavigationBar />}
         <Switch>
           <Route path="/" exact>
-            {token !== "null" ? <Redirect to="/dashboard" /> : <LoginPage />}
+            {token !== null ? <Redirect to="/dashboard" /> : <LoginPage />}
           </Route>
-          {token !== "null" && (
+          {token !== null && (
             <Route path="/dashboard" exact component={Dashboard} />
           )}
-          {token !== "null" && (
+          {token !== null && (
             <Route path="/bookings" exact component={VenueBookingPage} />
           )}
-          {token !== "null" && DEVELOPMENT_VIEW && (
+          {token !== null && DEVELOPMENT_VIEW && (
             <Route path="/events" exact component={EventsPage} />
           )}
-          {token !== "null" && role === "Admin" && (
+          {token !== null && role === "Admin" && (
             <Route path="/admin" exact component={AdminPage} />
           )}
-          {token !== "null" && (
+          {token !== null && (
             <Route path="/profile" exact component={ProfilePage} />
           )}
           <Route path="/user/create" component={DirectAccountCreationPage} />
@@ -61,7 +61,7 @@ class App extends React.Component {
             <Redirect to="/" />
           </Route>
         </Switch>
-      </div>
+      </main>
     );
   }
 }
