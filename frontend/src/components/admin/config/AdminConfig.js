@@ -127,29 +127,36 @@ class AdminConfig extends React.Component {
             The below email is assigned to receive receipts for the creation or
             change in status of all bookings.
           </text>
+          <br />
+          <br />
           <Form.Input
             error={emailError}
             placeholder="CC Email"
             name="email"
-            value={email}
+            value={email === "" ? "Loading..." : email}
             onChange={this.handleChange}
             disabled={disabled}
           />
+          <div
+            style={{ width: "100%", justifyContent: "center", display: "flex" }}
+          >
+            <Button.Group style={{ display: "flex" }}>
+              <Button
+                secondary
+                content="Edit CC Email"
+                onClick={this.toggleField}
+                style={{ border: "1px solid #dfdfdf" }}
+              />
+              <Button
+                primary
+                content="Confirm"
+                disabled={emailError || disabled}
+                onClick={this.handleSubmit}
+                style={{ border: "1px solid #dfdfdf" }}
+              />
+            </Button.Group>
+          </div>
         </Form>
-        <Button.Group>
-          <Button
-            content="Edit CC Email"
-            onClick={this.toggleField}
-            style={{ border: "1px solid #dfdfdf" }}
-          />
-          <Button
-            primary
-            content="Confirm"
-            disabled={emailError || disabled}
-            onClick={this.handleSubmit}
-            style={{ border: "1px solid #dfdfdf" }}
-          />
-        </Button.Group>
       </Segment>
     );
   }

@@ -155,6 +155,7 @@ class NavigationBar extends React.Component {
                   )}`}
                   avatar
                   bordered
+                  style={{ boxShadow: "1px 1px 2px 0 rgba(34,36,38,.85)" }}
                 />
               }
               options={options}

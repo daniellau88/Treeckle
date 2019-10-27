@@ -61,7 +61,7 @@ class UserAccountsTable extends React.Component {
 
   render() {
     return this.state.isLoading ? (
-      <Table>
+      <Table style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}>
         <Table.Row>
           <Table.Cell>
             <Placeholder>
@@ -131,6 +131,7 @@ class UserAccountsTable extends React.Component {
       </Table>
     ) : (
       <Table
+        style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}
         fixed
         headerRow={
           <Table.Row>
