@@ -3,6 +3,7 @@ import React from "react";
 //import axios from "axios";
 import { Context } from "../contexts/UserProvider";
 import { Menu, Container } from "semantic-ui-react";
+import ReactGA from "react-ga";
 //import { srcToFile } from "../util/ValidationUtil";
 
 class Dashboard extends React.Component {
@@ -11,7 +12,7 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    ReactGA.pageview("/dashboard");
   }
 
   /*

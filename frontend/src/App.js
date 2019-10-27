@@ -1,55 +1,46 @@
-import React, { useContext } from "react";
+import React from "react";
 import "./App.css";
-import { BrowserRouter as Router } from "react-router-dom";
-import ReactGA from "react-ga";
 import { Context } from "./contexts/UserProvider";
-import { Routes } from "./routes"; // where we are going to specify our routes
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import ReactGA from "react-ga";
+import NavigationBar from "./components/NavigationBar";
+import Dashboard from "./pages/Dashboard";
+import AdminPage from "./pages/AdminPage";
+import EventsPage from "./pages/EventsPage";
+import VenueBookingPage from "./pages/VenueBookingPage";
+import ProfilePage from "./pages/ProfilePage";
+import LoginForm from "./pages/authentication/Login";
+import ForgotPasswordForm from "./pages/authentication/ForgotPassword";
+import ResetPasswordForm from "./pages/authentication/ResetPassword";
+import RegisterFromEmailForm from "./pages/authentication/RegisterFromEmail";
+import CreateAccountUserPage from "./pages/authentication/CreateAccountUserPage";
+import { DEVELOPMENT_VIEW } from "./DevelopmentView";
 
-function App() {
-  ReactGA.initialize("UA-150749063-1");
-  ReactGA.pageview("/homepage");
-  const contextValue = useContext(Context);
+class App extends React.Component {
+  static contextType = Context;
 
-  let token = contextValue.token;
-  let name = contextValue.name;
-  let profilePic = contextValue.profilePic;
-  let role = contextValue.role;
+  constructor(props) {
+    super(props);
 
-  if (contextValue.token !== -1 && contextValue.token !== -2) {
-    token = localStorage.getItem("token");
-    name = localStorage.getItem("name");
-    profilePic =
-      localStorage.getItem("profilePic") === null ||
-      localStorage.getItem("profilePic") === ""
-        ? null
-        : JSON.parse(localStorage.getItem("profilePic"));
-    role = localStorage.getItem("role");
+    ReactGA.initialize("UA-150749063-1");
   }
 
-  token = token === null ? "" : token;
-  name = name === null ? "" : name;
-  profilePic = profilePic === null ? "" : profilePic;
-  role = role === null ? "" : role;
-
-  React.useEffect(() => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("name", name);
-    localStorage.setItem("profilePic", JSON.stringify(profilePic));
-    localStorage.setItem("role", role);
-    if (contextValue.token !== -1 && contextValue.token !== -2) {
-      contextValue.setUser(token, name, profilePic, role);
-    }
-  }, []);
-
-  return (
-    <Context.Consumer>
-      {(token, name, profilePic, role) => (
-        <Router>
-          <Routes />
-        </Router>
-      )}
-    </Context.Consumer>
-  );
+  render() {
+    console.log(this.context);
+    return (
+      <Router>
+        <NavigationBar />
+        <Switch>
+          <Route path="/dashboard" exact component={Dashboard} />
+          <Route path="/bookings" exact component={VenueBookingPage} />
+          <Route path="/events" exact component={EventsPage} />
+          <Route path="/admin" exact component={AdminPage} />
+          <Route path="/profile" exact component={ProfilePage} />
+          <Route path="/" exact component={LoginForm} />
+        </Switch>
+      </Router>
+    );
+  }
 }
 
 export default App;

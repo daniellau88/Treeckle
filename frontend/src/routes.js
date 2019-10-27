@@ -26,31 +26,6 @@ export const Routes = () => {
   let profilePic = contextValue.profilePic;
   let role = contextValue.role;
 
-  if (notNull(token)) {
-    localStorage.setItem("token", token);
-  } else {
-    token = localStorage.getItem("token");
-  }
-  if (notNull(name)) {
-    localStorage.setItem("name", name);
-  } else {
-    name = localStorage.getItem("name");
-  }
-  if (notNull(profilePic)) {
-    localStorage.setItem("profilePic", JSON.stringify(profilePic));
-  } else {
-    profilePic =
-      localStorage.getItem("profilePic") === null ||
-      localStorage.getItem("profilePic") === ""
-        ? null
-        : JSON.parse(localStorage.getItem("profilePic"));
-  }
-  if (notNull(role)) {
-    localStorage.setItem("role", role);
-  } else {
-    role = localStorage.getItem("role");
-  }
-
   return (
     <div>
       {token !== "" && token !== -1 && token !== -2 && <NavigationBar />}

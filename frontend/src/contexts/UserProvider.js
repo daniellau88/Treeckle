@@ -23,6 +23,10 @@ class UserProvider extends React.Component {
       profilePic: profilePic,
       role: role
     });
+    localStorage.setItem("token", token);
+    localStorage.setItem("name", name);
+    localStorage.setItem("profilePic", profilePic);
+    localStorage.setItem("role", role);
   }
 
   resetUser() {
