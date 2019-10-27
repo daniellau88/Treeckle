@@ -60,11 +60,12 @@ const eventSchema = new schema({
         required: true,
         unique: false
     },
-    attendees: {
-        type: [schema.Types.ObjectId],
+    attendees: [{
+        type: schema.Types.ObjectId,
         required: false,
-        unique: false
-    },
+        unique: false,
+        ref: 'user'
+    }],
     shortId: {
         type: String,
         required: true,

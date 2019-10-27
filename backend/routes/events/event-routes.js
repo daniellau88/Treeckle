@@ -71,9 +71,47 @@ router.post('/', jsonParser, [
                 res.send(constructedResponse);
             }
         )
-        .catch(err => res.status(500).send("Database Error"));
+        .catch(err => {
+            res.status(500).send("Database Error");
+        });
     }
 });
+
+// Organiser and higher: Get self-created requests
+router.get('/', async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.readSelf);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return ;
+    }
+
+    Event.byTenant(req.user.residence).find({ createdBy: req.user.userId }, '-createdBy -__v -tenantId', {sort: {eventDate : 1}})
+    .populate('attendees', 'name').lean()
+    .then(results => {
+        const sendToUser = [];
+            results.forEach(doc => {
+                sendToUser.push({
+                    eventId: doc._id,
+                    title: doc.title,
+                    description: doc.description,
+                    categories: doc.categories,
+                    venue: doc.venue,
+                    attendees: doc.attendees.map(userDoc => userDoc.name),
+                    attendeesNum: doc.attendees.length,
+                    organisedBy: doc.organisedBy,
+                    posterPath: doc.posterPath,
+                    eventDate: doc.eventDate.getTime(),
+                    signupsAllowed: doc.signupsAllowed,
+                    shortId: doc.shortId
+                });
+            });
+      res.send(sendToUser);  
+    })
+    .catch(error => {
+        res.status(500).send("Database Error");
+    })
+})
 
 //Resident: Set category tags
 router.post('/set/tags', jsonParser, [
