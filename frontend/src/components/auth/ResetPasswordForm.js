@@ -108,7 +108,7 @@ const ResetPasswordForm = props => {
         />
       )}
 
-      <Button
+      <Form.Button
         content={passwordChanged ? "Password changed" : "Reset"}
         primary={!passwordChanged}
         secondary={passwordChanged}
@@ -118,7 +118,7 @@ const ResetPasswordForm = props => {
         style={{ marginTop: "1em" }}
       />
       {passwordChanged && (
-        <Button
+        <Form.Button
           fluid
           content="Login here"
           onClick={() => history.push("/")}
