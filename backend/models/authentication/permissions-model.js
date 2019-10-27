@@ -12,23 +12,27 @@ const permissionSchema = new schema({
            type: Map,
            of: Boolean
        },
-       accountsAll: {
+       accounts: {
            type: Map,
            of: Boolean
        },
-       accountsSelf: {
+       roomsManagement: {
            type: Map,
            of: Boolean
        },
-       RoomsManagement: {
-           type: Map,
-           of: Boolean
-       },
-       BookingRequestsManagement: {
+       bookingRequestsManagement: {
            type: Map,
            of: Boolean
        },
        emailReceiptsConfig: {
+           type: Map,
+           of: Boolean
+       },
+       eventInstances: {
+           type: Map,
+           of: Boolean
+       },
+       eventEngagement: {
            type: Map,
            of: Boolean
        }
@@ -40,31 +44,34 @@ const configurePermissions = async () => {
     const admin = new Permissions({
         role: constants.roles.Admin,
         accountCreationRequest: {},
-        accountsAll: {},
-        accountsSelf: {},
-        RoomsManagement: {},
-        BookingRequestsManagement: {},
-        emailReceiptsConfig: {}
+        accounts: {},
+        roomsManagement: {},
+        bookingRequestsManagement: {},
+        emailReceiptsConfig: {},
+        eventInstances: {},
+        eventEngagement: {}
     });
 
     const organiser = new Permissions({
         role: constants.roles.Organiser,
         accountCreationRequest: {},
-        accountsAll: {},
-        accountsSelf: {},
-        RoomsManagement: {},
-        BookingRequestsManagement: {},
-        emailReceiptsConfig: {}
+        accounts: {},
+        roomsManagement: {},
+        bookingRequestsManagement: {},
+        emailReceiptsConfig: {},
+        eventInstances: {},
+        eventEngagement: {}
     });
 
     const resident = new Permissions({
         role: constants.roles.Resident,
         accountCreationRequest: {},
-        accountsAll: {},
-        accountsSelf: {},
-        RoomsManagement: {},
-        BookingRequestsManagement: {},
-        emailReceiptsConfig: {}
+        accounts: {},
+        roomsManagement: {},
+        bookingRequestsManagement: {},
+        emailReceiptsConfig: {},
+        eventInstances: {},
+        eventEngagement: {}
     });
 
     try {
@@ -74,32 +81,42 @@ const configurePermissions = async () => {
         admin.accountCreationRequest.set("update", true);
         admin.accountCreationRequest.set("delete", true);
 
-        admin.accountsAll.set("create", false);
-        admin.accountsAll.set("read", true);
-        admin.accountsAll.set("update", true);
-        admin.accountsAll.set("delete", true);
+        admin.accounts.set("create", false);
+        admin.accounts.set("readSelf", true);
+        admin.accounts.set("read", true);
+        admin.accounts.set("update", true);
+        admin.accounts.set("updateSelf", true);
+        admin.accounts.set("delete", true);
 
-        admin.accountsSelf.set("create", false);
-        admin.accountsSelf.set("read", true);
-        admin.accountsSelf.set("update", true);
-        admin.accountsSelf.set("delete", false);
+        admin.roomsManagement.set("create", true);
+        admin.roomsManagement.set("read", true);
+        admin.roomsManagement.set("update", true);
+        admin.roomsManagement.set("delete", true);
 
-        admin.RoomsManagement.set("create", true);
-        admin.RoomsManagement.set("read", true);
-        admin.RoomsManagement.set("update", true);
-        admin.RoomsManagement.set("delete", true);
-
-        admin.BookingRequestsManagement.set("create", true);
-        admin.BookingRequestsManagement.set("readAll", true);
-        admin.BookingRequestsManagement.set("read", true);
-        admin.BookingRequestsManagement.set("cancelSelf", true);
-        admin.BookingRequestsManagement.set("update", true);
-        admin.BookingRequestsManagement.set("delete", true);
+        admin.bookingRequestsManagement.set("create", true);
+        admin.bookingRequestsManagement.set("read", true);
+        admin.bookingRequestsManagement.set("readSelf", true);
+        admin.bookingRequestsManagement.set("updateSelf", true);
+        admin.bookingRequestsManagement.set("update", true);
+        admin.bookingRequestsManagement.set("delete", true);
 
         admin.emailReceiptsConfig.set("create", true);
         admin.emailReceiptsConfig.set("read", true);
         admin.emailReceiptsConfig.set("update", true);
         admin.emailReceiptsConfig.set("delete", false);
+
+        admin.eventInstances.set("create", true);
+        admin.eventInstances.set("readSelf", true);
+        admin.eventInstances.set("read", true);
+        admin.eventInstances.set("updateSelf", true);
+        admin.eventInstances.set("update", true);
+        admin.eventInstances.set("deleteSelf", true);
+        admin.eventInstances.set("delete", true);
+
+        admin.eventEngagement.set("create", true);
+        admin.eventEngagement.set("read", true);
+        admin.eventEngagement.set("update", true);
+        admin.eventEngagement.set("delete", false);
 
         //Organiser configuration
         organiser.accountCreationRequest.set("create", false);
@@ -107,32 +124,42 @@ const configurePermissions = async () => {
         organiser.accountCreationRequest.set("update", false);
         organiser.accountCreationRequest.set("delete", false);
 
-        organiser.accountsAll.set("create", false);
-        organiser.accountsAll.set("read", false);
-        organiser.accountsAll.set("update", false);
-        organiser.accountsAll.set("delete", false);
+        organiser.accounts.set("create", false);
+        organiser.accounts.set("readSelf", true);
+        organiser.accounts.set("read", false);
+        organiser.accounts.set("update", false);
+        organiser.accounts.set("updateSelf", true);
+        organiser.accounts.set("delete", false);
 
-        organiser.accountsSelf.set("create", false);
-        organiser.accountsSelf.set("read", true);
-        organiser.accountsSelf.set("update", true);
-        organiser.accountsSelf.set("delete", false);
+        organiser.roomsManagement.set("create", false);
+        organiser.roomsManagement.set("read", true);
+        organiser.roomsManagement.set("update", false);
+        organiser.roomsManagement.set("delete", false);
 
-        organiser.RoomsManagement.set("create", false);
-        organiser.RoomsManagement.set("read", true);
-        organiser.RoomsManagement.set("update", false);
-        organiser.RoomsManagement.set("delete", false);
-
-        organiser.BookingRequestsManagement.set("create", true);
-        organiser.BookingRequestsManagement.set("readAll", false);
-        organiser.BookingRequestsManagement.set("read", true);
-        organiser.BookingRequestsManagement.set("cancelSelf", true);
-        organiser.BookingRequestsManagement.set("update", false);
-        organiser.BookingRequestsManagement.set("delete", false);
+        organiser.bookingRequestsManagement.set("create", true);
+        organiser.bookingRequestsManagement.set("read", false);
+        organiser.bookingRequestsManagement.set("readSelf", true);
+        organiser.bookingRequestsManagement.set("updateSelf", true);
+        organiser.bookingRequestsManagement.set("update", false);
+        organiser.bookingRequestsManagement.set("delete", false);
 
         organiser.emailReceiptsConfig.set("create", false);
         organiser.emailReceiptsConfig.set("read", false);
         organiser.emailReceiptsConfig.set("update", false);
         organiser.emailReceiptsConfig.set("delete", false);
+
+        organiser.eventInstances.set("create", true);
+        organiser.eventInstances.set("readSelf", true);
+        organiser.eventInstances.set("read", false);
+        organiser.eventInstances.set("updateSelf", true);
+        organiser.eventInstances.set("update", false);
+        organiser.eventInstances.set("deleteSelf", true);
+        organiser.eventInstances.set("delete", false);
+
+        organiser.eventEngagement.set("create", false);
+        organiser.eventEngagement.set("read", true);
+        organiser.eventEngagement.set("update", true);
+        organiser.eventEngagement.set("delete", false);
 
         //Resident configuration
         resident.accountCreationRequest.set("create", false);
@@ -140,32 +167,42 @@ const configurePermissions = async () => {
         resident.accountCreationRequest.set("update", false);
         resident.accountCreationRequest.set("delete", false);
 
-        resident.accountsAll.set("create", false);
-        resident.accountsAll.set("read", false);
-        resident.accountsAll.set("update", true);
-        resident.accountsAll.set("delete", true);
+        resident.accounts.set("create", false);
+        resident.accounts.set("readSelf", true);
+        resident.accounts.set("read", false);
+        resident.accounts.set("update", false);
+        resident.accounts.set("updateSelf", true);
+        resident.accounts.set("delete", false);
 
-        resident.accountsSelf.set("create", false);
-        resident.accountsSelf.set("read", true);
-        resident.accountsSelf.set("update", true);
-        resident.accountsSelf.set("delete", false);
+        resident.roomsManagement.set("create", false);
+        resident.roomsManagement.set("read", true);
+        resident.roomsManagement.set("update", false);
+        resident.roomsManagement.set("delete", false);
 
-        resident.RoomsManagement.set("create", false);
-        resident.RoomsManagement.set("read", true);
-        resident.RoomsManagement.set("update", false);
-        resident.RoomsManagement.set("delete", false);
-
-        resident.BookingRequestsManagement.set("create", true);
-        resident.BookingRequestsManagement.set("readAll", false);
-        resident.BookingRequestsManagement.set("read", true);
-        resident.BookingRequestsManagement.set("cancelSelf", true);
-        resident.BookingRequestsManagement.set("update", false);
-        resident.BookingRequestsManagement.set("delete", false);
+        resident.bookingRequestsManagement.set("create", true);
+        resident.bookingRequestsManagement.set("read", false);
+        resident.bookingRequestsManagement.set("readSelf", true);
+        resident.bookingRequestsManagement.set("updateSelf", true);
+        resident.bookingRequestsManagement.set("update", false);
+        resident.bookingRequestsManagement.set("delete", false);
 
         resident.emailReceiptsConfig.set("create", false);
         resident.emailReceiptsConfig.set("read", false);
         resident.emailReceiptsConfig.set("update", false);
         resident.emailReceiptsConfig.set("delete", false);
+
+        resident.eventInstances.set("create", false);
+        resident.eventInstances.set("readSelf", false);
+        resident.eventInstances.set("read", false);
+        resident.eventInstances.set("updateSelf", false);
+        resident.eventInstances.set("update", false);
+        resident.eventInstances.set("deleteSelf", false);
+        resident.eventInstances.set("delete", false);
+
+        resident.eventEngagement.set("create", false);
+        resident.eventEngagement.set("read", true);
+        resident.eventEngagement.set("update", true);
+        resident.eventEngagement.set("delete", false);
 
         await admin.save();
         await organiser.save();

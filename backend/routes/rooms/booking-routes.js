@@ -14,7 +14,7 @@ const jsonParser = bodyParser.json();
 
 //Resident and up: Get an array of all roomBookings' made by requesting user
 router.get('/', async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.read);
+    const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.readSelf);
     
     if (!permitted) {
         res.sendStatus(401);
@@ -78,7 +78,7 @@ router.get('/all', [
     query("sortOrder").optional().isIn([-1, 1]).toInt()
 ], async (req, res) => {
     const errors = validationResult(req);
-    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.readAll);
+    const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.read);
 
     if (!permitted) {
         res.sendStatus(401);
@@ -193,7 +193,7 @@ router.get('/all', [
 
 //Admin: Get conflicts that approval can cause
 router.get('/manage/:id', async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.readAll);
+    const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.read);
     if (!permitted) {
         res.sendStatus(401);
     } else {
@@ -219,12 +219,12 @@ router.get('/manage/:id', async (req, res) => {
     }
 });
 
-//Authenticated User: Cancel their own request from pending/approved state
+//Resident and above: Cancel their own request from pending/approved state
 router.patch('/', jsonParser, [
     body('id').exists()
 ], async (req, res) => {
     const errors = validationResult(req);
-    const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.cancelSelf);
+    const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.updateSelf);
     if (!permitted) {
         res.sendStatus(401);
     } else if (!errors.isEmpty()) {
@@ -269,7 +269,7 @@ router.patch('/manage', jsonParser, [
     body('approved').exists().isInt()
     ], async (req, res) => {
         const errors = validationResult(req);
-        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.update);
+        const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.update);
         
         if (!permitted) {
             res.sendStatus(401);
@@ -409,7 +409,7 @@ router.get('/:roomId/:start-:end', [
     param('end').exists().isInt().toInt()
     ], sanitizeParam('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
      async (req, res) => {
-        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.read);
+        const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.readSelf);
         //Check for input errors
         const {roomId,start,end} = req.params;
         const errors = validationResult(req);
@@ -440,7 +440,7 @@ router.post('/', jsonParser, [
     body('end').exists().isInt(),
     ], sanitizeBody('roomId').customSanitizer(value => {return mongoose.Types.ObjectId(value)}),
     async (req, res) => {
-        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.create);
+        const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.create);
         //Check for input errors
         const errors = validationResult(req);
         if (!permitted) {
@@ -512,7 +512,7 @@ router.post('/', jsonParser, [
 router.delete('/', jsonParser, [
     body("bookingId").exists()
     ], async (req, res) => {
-        const permitted = await isPermitted(req.user.role, constants.categories.BookingRequestsManagement, constants.actions.delete);
+        const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.delete);
 
         //Check for input errors
         const errors = validationResult(req);
