@@ -25,6 +25,8 @@ router.get('/', async (req, res) => {
                     title: doc.title,
                     description: doc.description,
                     categories: doc.categories,
+                    venue: doc.venue,
+                    capacity: doc.capacity,
                     attendees: doc.attendees.length,
                     isUserAttendee: doc.attendees.includes(req.user.userId),
                     organisedBy: doc.organisedBy,

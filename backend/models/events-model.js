@@ -62,8 +62,6 @@ const eventSchema = new schema({
     },
     attendees: [{
         type: schema.Types.ObjectId,
-        required: false,
-        unique: false,
         ref: 'user'
     }],
     shortId: {
