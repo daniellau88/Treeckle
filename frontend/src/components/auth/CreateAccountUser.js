@@ -1,14 +1,13 @@
 import React from "react";
-import logo from "../images/treeckle_startup.png";
-import { Context } from "../contexts/UserProvider";
 import { withRouter } from "react-router";
-import axios from "axios";
+import logo from "../../images/treeckle_startup.png";
+import Axios from "axios";
 import * as yup from "yup";
+import { Context } from "../../contexts/UserProvider";
 import { Button, Form, Grid, Segment, Image, Header } from "semantic-ui-react";
 
-class ResetPasswordDivider extends React.Component {
+class CreateAccountUser extends React.Component {
   static contextType = Context;
-
   constructor(props) {
     super(props);
 
@@ -60,19 +59,17 @@ class ResetPasswordDivider extends React.Component {
       })
   });
 
-  handleChange = (e, { name, value }) => {
+  handleChange = (event, { name, value }) => {
     this.setState({ [name]: value });
   };
 
   handleSubmit = () => {
+    console.log();
+
     if (this.state.password != this.state.passwordRepeated) {
       return;
     }
-    const config = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
+
     const { email, password } = this.state;
     this.setState({
       submittedEmail: email,
@@ -89,25 +86,37 @@ class ResetPasswordDivider extends React.Component {
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!" + this.context.token);
-        axios
-          .post(
-            "/auth/resetAttempt",
-            {
-              name: this.state.name,
-              email: this.state.email,
-              password: this.state.password,
-              uniqueURIcomponent: this.props.match.params.uniqueId
-            },
-            config
-          )
-          .then(res => {
-            if (res.status === 200) {
-              window.location.replace("/");
-            }
+        if (this.props.match.params.uniqueId === undefined) {
+          //Used for pilot test
+          Axios.post("/auth/newAccountsDirect", {
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password
           })
-          .catch(err => {
-            console.log(err);
-          });
+            .then(res => {
+              if (res.status === 200) {
+                this.setState({ userCreated: true });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        } else {
+          Axios.post("/auth/newAccounts", {
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password,
+            uniqueURIcomponent: this.props.match.params.uniqueId
+          })
+            .then(res => {
+              if (res.status === 200) {
+                this.setState({ userCreated: true });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        }
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
           if (!valid) {
@@ -127,6 +136,15 @@ class ResetPasswordDivider extends React.Component {
     });
   };
 
+  areValidFields() {
+    return (
+      this.state.name &&
+      this.state.email &&
+      this.state.password.length >= 8 &&
+      this.state.password === this.state.passwordRepeated
+    );
+  }
+
   render() {
     const {
       name,
@@ -136,16 +154,14 @@ class ResetPasswordDivider extends React.Component {
       submittedEmail,
       submittedPassword,
       emailError,
-      passwordError
+      passwordError,
+      userCreated
     } = this.state;
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
           <Grid.Column verticalAlign="middle">
-            <Header style={{ margin: "1.5em auto" }}>Reset Password</Header>
-            <p>
-              Please provide us with your full name, email and new password.
-            </p>
+            <Header style={{ margin: "1.5em auto" }}>Create account</Header>
             <Form onSubmit={this.handleSubmit}>
               <Form.Input
                 icon="user"
@@ -154,15 +170,17 @@ class ResetPasswordDivider extends React.Component {
                 name="name"
                 value={name}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
               <Form.Input
                 error={emailError}
-                icon="user"
+                icon="mail"
                 iconPosition="left"
                 placeholder="Email"
                 name="email"
                 value={email}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
               <Form.Input
                 error={passwordError}
@@ -173,6 +191,7 @@ class ResetPasswordDivider extends React.Component {
                 name="password"
                 value={password}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
               <Form.Input
                 icon="lock"
@@ -182,19 +201,39 @@ class ResetPasswordDivider extends React.Component {
                 name="passwordRepeated"
                 value={passwordRepeated}
                 onChange={this.handleChange}
+                disabled={userCreated}
               />
-              {this.state.password == ""
-                ? null
-                : this.state.password == this.state.passwordRepeated
-                ? "passwords match"
-                : "passwords don't match"}
+
+              {!userCreated && password && password.length < 8 && (
+                <div style={{ color: "red" }}>
+                  Password is less than 8 characters
+                </div>
+              )}
+
+              {!userCreated && password && passwordRepeated && (
+                <div style={{ color: "red" }}>
+                  {password === passwordRepeated
+                    ? "Passwords match"
+                    : "Passwords don't match"}
+                </div>
+              )}
 
               <Button
-                content={"Reset Password"}
-                primary
+                content={userCreated ? "User Created" : "Create"}
+                primary={!userCreated}
+                secondary={userCreated}
                 style={{ minWidth: "210px", margin: "1em auto" }}
+                disabled={!this.areValidFields() || userCreated}
               />
             </Form>
+            {this.state.userCreated && (
+              <Button
+                fluid
+                content="Login here"
+                onClick={() => this.props.history.push("/")}
+                primary
+              />
+            )}
           </Grid.Column>
           <Grid.Column
             verticalAlign="middle"
@@ -211,11 +250,9 @@ class ResetPasswordDivider extends React.Component {
             />
           </Grid.Column>
         </Grid>
-
-        {/* <Divider vertical></Divider> */}
       </Segment>
     );
   }
 }
 
-export default withRouter(ResetPasswordDivider);
+export default withRouter(CreateAccountUser);

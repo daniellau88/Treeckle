@@ -27,6 +27,7 @@ class DeleteUserButton extends React.Component {
         CONSOLE_LOGGING && console.log("DELETE user", response);
         if (response.status === 200) {
           this.props.updateTable();
+          this.togglePopup();
         }
       })
       .catch(({ response }) => {

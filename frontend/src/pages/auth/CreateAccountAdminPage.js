@@ -1,5 +1,5 @@
 import React from "react";
-import CreateAccountAdmin from "../../components/CreateAccountAdmin";
+import CreateAccountAdmin from "../../components/auth/CreateAccountAdmin";
 import { Grid } from "semantic-ui-react";
 
 const CreateAccountAdminPage = () => (

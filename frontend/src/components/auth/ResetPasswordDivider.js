@@ -1,35 +1,28 @@
 import React from "react";
-import logo from "../images/treeckle_startup.png";
-import { Context } from "../contexts/UserProvider";
+import logo from "../../images/treeckle_startup.png";
+import { Context } from "../../contexts/UserProvider";
 import { withRouter } from "react-router";
 import axios from "axios";
 import * as yup from "yup";
-import {
-  Button,
-  Divider,
-  Form,
-  Grid,
-  Segment,
-  Image,
-  Header
-} from "semantic-ui-react";
+import { Button, Form, Grid, Segment, Image, Header } from "semantic-ui-react";
 
-class RegisterFromEmailDivider extends React.Component {
+class ResetPasswordDivider extends React.Component {
   static contextType = Context;
-  state = {
-    name: "",
-    email: "",
-    password: "",
-    passwordRepeated: "",
-    submittedEmail: "",
-    submittedPassword: "",
-    emailError: null,
-    passwordError: null,
-    userCreated: false
-  };
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      name: "",
+      email: "",
+      password: "",
+      passwordRepeated: "",
+      submittedEmail: "",
+      submittedPassword: "",
+      emailError: null,
+      passwordError: null,
+      userCreated: false
+    };
   }
 
   InputSchema = yup.object().shape({
@@ -98,7 +91,7 @@ class RegisterFromEmailDivider extends React.Component {
         console.log("yell hea!" + this.context.token);
         axios
           .post(
-            "/auth/newAccounts",
+            "/auth/resetAttempt",
             {
               name: this.state.name,
               email: this.state.email,
@@ -149,7 +142,7 @@ class RegisterFromEmailDivider extends React.Component {
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
           <Grid.Column verticalAlign="middle">
-            <Header style={{ margin: "1.5em auto" }}>Register</Header>
+            <Header style={{ margin: "1.5em auto" }}>Reset Password</Header>
             <p>
               Please provide us with your full name, email and new password.
             </p>
@@ -164,7 +157,7 @@ class RegisterFromEmailDivider extends React.Component {
               />
               <Form.Input
                 error={emailError}
-                icon="mail"
+                icon="user"
                 iconPosition="left"
                 placeholder="Email"
                 name="email"
@@ -197,7 +190,7 @@ class RegisterFromEmailDivider extends React.Component {
                 : "passwords don't match"}
 
               <Button
-                content={"Complete Registration"}
+                content={"Reset Password"}
                 primary
                 style={{ minWidth: "210px", margin: "1em auto" }}
               />
@@ -225,4 +218,4 @@ class RegisterFromEmailDivider extends React.Component {
   }
 }
 
-export default withRouter(RegisterFromEmailDivider);
+export default withRouter(ResetPasswordDivider);

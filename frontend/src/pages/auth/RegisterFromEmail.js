@@ -1,13 +1,13 @@
 import React from "react";
-import CreateAccountUser from "../../components/CreateAccountUser";
+import RegisterFromEmailDivider from "../../components/auth/RegisterFromEmailDivider.js";
 import { Grid } from "semantic-ui-react";
 
-const CreateAccountUserPage = () => (
+const RegisterFromEmailForm = () => (
   <Grid style={{ height: "100vh" }} textAlign="center" verticalAlign="middle">
     <Grid.Column style={{ maxWidth: "80%" }}>
-      <CreateAccountUser />
+      <RegisterFromEmailDivider />
     </Grid.Column>
   </Grid>
 );
 
-export default CreateAccountUserPage;
+export default RegisterFromEmailForm;

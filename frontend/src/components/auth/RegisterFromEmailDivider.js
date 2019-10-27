@@ -1,27 +1,27 @@
 import React from "react";
+import logo from "../../images/treeckle_startup.png";
+import { Context } from "../../contexts/UserProvider";
 import { withRouter } from "react-router";
-import logo from "../images/treeckle_startup.png";
-import Axios from "axios";
+import axios from "axios";
 import * as yup from "yup";
-import { Context } from "../contexts/UserProvider";
 import { Button, Form, Grid, Segment, Image, Header } from "semantic-ui-react";
 
-class CreateAccountUser extends React.Component {
+class RegisterFromEmailDivider extends React.Component {
   static contextType = Context;
+  state = {
+    name: "",
+    email: "",
+    password: "",
+    passwordRepeated: "",
+    submittedEmail: "",
+    submittedPassword: "",
+    emailError: null,
+    passwordError: null,
+    userCreated: false
+  };
+
   constructor(props) {
     super(props);
-
-    this.state = {
-      name: "",
-      email: "",
-      password: "",
-      passwordRepeated: "",
-      submittedEmail: "",
-      submittedPassword: "",
-      emailError: null,
-      passwordError: null,
-      userCreated: false
-    };
   }
 
   InputSchema = yup.object().shape({
@@ -59,17 +59,19 @@ class CreateAccountUser extends React.Component {
       })
   });
 
-  handleChange = (event, { name, value }) => {
+  handleChange = (e, { name, value }) => {
     this.setState({ [name]: value });
   };
 
   handleSubmit = () => {
-    console.log();
-
     if (this.state.password != this.state.passwordRepeated) {
       return;
     }
-
+    const config = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
     const { email, password } = this.state;
     this.setState({
       submittedEmail: email,
@@ -86,37 +88,25 @@ class CreateAccountUser extends React.Component {
     this.InputSchema.isValid(inputData).then(valid => {
       if (valid) {
         console.log("yell hea!" + this.context.token);
-        if (this.props.match.params.uniqueId === undefined) {
-          //Used for pilot test
-          Axios.post("/auth/newAccountsDirect", {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password
+        axios
+          .post(
+            "/auth/newAccounts",
+            {
+              name: this.state.name,
+              email: this.state.email,
+              password: this.state.password,
+              uniqueURIcomponent: this.props.match.params.uniqueId
+            },
+            config
+          )
+          .then(res => {
+            if (res.status === 200) {
+              window.location.replace("/");
+            }
           })
-            .then(res => {
-              if (res.status === 200) {
-                this.setState({ userCreated: true });
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        } else {
-          Axios.post("/auth/newAccounts", {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password,
-            uniqueURIcomponent: this.props.match.params.uniqueId
-          })
-            .then(res => {
-              if (res.status === 200) {
-                this.setState({ userCreated: true });
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        }
+          .catch(err => {
+            console.log(err);
+          });
       } else {
         this.EmailSchema.isValid(inputData).then(valid => {
           if (!valid) {
@@ -136,15 +126,6 @@ class CreateAccountUser extends React.Component {
     });
   };
 
-  areValidFields() {
-    return (
-      this.state.name &&
-      this.state.email &&
-      this.state.password.length >= 8 &&
-      this.state.password === this.state.passwordRepeated
-    );
-  }
-
   render() {
     const {
       name,
@@ -154,14 +135,16 @@ class CreateAccountUser extends React.Component {
       submittedEmail,
       submittedPassword,
       emailError,
-      passwordError,
-      userCreated
+      passwordError
     } = this.state;
     return (
       <Segment placeholder>
         <Grid columns={2} relaxed="very" stackable>
           <Grid.Column verticalAlign="middle">
-            <Header style={{ margin: "1.5em auto" }}>Create account</Header>
+            <Header style={{ margin: "1.5em auto" }}>Register</Header>
+            <p>
+              Please provide us with your full name, email and new password.
+            </p>
             <Form onSubmit={this.handleSubmit}>
               <Form.Input
                 icon="user"
@@ -170,7 +153,6 @@ class CreateAccountUser extends React.Component {
                 name="name"
                 value={name}
                 onChange={this.handleChange}
-                disabled={userCreated}
               />
               <Form.Input
                 error={emailError}
@@ -180,7 +162,6 @@ class CreateAccountUser extends React.Component {
                 name="email"
                 value={email}
                 onChange={this.handleChange}
-                disabled={userCreated}
               />
               <Form.Input
                 error={passwordError}
@@ -191,7 +172,6 @@ class CreateAccountUser extends React.Component {
                 name="password"
                 value={password}
                 onChange={this.handleChange}
-                disabled={userCreated}
               />
               <Form.Input
                 icon="lock"
@@ -201,39 +181,19 @@ class CreateAccountUser extends React.Component {
                 name="passwordRepeated"
                 value={passwordRepeated}
                 onChange={this.handleChange}
-                disabled={userCreated}
               />
-
-              {!userCreated && password && password.length < 8 && (
-                <div style={{ color: "red" }}>
-                  Password is less than 8 characters
-                </div>
-              )}
-
-              {!userCreated && password && passwordRepeated && (
-                <div style={{ color: "red" }}>
-                  {password === passwordRepeated
-                    ? "Passwords match"
-                    : "Passwords don't match"}
-                </div>
-              )}
+              {this.state.password == ""
+                ? null
+                : this.state.password == this.state.passwordRepeated
+                ? "passwords match"
+                : "passwords don't match"}
 
               <Button
-                content={userCreated ? "User Created" : "Create"}
-                primary={!userCreated}
-                secondary={userCreated}
+                content={"Complete Registration"}
+                primary
                 style={{ minWidth: "210px", margin: "1em auto" }}
-                disabled={!this.areValidFields() || userCreated}
               />
             </Form>
-            {this.state.userCreated && (
-              <Button
-                fluid
-                content="Login here"
-                onClick={() => this.props.history.push("/")}
-                primary
-              />
-            )}
           </Grid.Column>
           <Grid.Column
             verticalAlign="middle"
@@ -250,9 +210,11 @@ class CreateAccountUser extends React.Component {
             />
           </Grid.Column>
         </Grid>
+
+        {/* <Divider vertical></Divider> */}
       </Segment>
     );
   }
 }
 
-export default withRouter(CreateAccountUser);
+export default withRouter(RegisterFromEmailDivider);
