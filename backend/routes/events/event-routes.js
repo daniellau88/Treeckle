@@ -65,6 +65,7 @@ router.post('/', jsonParser, [
         .then(result => {
                 const constructedResponse = {
                     posterPath: result.posterPath,
+                    creationDate: result.creationDate.getTime(),
                     shortId: result.shortId
                 }
                 res.send(constructedResponse);
