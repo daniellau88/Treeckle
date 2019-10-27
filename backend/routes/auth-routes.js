@@ -112,7 +112,7 @@ router.post("/newAccounts", jsonParser, [
     }
 });
 
-//Account creation request
+//Admin: Account creation request
 router.post('/newAccountRequest', passport.authenticate('jwt', { session: false }), jsonParser, [
     check('email').isEmail(),
 ], async (req, res) => {
@@ -167,7 +167,7 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
     }
 });
 
-//Bulk account creation requests through CSV file
+//Admin: Bulk account creation requests through CSV file
 router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: false }), upload.single('csvFile'), async (req, res) => {
     const acceptedRows = [];
     const rejectedRows = [];

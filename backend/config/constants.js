@@ -25,19 +25,21 @@ module.exports = {
     },
     categories: {
         accountCreationRequest: "accountCreationRequest",
-        accountsAll: "accountsAll",
-        accountsSelf: "accountsSelf",
-        RoomsManagement: "RoomsManagement",
-        BookingRequestsManagement: "BookingRequestsManagement",
-        emailReceiptsConfig: "emailReceiptsConfig"
+        accounts: "accounts",
+        roomsManagement: "roomsManagement",
+        bookingRequestsManagement: "bookingRequestsManagement",
+        emailReceiptsConfig: "emailReceiptsConfig",
+        eventInstances: "eventInstances",
+        eventEngagement: "eventEngagement"
     },
     actions: {
         create: "create",
+        readSelf: "read",
         read: "read",
-        readAll: "readAll",
-        cancelSelf: "cancelSelf",
+        updateSelf: "updateSelf",
         update: "update",
-        delete: "delete"
+        delete: "delete",
+        deleteSelf: "deleteSelf"
     },
     profilePicSizeLimit: 4096000,
     residences: {
