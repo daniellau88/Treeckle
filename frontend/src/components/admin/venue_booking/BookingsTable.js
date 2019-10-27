@@ -89,6 +89,7 @@ class BookingsTable extends React.Component {
   render() {
     return this.state.allRequests.length > 0 ? (
       <Table
+        style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}
         headerRow={
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
@@ -107,7 +108,12 @@ class BookingsTable extends React.Component {
         renderBodyRow={this.renderBodyRow}
       />
     ) : (
-      <Segment textAlign="center" size="huge" loading={this.state.isLoading}>
+      <Segment
+        placeholder
+        textAlign="center"
+        size="huge"
+        loading={this.state.isLoading}
+      >
         There are currently no booking requests
       </Segment>
     );
