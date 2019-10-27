@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const creationRoutes = require('./creation-routes');
-const attendRoutes = require('./attend-routes');
+const galleryRoutes = require('./gallery-routes');
 const bodyParser = require('body-parser');
 const Event = require('../../models/events-model');
 const User = require('../../models/authentication/user-model');
@@ -22,7 +22,7 @@ const upload = multer({ storage: storage });
 
 const jsonParser = bodyParser.json();
 
-router.use('/attend', attendRoutes);
+router.use('/gallery', galleryRoutes);
 router.use('/create', creationRoutes);
 
 //Organiser or above: Create new event
@@ -73,39 +73,6 @@ router.post('/', jsonParser, [
         )
         .catch(err => res.status(500).send("Database Error"));
     }
-});
-
-//Resident and higher: View all events
-router.get('/', async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
-
-    if (!permitted) {
-        res.sendStatus(401);
-        return ;
-    }
-
-    Event.byTenant(req.user.residence).find({}, '-creationDate -createdBy -__v -tenantId', {sort: {eventDate : 1}}).lean()
-        .then(resp => {
-            const sendToUser = [];
-            resp.forEach(doc => {
-                sendToUser.push({
-                    eventId: doc._id,
-                    title: doc.title,
-                    description: doc.description,
-                    categories: doc.categories,
-                    attendees: doc.attendees.length,
-                    organisedBy: doc.organisedBy,
-                    posterPath: doc.posterPath,
-                    eventDate: doc.eventDate.getTime(),
-                    signupsAllowed: doc.signupsAllowed,
-                    shortId: doc.shortId
-                });
-            });
-            res.send(sendToUser);
-        })
-        .catch(err => {
-            res.status(500).send("Database Error");
-        });
 });
 
 //Resident: Set category tags
