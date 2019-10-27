@@ -96,3 +96,4 @@ typings/
 # Additional
 /config/keys.js
 /uploads
+/public
