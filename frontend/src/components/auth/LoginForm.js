@@ -26,7 +26,7 @@ const LoginForm = props => {
         CONSOLE_LOGGING && console.log("POST sign in:", response);
         if (response.status === 200) {
           const { token, name, profilePic, role } = response.data;
-          context.setUser(token, name, profilePic, role);
+          context.setUser(token, name, profilePic.data, role);
           history.replace("/dashboard");
         }
       })

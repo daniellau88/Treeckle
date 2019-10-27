@@ -1,6 +1,5 @@
 import React from "react";
 import "./App.css";
-import Axios from "axios";
 import { Context } from "./contexts/UserProvider";
 import {
   BrowserRouter as Router,
@@ -31,20 +30,46 @@ class App extends React.Component {
   }
 
   render() {
-    console.log(this.context);
+    const { token, role } = this.context;
+
     return (
       <Router>
-        <NavigationBar />
+        {token !== "null" && <NavigationBar />}
         <Switch>
-          <Route path="/" exact component={LoginPage} />
-          <Route path="/dashboard" exact component={Dashboard} />
-          <Route path="/bookings" exact component={VenueBookingPage} />
-
-          <Route path="/events" exact component={EventsPage} />
-
-          <Route path="/admin" exact component={AdminPage} />
-
-          <Route path="/profile" exact component={ProfilePage} />
+          <Route path="/" exact>
+            {token !== "null" ? <Redirect to="/dashboard" /> : <LoginPage />}
+          </Route>
+          {token !== "null" && (
+            <Route path="/dashboard" exact component={Dashboard} />
+          )}
+          {token !== "null" && (
+            <Route path="/bookings" exact component={VenueBookingPage} />
+          )}
+          {token !== "null" && DEVELOPMENT_VIEW && (
+            <Route path="/events" exact component={EventsPage} />
+          )}
+          {token !== "null" && role === "Admin" && (
+            <Route path="/admin" exact component={AdminPage} />
+          )}
+          {token !== "null" && (
+            <Route path="/profile" exact component={ProfilePage} />
+          )}
+          <Route
+            path="/user/create/:uniqueId"
+            component={CreateAccountUserPage}
+          ></Route>
+          <Route path="/user/create/" component={CreateAccountUserPage}></Route>
+          <Route
+            path="/auth/newAccounts/:uniqueId"
+            component={RegisterFromEmailForm}
+          ></Route>
+          <Route
+            path="/auth/resetAttempt/:uniqueId"
+            component={ResetPasswordForm}
+          ></Route>
+          <Route>
+            <Redirect to="/" />
+          </Route>
         </Switch>
       </Router>
     );
