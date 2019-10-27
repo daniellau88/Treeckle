@@ -3,12 +3,12 @@ import AuthLayout from "../../components/auth/AuthLayout";
 import LoginForm from "../../components/auth/LoginForm";
 import ForgetPasswordForm from "../../components/auth/ForgotPasswordForm";
 
-const LoginPage = props => {
+const LoginPage = () => {
   const [forgetPassword, setForgetPassword] = useState(false);
 
   return (
     <AuthLayout
-      children={
+      form={
         forgetPassword ? (
           <ForgetPasswordForm setForgetPassword={setForgetPassword} />
         ) : (

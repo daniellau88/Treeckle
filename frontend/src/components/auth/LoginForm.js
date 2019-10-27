@@ -54,7 +54,6 @@ const LoginForm = props => {
         icon="mail"
         iconPosition="left"
         placeholder="Email"
-        name="email"
         onChange={(event, { value }) => {
           setEmail(value);
           setInvalidMessage("");
@@ -66,7 +65,6 @@ const LoginForm = props => {
         iconPosition="left"
         placeholder="Password"
         type="password"
-        name="password"
         onChange={(event, { value }) => {
           setPassword(value);
           setInvalidMessage("");

@@ -1,12 +1,7 @@
 import React from "react";
 import "./App.css";
 import { Context } from "./contexts/UserProvider";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Redirect
-} from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import ReactGA from "react-ga";
 import NavigationBar from "./components/NavigationBar";
 import Dashboard from "./pages/Dashboard";
@@ -15,9 +10,9 @@ import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
-import ResetPasswordForm from "./pages/auth/ResetPassword";
-import RegisterFromEmailForm from "./pages/auth/RegisterFromEmail";
-import CreateAccountUserPage from "./pages/auth/CreateAccountUserPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import DirectAccountCreationPage from "./pages/auth/DirectAccountCreationPage";
+import LinkAccountCreationPage from "./pages/auth/LinkAccountCreationPage";
 import { DEVELOPMENT_VIEW } from "./DevelopmentView";
 
 class App extends React.Component {
@@ -31,9 +26,8 @@ class App extends React.Component {
 
   render() {
     const { token, role } = this.context;
-
     return (
-      <Router>
+      <div>
         {token !== "null" && <NavigationBar />}
         <Switch>
           <Route path="/" exact>
@@ -54,24 +48,20 @@ class App extends React.Component {
           {token !== "null" && (
             <Route path="/profile" exact component={ProfilePage} />
           )}
-          <Route
-            path="/user/create/:uniqueId"
-            component={CreateAccountUserPage}
-          ></Route>
-          <Route path="/user/create/" component={CreateAccountUserPage}></Route>
+          <Route path="/user/create" component={DirectAccountCreationPage} />
           <Route
             path="/auth/newAccounts/:uniqueId"
-            component={RegisterFromEmailForm}
-          ></Route>
+            component={LinkAccountCreationPage}
+          />
           <Route
             path="/auth/resetAttempt/:uniqueId"
-            component={ResetPasswordForm}
-          ></Route>
+            component={ResetPasswordPage}
+          />
           <Route>
             <Redirect to="/" />
           </Route>
         </Switch>
-      </Router>
+      </div>
     );
   }
 }

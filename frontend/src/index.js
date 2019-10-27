@@ -7,15 +7,18 @@ import * as serviceWorker from "./serviceWorker";
 // import "semantic-ui-css/semantic.min.css";
 import "semantic-ui-less/semantic.less";
 import UserProvider, { Context } from "./contexts/UserProvider";
+import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(
-  <UserProvider>
-    <Context.Consumer>
-      {(token, name, profilePic, role, setUser, resetUser) => {
-        return <App />;
-      }}
-    </Context.Consumer>
-  </UserProvider>,
+  <Router>
+    <UserProvider>
+      <Context.Consumer>
+        {(token, name, profilePic, role, setUser, resetUser, toLoginPage) => {
+          return <App />;
+        }}
+      </Context.Consumer>
+    </UserProvider>
+  </Router>,
 
   document.getElementById("root")
 );

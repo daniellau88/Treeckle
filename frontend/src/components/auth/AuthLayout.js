@@ -8,7 +8,7 @@ const AuthLayout = props => {
       <Grid.Column style={{ maxWidth: "80%" }}>
         <Segment placeholder>
           <Grid columns={2} relaxed="very" stackable>
-            <Grid.Column verticalAlign="middle">{props.children}</Grid.Column>
+            <Grid.Column verticalAlign="middle">{props.form}</Grid.Column>
             <Grid.Column
               verticalAlign="middle"
               style={{ display: "flex", alignItems: "center" }}
