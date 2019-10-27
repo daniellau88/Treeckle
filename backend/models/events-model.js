@@ -52,7 +52,7 @@ const eventSchema = new schema({
     },
     eventDate: {
         type: Date,
-        required: false,
+        required: true,
         unique: false
     },
     signupsAllowed: {

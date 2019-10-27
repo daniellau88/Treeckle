@@ -31,7 +31,7 @@ router.post('/', jsonParser, [
     body('categories').isArray(),
     body('organisedBy').exists(),
     body('capacity').optional().isInt().toInt(),
-    body('eventDate').optional().isInt().toInt(),
+    body('eventDate').isInt().toInt(),
     body('signupsAllowed').isBoolean().toBoolean()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.create);
@@ -75,25 +75,35 @@ router.post('/', jsonParser, [
     }
 });
 
-//Resident: View all events
-router.post('/all', jsonParser, [
-], async (req, res) => {
-    //Check for input errors
+//Resident and higher: View all events
+router.get('/', async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
 
-    Event.byTenant(req.user.residence).find({}).lean()
-        .then(async resp => {
-            try {
-                const sendToUser = [];
-                resp.forEach(request => {
-                    sendToUser.push({
-                        request
-                    });
+    if (!permitted) {
+        res.sendStatus(401);
+        return ;
+    }
+
+    Event.byTenant(req.user.residence).find({}, '-creationDate -createdBy -__v -tenantId', {sort: {eventDate : 1}}).lean()
+        .then(resp => {
+            const sendToUser = [];
+            resp.forEach(doc => {
+                sendToUser.push({
+                    eventId: doc._id,
+                    title: doc.title,
+                    description: doc.description,
+                    categories: doc.categories,
+                    attendees: doc.attendees.length,
+                    organisedBy: doc.organisedBy,
+                    posterPath: doc.posterPath,
+                    eventDate: doc.eventDate.getTime(),
+                    signupsAllowed: doc.signupsAllowed,
+                    shortId: doc.shortId
                 });
-                res.send(sendToUser);
-            } catch (err) {
-                res.status(500).send("Database Error");
-            }
-        }).catch(err => {
+            });
+            res.send(sendToUser);
+        })
+        .catch(err => {
             res.status(500).send("Database Error");
         });
 });
