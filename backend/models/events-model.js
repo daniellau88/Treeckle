@@ -10,8 +10,9 @@ const eventSchema = new schema({
     },
     description: {
         type: String,
-        required: false,
-        unique: false
+        required: true,
+        unique: false,
+        default: "No description provided."
     },
     categories: {
         type: [String],
@@ -23,9 +24,9 @@ const eventSchema = new schema({
         required: false,
         unique: false
     },
-    organizedBy: {
+    organisedBy: {
         type: String,
-        required: false,
+        required: true,
         unique: false
     },
     createdBy: {
@@ -35,7 +36,7 @@ const eventSchema = new schema({
     },
     posterPath: {
         type: String,
-        required: false,
+        required: true,
         unique: false
     },
     venue: {
@@ -46,7 +47,7 @@ const eventSchema = new schema({
     creationDate: {
         type: Date,
         default: Date.now,
-        required: false,
+        required: true,
         unique: false
     },
     eventDate: {
@@ -56,17 +57,21 @@ const eventSchema = new schema({
     },
     signupsAllowed: {
         type: Boolean,
-        required: false,
+        required: true,
         unique: false
     },
     attendees: {
         type: [schema.Types.ObjectId],
         required: false,
         unique: false
+    },
+    shortId: {
+        type: String,
+        required: true,
+        unique: true
     }
 });
 
-eventSchema.index({eventDate: 1, title: 1}, {unique: true});
 eventSchema.plugin(mongoTenant);
 const Event = mongoose.model('event', eventSchema);
 module.exports = Event;
