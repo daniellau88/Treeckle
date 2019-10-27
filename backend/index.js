@@ -15,6 +15,8 @@ const app = express();
 const path = require("path");
 const port = 3000;
 
+const serveIndex = require('serve-index');
+
 //Initialize
 app.use(passport.initialize());
 //configurePermissions();
@@ -43,9 +45,11 @@ app.get("/", (req, res) =>
 
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 
+app.use('/ftp', express.static('public'), serveIndex('public', {'icons': true}));
+
 //Catch GET requests to invalid URIs and redirect to home page
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
-});
+//app.get("/*", (req, res) => {
+//  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+//});
 
 app.listen(port, () => console.log(`Application running on port ${port}!`));

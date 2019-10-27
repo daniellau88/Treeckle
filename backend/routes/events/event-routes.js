@@ -4,9 +4,21 @@ const attendRoutes = require('./attend-routes');
 const bodyParser = require('body-parser');
 const Event = require('../../models/events-model');
 const User = require('../../models/authentication/user-model');
+const path = require('path');
 const constants = require('../../config/constants');
 const { isPermitted } = require('../../services/auth-service');
 const { body, validationResult } = require('express-validator');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: 'public',
+    filename: function (req, file, cb) {
+        //console.log("in middle ", req.body);
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+})
+
+const upload = multer({ storage: storage });
 
 const jsonParser = bodyParser.json();
 
@@ -90,6 +102,7 @@ router.post('/all', jsonParser, [
 
 //Resident: Set category tags
 router.post('/set/tags', jsonParser, [
+    body("categories").exists()
 ], async (req, res) => {
     //Check for input errors
     //console.log(req.body.categories);
@@ -162,5 +175,26 @@ router.delete('/', jsonParser, [
 
 
 })
+
+//Upload image for event matching title and time
+router.post('/image', upload.single('image'), [
+    body("title").exists(),
+    body("date").exists()
+], async (req, res) => {
+    console.log(req.body.title + req.body.date);
+    console.log(req.file);
+
+    Event.byTenant(req.user.residence).findOneAndUpdate(
+        { eventDate: req.body.date, createdBy: req.user.userId, title: req.body.title },
+        { posterPath: req.file.path }
+    )
+        .then(resp => {
+            res.send(req.file);
+        })
+        .catch(err => {
+            res.sendStatus(400);
+        })
+
+});
 
 module.exports = router;
