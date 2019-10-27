@@ -1,10 +1,10 @@
 import React from "react";
-import sampleSVG from "../images/SampleSVGImage.svg";
-import axios from "axios";
+//import sampleSVG from "../images/SampleSVGImage.svg";
+//import axios from "axios";
 import { Context } from "../contexts/UserProvider";
 import { Menu, Container } from "semantic-ui-react";
 import ReactGA from "react-ga";
-import { srcToFile } from "../util/ValidationUtil";
+//import { srcToFile } from "../util/ValidationUtil";
 
 class Dashboard extends React.Component {
   static contextType = Context;
@@ -14,7 +14,7 @@ class Dashboard extends React.Component {
 
     ReactGA.pageview("/dashboard");
   }
-
+  /*
   componentDidMount() {
     setTimeout(
       srcToFile(sampleSVG, "test.svg", "image/svc").then(function(file) {
@@ -39,7 +39,7 @@ class Dashboard extends React.Component {
       1000
     );
   }
-
+*/
   render() {
     return (
       <main className="dashboard">
