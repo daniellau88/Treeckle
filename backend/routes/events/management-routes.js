@@ -1,90 +1,17 @@
 const router = require('express').Router();
-const creationRoutes = require('./creation-routes');
-const galleryRoutes = require('./gallery-routes');
-const managementRoutes = require('./management-routes');
-const bodyParser = require('body-parser');
 const Event = require('../../models/events-model');
-const User = require('../../models/authentication/user-model');
-const shortId = require('shortid');
-const path = require('path');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
 const constants = require('../../config/constants');
 const { isPermitted } = require('../../services/auth-service');
 const { body, query, validationResult } = require('express-validator');
-const multer = require('multer');
 
-const storage = multer.diskStorage({
-    destination: 'public',
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    }
-})
-
-const upload = multer({ storage: storage });
-
-const jsonParser = bodyParser.json();
-
-router.use('/gallery', galleryRoutes);
-router.use('/create', creationRoutes);
-router.use('/management', managementRoutes);
-
-//Organiser or above: Create new event
-router.post('/', jsonParser, [
-    body('title').exists().isString(),
-    body('categories').isArray(),
-    body('organisedBy').exists(),
-    body('capacity').optional().isInt().toInt(),
-    body('eventDate').isInt().toInt(),
-    body('signupsAllowed').isBoolean().toBoolean()
-], async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.create);
-
-    //Check for input errors
-    const errors = validationResult(req);
-
-    if (!permitted) {
-        res.sendStatus(401);
-    } else if (!errors.isEmpty()) {
-        res.status(422).json({ errors: errors.array() });
-    } else {
-        const newEvent = {
-            title: req.body.title,
-            description: req.body.description,
-            categories: req.body.categories,
-            capacity: req.body.capacity,
-            organisedBy: req.body.organisedBy,
-            createdBy: req.user.userId,
-            posterPath: "EventPoster.png", //to be updated
-            venue: req.body.venue,
-            eventDate: req.body.eventDate,
-            signupsAllowed: req.body.signupsAllowed,
-            attendees: [],
-            shortId: shortId.generate()
-        };
-
-        const EventModel = Event.byTenant(req.user.residence);
-        const eventInstance = new EventModel(newEvent);
-        eventInstance.save()
-            .then(result => {
-                const constructedResponse = {
-                    posterPath: result.posterPath,
-                    creationDate: result.creationDate.getTime(),
-                    shortId: result.shortId
-                }
-                res.send(constructedResponse);
-            }
-            )
-            .catch(err => {
-                res.status(500).send("Database Error");
-            });
-    }
-});
-
-//Organiser and higher: Get self-created requests
+//Admin: Get all requests
 router.get('/', [
     query('historical').optional().isBoolean().toBoolean(),
     query('latestFirst').optional().isBoolean().toBoolean()
 ], async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.readSelf);
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.read);
 
     //Check for input errors
     const errors = validationResult(req);
@@ -97,11 +24,12 @@ router.get('/', [
         return;
     }
 
-    const filter = (req.query.historical)? { createdBy: req.user.userId } : { createdBy: req.user.userId, eventDate : { $gte : Date.now() }};
+    const filter = (req.query.historical)? {} : { eventDate : { $gte : Date.now() }};
     const sortOrder = (req.query.latestFirst)? {sort: {eventDate : -1}} : {sort: {eventDate : 1}};
 
-    Event.byTenant(req.user.residence).find(filter, '-createdBy -__v -tenantId', sortOrder)
-        .populate('attendees', 'name').lean()
+    Event.byTenant(req.user.residence).find(filter, ' -__v -tenantId', sortOrder)
+        .populate('attendees', 'name')
+        .populate('createdBy', 'name email').lean()
         .then(results => {
             const sendToUser = [];
             results.forEach(doc => {
@@ -115,6 +43,7 @@ router.get('/', [
                     attendeesNames: doc.attendees.map(userDoc => userDoc.name),
                     attendees: doc.attendees.length,
                     organisedBy: doc.organisedBy,
+                    createdBy: { email: doc.createdBy.email, name: doc.createdBy.name },
                     posterPath: doc.posterPath,
                     eventDate: doc.eventDate.getTime(),
                     signupsAllowed: doc.signupsAllowed,
@@ -128,11 +57,11 @@ router.get('/', [
         })
 });
 
-//Organiser and above: Delete a self-created event
+//Admin: Delete any event
 router.delete('/', jsonParser, [
     body("eventId").exists()
 ], async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.deleteSelf);
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.delete);
 
     //Check for input errors
     const errors = validationResult(req);
@@ -145,7 +74,7 @@ router.delete('/', jsonParser, [
         return;
     }
 
-    Event.byTenant(req.user.residence).deleteOne({ createdBy: req.user.userId, _id: req.body.eventId })
+    Event.byTenant(req.user.residence).deleteOne({ _id: req.body.eventId })
         .then(result => {
             if (result.deletedCount > 0) {
                 res.sendStatus(200);
@@ -162,7 +91,7 @@ router.delete('/', jsonParser, [
         });
 });
 
-//Organiser and higher: Update a self-created event
+//Admin: Update a self-created event
 router.patch('/', jsonParser, [
     body('eventId').exists(),
     body('title').optional().not().isEmpty(),
@@ -174,7 +103,7 @@ router.patch('/', jsonParser, [
     body('eventDate').optional().isInt().toInt(),
     body('signupsAllowed').optional().isBoolean().toBoolean().isIn([true])
 ], async (req, res) => {
-    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.updateSelf);
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.update);
 
     //Check for input errors
     const errors = validationResult(req);
@@ -194,8 +123,9 @@ router.patch('/', jsonParser, [
         if (req.body.eventDate) updateObject.eventDate = req.body.eventDate;
         if (req.body.signupsAllowed) updateObject.signupsAllowed = req.body.signupsAllowed;
 
-        Event.byTenant(req.user.residence).findOneAndUpdate({ createdBy: req.user.userId, _id: req.body.eventId },
-            updateObject, {new: true}).lean()
+        Event.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.eventId },
+            updateObject, {new: true})
+            .populate('createdBy', 'name email').lean()
             .then(doc => {
                 if (!doc) {
                     res.sendStatus(404);
@@ -210,6 +140,7 @@ router.patch('/', jsonParser, [
                         attendeesNames: doc.attendees.map(userDoc => userDoc.name),
                         attendees: doc.attendees.length,
                         organisedBy: doc.organisedBy,
+                        createdBy: { email: doc.createdBy.email, name: doc.createdBy.name },
                         posterPath: doc.posterPath,
                         eventDate: doc.eventDate.getTime(),
                         signupsAllowed: doc.signupsAllowed,
@@ -223,32 +154,5 @@ router.patch('/', jsonParser, [
     }
 });
 
-
-//Organiser or above: Add poster for event
-router.patch('/image', upload.single('image'), [
-    body('eventId').exists()
-], async (req, res) => {
-
-    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.create);
-
-    //Check for input errors
-    const errors = validationResult(req);
-
-    if (!permitted) {
-        res.sendStatus(401);
-    } else if (!errors.isEmpty()) {
-        res.status(422).json({ errors: errors.array() });
-    } else {
-        Event.byTenant(req.user.residence).findOneAndUpdate(
-            { _id: req.body.eventId, createdBy: req.user.userId, },
-            { posterPath: req.file.path }
-        ).then(resp => {
-            res.send(resp);
-        }).catch(err => {
-            res.sendStatus(500).send("Database Error");
-        })
-    }
-
-});
 
 module.exports = router;
