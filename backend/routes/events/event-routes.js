@@ -3,6 +3,7 @@ const creationRoutes = require('./creation-routes');
 const galleryRoutes = require('./gallery-routes');
 const bodyParser = require('body-parser');
 const Event = require('../../models/events-model');
+const Category = require('../../models/category-model');
 const User = require('../../models/authentication/user-model');
 const shortId = require('shortid');
 const path = require('path');
@@ -58,6 +59,27 @@ router.post('/', jsonParser, [
             attendees: [],
             shortId: shortId.generate()
         };
+
+        const CategoryModel = Category.byTenant(req.user.residence);
+        if (req.body.categories) {
+            for (i = 0; i < req.body.categories.length; i++) {
+                const curr = req.body.categories[i];
+                CategoryModel.findOne({ "name": curr })
+                    .then(exists => {
+                        if (exists) {
+                            const previousCount = exists.upcomingEventCount;
+                            User.findOneAndUpdate({ "name": curr }, { upcomingEventCount: previousCount+1});
+                        } else {
+                            const newCategory = {
+                                "name": curr,
+                                upcomingEventCount: 0
+                            }
+                            const categoryInstance = new CategoryModel(newCategory);
+                            categoryInstance.save();
+                        }
+                    });
+            }
+        }
 
         const EventModel = Event.byTenant(req.user.residence);
         const eventInstance = new EventModel(newEvent);
@@ -120,8 +142,24 @@ router.get('/', [
         })
 })
 
-//Resident: Set category tags
-router.post('/set/tags', jsonParser, [
+//Resident: View all category tags
+router.get('/tags', jsonParser, [
+], async (req, res) => {
+    //Check for input errors
+    //console.log(req.body.categories);
+    const CategoryModel = Category.byTenant(req.user.residence);
+    CategoryModel.find({})
+        .then(resp => {
+            res.status(200).send(resp);
+        })
+        .catch(err => {
+            res.sendStatus(400);
+        });
+
+});
+
+//Resident: Set available categories
+router.get('/set/tags', jsonParser, [
     body("categories").exists()
 ], async (req, res) => {
     //Check for input errors
