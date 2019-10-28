@@ -146,51 +146,35 @@ router.get('/', [
         .catch(error => {
             res.status(500).send("Database Error");
         })
-})
-
-//Resident: View all category tags
-router.get('/tags', jsonParser, [
-], async (req, res) => {
-    //Check for input errors
-    //console.log(req.body.categories);
-    const CategoryModel = Category.byTenant(req.user.residence);
-    CategoryModel.find({})
-        .then(resp => {
-            res.status(200).send(resp);
-        })
-        .catch(err => {
-            res.sendStatus(400);
-        });
-
 });
 
-//delete event by title
+//Organiser and above: Delete a self-created event
 router.delete('/', jsonParser, [
-    body("title").exists()
+    body("eventId")
 ], async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.deleteSelf);
 
-    Event.byTenant(req.user.residence).findOne({ title: req.body.title, createdBy: req.user.userId })
-        .then(async relevantReq => {
-            if (!relevantReq) {
-                res.sendStatus(400);
+    //Check for input errors
+    const errors = validationResult(req);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+        return;
+    }
+
+    Event.byTenant(req.user.residence).deleteOne({ createdBy: req.user.userId, _id: req.body.eventId })
+        .then(result => {
+            if (result.deletedCount > 0) {
+                res.sendStatus(200);
             } else {
-                Event.byTenant(req.user.residence).deleteOne({ title: req.body.title })
-                    .then(result => {
-                        if (result.deletedCount > 0) {
-                            res.sendStatus(200);
-                        } else {
-                            res.sendStatus(404);
-                        }
-                    })
-                    .catch(err => res.sendStatus(500));
+                res.sendStatus(404);
             }
         })
-        .catch(err => {
-            res.sendStatus(400);
-        })
-
-
-})
+        .catch(err => res.sendStatus(500));
+});
 
 //Organiser or above: Add poster for event
 router.patch('/image', upload.single('image'), [
