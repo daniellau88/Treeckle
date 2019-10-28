@@ -35,10 +35,10 @@ router.post('/', jsonParser, [
     body('signupsAllowed').isBoolean().toBoolean()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.create);
-    
+
     //Check for input errors
     const errors = validationResult(req);
-    
+
     if (!permitted) {
         res.sendStatus(401);
     } else if (!errors.isEmpty()) {
@@ -51,7 +51,7 @@ router.post('/', jsonParser, [
             capacity: req.body.capacity,
             organisedBy: req.body.organisedBy,
             createdBy: req.user.userId,
-            posterPath: "insertDefaultPicturePathHere", //to be updated
+            posterPath: "EventPoster.png", //to be updated
             venue: req.body.venue,
             eventDate: req.body.eventDate,
             signupsAllowed: req.body.signupsAllowed,
@@ -62,7 +62,7 @@ router.post('/', jsonParser, [
         const EventModel = Event.byTenant(req.user.residence);
         const eventInstance = new EventModel(newEvent);
         eventInstance.save()
-        .then(result => {
+            .then(result => {
                 const constructedResponse = {
                     posterPath: result.posterPath,
                     creationDate: result.creationDate.getTime(),
@@ -70,10 +70,10 @@ router.post('/', jsonParser, [
                 }
                 res.send(constructedResponse);
             }
-        )
-        .catch(err => {
-            res.status(500).send("Database Error");
-        });
+            )
+            .catch(err => {
+                res.status(500).send("Database Error");
+            });
     }
 });
 
@@ -83,13 +83,13 @@ router.get('/', async (req, res) => {
 
     if (!permitted) {
         res.sendStatus(401);
-        return ;
+        return;
     }
 
-    Event.byTenant(req.user.residence).find({ createdBy: req.user.userId }, '-createdBy -__v -tenantId', {sort: {eventDate : 1}})
-    .populate('attendees', 'name').lean()
-    .then(results => {
-        const sendToUser = [];
+    Event.byTenant(req.user.residence).find({ createdBy: req.user.userId }, '-createdBy -__v -tenantId', { sort: { eventDate: 1 } })
+        .populate('attendees', 'name').lean()
+        .then(results => {
+            const sendToUser = [];
             results.forEach(doc => {
                 sendToUser.push({
                     eventId: doc._id,
@@ -107,11 +107,11 @@ router.get('/', async (req, res) => {
                     shortId: doc.shortId
                 });
             });
-      res.send(sendToUser);  
-    })
-    .catch(error => {
-        res.status(500).send("Database Error");
-    })
+            res.send(sendToUser);
+        })
+        .catch(error => {
+            res.status(500).send("Database Error");
+        })
 })
 
 //Resident: Set category tags
@@ -190,24 +190,30 @@ router.delete('/', jsonParser, [
 
 })
 
-//Upload image for event matching title and time
-router.post('/image', upload.single('image'), [
-    body("title").exists(),
-    body("date").exists()
+//Organiser or above: Add poster for event
+router.patch('/image', upload.single('image'), [
+    body('eventId').exists()
 ], async (req, res) => {
-    console.log(req.body.title + req.body.date);
-    console.log(req.file);
 
-    Event.byTenant(req.user.residence).findOneAndUpdate(
-        { eventDate: req.body.date, createdBy: req.user.userId, title: req.body.title },
-        { posterPath: req.file.path }
-    )
-        .then(resp => {
-            res.send(req.file);
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.create);
+
+    //Check for input errors
+    const errors = validationResult(req);
+
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        Event.byTenant(req.user.residence).findOneAndUpdate(
+            { _id: req.body.eventId, createdBy: req.user.userId, },
+            { posterPath: req.file.path }
+        ).then(resp => {
+            res.send(resp);
+        }).catch(err => {
+            res.sendStatus(500).send("Database Error");
         })
-        .catch(err => {
-            res.sendStatus(400);
-        })
+    }
 
 });
 

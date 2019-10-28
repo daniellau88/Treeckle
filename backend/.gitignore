@@ -97,3 +97,4 @@ typings/
 /config/keys.js
 /uploads
 /public
+!EventPoster.png
