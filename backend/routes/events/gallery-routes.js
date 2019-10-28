@@ -103,7 +103,7 @@ router.patch('/', jsonParser, [
 });
 
 //Resident and higher: Retrieve user's categories
-router.get('/userCategories', async (req, res) => {
+router.get('/categories', async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.readSelf);
 
     if (!permitted) {
@@ -122,7 +122,7 @@ router.get('/userCategories', async (req, res) => {
 })
 
 //Resident and higher: Set user's categories
-router.patch('/userCategories', jsonParser, [
+router.patch('/categories', jsonParser, [
     body('subscribedCategories').isArray(),
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.updateSelf);
@@ -148,32 +148,51 @@ router.patch('/userCategories', jsonParser, [
         });
 });
 
-//Resident: View events with user categories
-router.post('/all/tags', jsonParser, [
+//Resident and higher: View events filtered by categories
+router.post('/categories', jsonParser, [
+    body('filterCategories').isArray(),
+    body('latestFirst').optional().isBoolean().toBoolean()
 ], async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
+    
     //Check for input errors
+    const errors = validationResult(req);
 
-    User.findOne({ _id: req.user.userId }).lean()
-        .then(user => {
-            const tags = user.subscribedCategories;
-            Event.byTenant(req.user.residence).find({}).lean()
-                .then(async resp => {
-                    try {
-                        const sendToUser = [];
-                        resp.forEach(event => {
-                            if (tags.some(x => event.categories.includes(x))) {
-                                sendToUser.push({
-                                    event
-                                });
-                            }
-                        });
-                        res.send(sendToUser);
-                    } catch (err) {
-                        res.status(500).send("Database Error");
-                    }
-                }).catch(err => {
-                    res.status(500).send("Database Error");
+    if (!permitted) {
+        res.sendStatus(401);
+        return;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+        return;
+    }
+
+    const filter =  { eventDate: {$gte : Date.now() }, categories : { $in : req.body.filterCategories }};
+    const sortOrder = (req.body.latestFirst)? {sort: {eventDate : -1}} : {sort: {eventDate : 1}};
+
+    Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder ).lean()
+        .then(resp => {
+            const sendToUser = [];
+            resp.forEach(doc => {
+                sendToUser.push({
+                    eventId: doc._id,
+                    title: doc.title,
+                    description: doc.description,
+                    categories: doc.categories,
+                    venue: doc.venue,
+                    capacity: doc.capacity,
+                    attendees: doc.attendees.length,
+                    isUserAttendee: doc.attendees.includes(req.user.userId),
+                    organisedBy: doc.organisedBy,
+                    posterPath: doc.posterPath,
+                    eventDate: doc.eventDate.getTime(),
+                    signupsAllowed: doc.signupsAllowed,
+                    shortId: doc.shortId
                 });
+            });
+            res.send(sendToUser);
+        })
+        .catch(err => {
+            res.status(500).send("Database Error");
         });
 });
 
