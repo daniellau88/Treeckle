@@ -150,7 +150,7 @@ router.get('/', [
 
 //Organiser and above: Delete a self-created event
 router.delete('/', jsonParser, [
-    body("eventId")
+    body("eventId").exists()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.deleteSelf);
 
@@ -173,7 +173,7 @@ router.delete('/', jsonParser, [
                 res.sendStatus(404);
             }
         })
-        .catch(err => res.sendStatus(500));
+        .catch(err => res.status(500).send("Database Error"));
 });
 
 //Organiser or above: Add poster for event
