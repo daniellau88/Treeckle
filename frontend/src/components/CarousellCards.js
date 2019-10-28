@@ -1,12 +1,9 @@
 import React from "react";
 import EventCard from "./EventCard";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import "./CarousellCards.css";
 import { Button } from "semantic-ui-react";
 
 const CarousellCards = () => {
-
   let ref = React.createRef();
 
   const handleClick = () => {
@@ -14,8 +11,7 @@ const CarousellCards = () => {
     // ref.current.scrollIntoView({
     //   behavior: 'smooth',
     //   block: 'start',
-    };
-
+  };
 
   const eventOne = {
     title: "Investment",
@@ -44,7 +40,6 @@ const CarousellCards = () => {
     image:
       "http://www.orlandonorthsports.com/assets/images/placeholders/placeholder-event.png"
   };
-
 
   return (
     <div>
@@ -75,8 +70,12 @@ const CarousellCards = () => {
         </a>
       </div>
       <div>
-        <Button id="left-button" floated='left' onClick={null}>Left</Button>
-        <Button floated='right' onClick={handleClick}>Right</Button>
+        <Button id="left-button" floated="left" onClick={null}>
+          Left
+        </Button>
+        <Button floated="right" onClick={handleClick}>
+          Right
+        </Button>
       </div>
     </div>
   );

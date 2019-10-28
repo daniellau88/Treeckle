@@ -130,11 +130,11 @@ class ProfileCard extends React.Component {
                 <Grid.Column stretched>
                   <Segment basic compact size="huge">
                     <Header size={"huge"}>{this.context.name}</Header>
-                    <p style={{ fontSize: "0.75em" }}>
+                    <div style={{ fontSize: "0.75em" }}>
                       <br />
                       <strong>Role: </strong>
                       {this.context.role}
-                    </p>
+                    </div>
                   </Segment>
                   <Segment basic compact></Segment>
                   <Segment basic compact>

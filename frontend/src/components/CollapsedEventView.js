@@ -5,9 +5,7 @@ const CollapsedEventView = props => {
   const curr = props.event;
 
   return (
-    <Card
-      style={{ minWidth: "80vw", borderRadius: "1.25rem", overflow: "hidden" }}
-    >
+    <Card fluid>
       <Card.Content
         style={{
           display: "inline-flex",

@@ -1,43 +1,34 @@
-import React, { useState } from "react";
-import CarousellCards from "../components/CarousellCards";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { Card, Icon, Image, Header, Menu } from "semantic-ui-react";
-import EventCard from "../components/EventCard";
-import EventList from "../components/EventList";
+import React, { useState, useContext } from "react";
+import { Menu, Container, Button, Icon } from "semantic-ui-react";
+import { Context } from "../contexts/UserProvider";
+import EventsScene from "../components/user/events/EventsScene";
+import EventCreation from "../components/admin/events/EventCreation";
 
 const EventsPage = props => {
+  const context = useContext(Context);
+  const [creating, setCreating] = useState(false);
+
   return (
     <main className="events-page">
       <Menu size="huge"></Menu>
       <br />
-      <div className="placeholder">
-
-        <br /><br />
-        <Header style={{ margin: "1em 1em" }}>Recommended Events</Header>
-        <CarousellCards />
-        <br /><br />
-        <br /><br />
-
-        <br /><br />
-        <Header style={{ margin: "1em 1em" }}>Upcoming Events</Header>
-        <CarousellCards />
-        <br /><br />
-        <br /><br />
-
-        <br /><br />
-        <Header style={{ margin: "1em 1em" }}>Events you've signed up for</Header>
-        <CarousellCards />
-        <br /><br />
-        <br /><br />
-
-        <div style={{ margin: "auto 10vw" }}>
-          <Header style={{ margin: "1em 1em" }}>Your Created Events</Header>
-          <EventList />
-          <br /><br />
-          <br /><br />
-        </div>
-      </div>
+      <br />
+      {(context.role === "Organiser" || context.role === "Admin") && (
+        <Container>
+          <Button fluid animated="fade" onClick={() => setCreating(!creating)}>
+            <Button.Content visible>
+              <Icon name={creating ? "close" : "add"} />
+            </Button.Content>
+            <Button.Content hidden>
+              {creating ? "Cancel event creation" : "Create new event"}
+            </Button.Content>
+          </Button>
+          {!creating && (
+            <h1 style={{ color: "#FDFDFD" }}>Recommended Events</h1>
+          )}
+        </Container>
+      )}
+      {creating ? <EventCreation /> : <EventsScene />}
     </main>
   );
 };

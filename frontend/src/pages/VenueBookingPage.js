@@ -12,6 +12,7 @@ const VenueBookingPage = props => {
     <main className="booking-page">
       <Menu size="huge"></Menu>
       <br />
+      <br />
       <Container>
         <Button fluid animated="fade" onClick={() => setCreating(!creating)}>
           <Button.Content visible>
