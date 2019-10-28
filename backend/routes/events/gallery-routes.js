@@ -1,10 +1,11 @@
 const router = require('express').Router();
-const {isPermitted} = require('../../services/auth-service');
+const { isPermitted } = require('../../services/auth-service');
 const Event = require('../../models/events-model');
 const User = require('../../models/authentication/user-model');
 const constants = require('../../config/constants');
 const { body, query, validationResult } = require('express-validator');
 const bodyParser = require('body-parser');
+var csv = require('fast-csv');
 
 const jsonParser = bodyParser.json();
 
@@ -14,7 +15,7 @@ router.get('/', [
     query('latestFirst').optional().isBoolean().toBoolean()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
-    
+
     //Check for input errors
     const errors = validationResult(req);
 
@@ -27,10 +28,10 @@ router.get('/', [
     }
 
     //const filter = (req.query.historical)? {} : { eventDate : { $gte : Date.now() }};
-    const filter =  { eventDate: {$gte : Date.now() }};
-    const sortOrder = (req.query.latestFirst)? {sort: {eventDate : -1}} : {sort: {eventDate : 1}};
+    const filter = { eventDate: { $gte: Date.now() } };
+    const sortOrder = (req.query.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
 
-    Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder ).lean()
+    Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder).lean()
         .then(resp => {
             const sendToUser = [];
             resp.forEach(doc => {
@@ -57,10 +58,86 @@ router.get('/', [
         });
 });
 
+//Resident and higher: Get recommended events
+router.get('/recommended', [
+    query('latestFirst').optional().isBoolean().toBoolean()
+], async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
+
+    //Check for input errors
+    const errors = validationResult(req);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+        return;
+    }
+
+    const filter = { eventDate: { $gte: Date.now() } };
+    const sortOrder = (req.query.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
+
+
+    User.findById(req.user.userId, 'participatedEventsIds')
+        .lean()
+        .then(result => {
+            pastIds = result.participatedEventsIds;
+            var dict = {};
+            csv.fromPath("Recommendation/out.csv", { headers: false })
+                .on("data", data => {
+                    dict[data[0]] = data[1];
+                })
+                .on("end", () => {
+                    console.log(dict);
+                    console.log(pastIds);
+                    Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder).lean()
+                        .then(resp => {
+                            const sendToUser = [];
+                            resp.forEach(doc => {
+                                console.log("future events", doc._id);
+                                console.log("pair event", dict[doc._id]);
+                                const pairEvent = dict[doc._id];
+                                console.log("checking ", pastIds[0]==pairEvent);
+                                canInclude = false;
+                                if (pairEvent != undefined) {
+                                    pastIds.forEach(x => {
+                                        if (x == pairEvent) {
+                                            canInclude = true;
+                                        }
+                                    });
+                                }
+                                if (canInclude) {
+                                    sendToUser.push({
+                                        eventId: doc._id,
+                                        title: doc.title,
+                                        description: doc.description,
+                                        categories: doc.categories,
+                                        venue: doc.venue,
+                                        capacity: doc.capacity,
+                                        attendees: doc.attendees.length,
+                                        isUserAttendee: doc.attendees.includes(req.user.userId),
+                                        organisedBy: doc.organisedBy,
+                                        posterPath: doc.posterPath,
+                                        eventDate: doc.eventDate.getTime(),
+                                        signupsAllowed: doc.signupsAllowed,
+                                        shortId: doc.shortId
+                                    });
+                                }
+                            });
+                            res.send(sendToUser);
+                        })
+                })
+        })
+        .catch(err => {
+            res.status(500).send("Why Error");
+        });
+});
+
 //Resident and higher: (Un)Sign up for event
 router.patch('/', jsonParser, [
     body('eventId').exists(),
-    body('signUp').isIn([0,1]).toInt()
+    body('signUp').isIn([0, 1]).toInt()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.update);
 
@@ -72,33 +149,33 @@ router.patch('/', jsonParser, [
     } else if (!errors.isEmpty()) {
         res.status(422).json({ errors: errors.array() });
     } else {
-        const updateObject = (req.body.signUp === 1)? { $addToSet : { attendees: req.user.userId }} : { $pull : { attendees: req.user.userId }};
-        const userUpdateObject = (req.body.signUp === 1)? { $addToSet : { participatedEventsIds : req.body.eventId } }
-            : { $pull : {participatedEventsIds : req.body.eventId } };
+        const updateObject = (req.body.signUp === 1) ? { $addToSet: { attendees: req.user.userId } } : { $pull: { attendees: req.user.userId } };
+        const userUpdateObject = (req.body.signUp === 1) ? { $addToSet: { participatedEventsIds: req.body.eventId } }
+            : { $pull: { participatedEventsIds: req.body.eventId } };
 
-        Event.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.eventId, signupsAllowed: true, eventDate: { $gte : Date.now() }}, updateObject)
-        .then(async result => {
-            if (!result) {
-                res.sendStatus(400);
-            } else {
-                try {   
-                    await User.updateOne({ _id: req.user.userId }, userUpdateObject).lean();
-                    res.send({
-                        counterAddition: (req.body.signUp === 1)? (result.attendees.includes(req.user.userId))? 0 : 1 
-                            : (result.attendees.includes(req.user.userId))? -1 : 0
-                    });
-                } catch {
+        Event.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.eventId, signupsAllowed: true, eventDate: { $gte: Date.now() } }, updateObject)
+            .then(async result => {
+                if (!result) {
+                    res.sendStatus(400);
+                } else {
+                    try {
+                        await User.updateOne({ _id: req.user.userId }, userUpdateObject).lean();
+                        res.send({
+                            counterAddition: (req.body.signUp === 1) ? (result.attendees.includes(req.user.userId)) ? 0 : 1
+                                : (result.attendees.includes(req.user.userId)) ? -1 : 0
+                        });
+                    } catch {
+                        res.status(500).send("Database Error");
+                    }
+                }
+            })
+            .catch(err => {
+                if (err.name === 'CastError') {
+                    res.sendStatus(400);
+                } else {
                     res.status(500).send("Database Error");
-                }  
-            }
-        })
-        .catch (err => {
-            if (err.name === 'CastError') {
-                res.sendStatus(400);
-            } else {
-                res.status(500).send("Database Error");
-            }
-        });
+                }
+            });
     }
 });
 
@@ -126,10 +203,10 @@ router.patch('/categories', jsonParser, [
     body('subscribedCategories').isArray(),
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.updateSelf);
-    
+
     //Check for input errors
     const errors = validationResult(req);
-    
+
     if (!permitted) {
         res.sendStatus(401);
         return;
@@ -154,7 +231,7 @@ router.post('/categories', jsonParser, [
     body('latestFirst').optional().isBoolean().toBoolean()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
-    
+
     //Check for input errors
     const errors = validationResult(req);
 
@@ -166,10 +243,10 @@ router.post('/categories', jsonParser, [
         return;
     }
 
-    const filter =  { eventDate: {$gte : Date.now() }, categories : { $in : req.body.filterCategories }};
-    const sortOrder = (req.body.latestFirst)? {sort: {eventDate : -1}} : {sort: {eventDate : 1}};
+    const filter = { eventDate: { $gte: Date.now() }, categories: { $in: req.body.filterCategories } };
+    const sortOrder = (req.body.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
 
-    Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder ).lean()
+    Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder).lean()
         .then(resp => {
             const sendToUser = [];
             resp.forEach(doc => {

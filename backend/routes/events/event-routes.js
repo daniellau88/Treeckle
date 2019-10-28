@@ -7,6 +7,8 @@ const Category = require('../../models/category-model');
 const User = require('../../models/authentication/user-model');
 const shortId = require('shortid');
 const path = require('path');
+const fs = require('fs')
+const csv = require('fast-csv');
 const constants = require('../../config/constants');
 const { isPermitted } = require('../../services/auth-service');
 const { body, query, validationResult } = require('express-validator');
@@ -68,7 +70,7 @@ router.post('/', jsonParser, [
                     .then(exists => {
                         if (exists) {
                             const previousCount = exists.upcomingEventCount;
-                            User.findOneAndUpdate({ "name": curr }, { upcomingEventCount: previousCount+1});
+                            User.findOneAndUpdate({ "name": curr }, { upcomingEventCount: previousCount + 1 });
                         } else {
                             const newCategory = {
                                 "name": curr,
@@ -81,6 +83,13 @@ router.post('/', jsonParser, [
             }
         }
 
+
+        const append = (file, rows = []) => {
+            let csvFile = fs.createWriteStream(file, { flags: 'a', includeEndRowDelimiter: true })
+            csvFile.write('\n');
+            csv.writeToStream(csvFile, rows, { headers: false })
+        }
+
         const EventModel = Event.byTenant(req.user.residence);
         const eventInstance = new EventModel(newEvent);
         eventInstance.save()
@@ -90,6 +99,14 @@ router.post('/', jsonParser, [
                     creationDate: result.creationDate.getTime(),
                     shortId: result.shortId
                 }
+                const des = (req.body.description + " " + req.body.categories.join(' ') + " " + req.body.organisedBy + " " + req.body.venue + "\0");
+                append('Recommendation/in.csv', [
+                    {
+                        id: result._id,
+                        title: req.body.title,
+                        des: des
+                    },
+                ]);
                 res.send(constructedResponse);
             }
             )
@@ -117,8 +134,8 @@ router.get('/', [
         return;
     }
 
-    const filter = (req.query.historical)? { createdBy: req.user.userId } : { createdBy: req.user.userId, eventDate : { $gte : Date.now() }};
-    const sortOrder = (req.query.latestFirst)? {sort: {eventDate : -1}} : {sort: {eventDate : 1}};
+    const filter = (req.query.historical) ? { createdBy: req.user.userId } : { createdBy: req.user.userId, eventDate: { $gte: Date.now() } };
+    const sortOrder = (req.query.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
 
     Event.byTenant(req.user.residence).find(filter, '-createdBy -__v -tenantId', sortOrder)
         .populate('attendees', 'name').lean()
