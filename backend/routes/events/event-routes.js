@@ -106,8 +106,14 @@ router.get('/', [
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.readSelf);
 
+    //Check for input errors
+    const errors = validationResult(req);
+
     if (!permitted) {
         res.sendStatus(401);
+        return;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
         return;
     }
 
@@ -157,54 +163,6 @@ router.get('/tags', jsonParser, [
         });
 
 });
-
-//Resident: Set available categories
-router.get('/set/tags', jsonParser, [
-    body("categories").exists()
-], async (req, res) => {
-    //Check for input errors
-    //console.log(req.body.categories);
-    User.findOneAndUpdate({ _id: req.user.userId }, { subscribedCategories: req.body.categories })
-        .then(resp => {
-            res.status(200).send();
-        })
-        .catch(err => {
-            res.sendStatus(400);
-        })
-
-});
-
-//Resident: View events with user categories
-router.post('/all/tags', jsonParser, [
-], async (req, res) => {
-    //Check for input errors
-
-    User.findOne({ _id: req.user.userId }).lean()
-        .then(user => {
-            const tags = user.subscribedCategories;
-            Event.byTenant(req.user.residence).find({}).lean()
-                .then(async resp => {
-                    try {
-                        const sendToUser = [];
-                        resp.forEach(event => {
-                            if (tags.some(x => event.categories.includes(x))) {
-                                sendToUser.push({
-                                    event
-                                });
-                            }
-                        });
-                        res.send(sendToUser);
-                    } catch (err) {
-                        res.status(500).send("Database Error");
-                    }
-                }).catch(err => {
-                    res.status(500).send("Database Error");
-                });
-        });
-
-
-});
-
 
 //delete event by title
 router.delete('/', jsonParser, [

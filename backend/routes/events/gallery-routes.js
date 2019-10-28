@@ -14,9 +14,15 @@ router.get('/', [
     query('latestFirst').optional().isBoolean().toBoolean()
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventEngagement, constants.actions.read);
+    
+    //Check for input errors
+    const errors = validationResult(req);
 
     if (!permitted) {
         res.sendStatus(401);
+        return;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
         return;
     }
 
@@ -51,7 +57,7 @@ router.get('/', [
         });
 });
 
-// Resident and higher: (Un)Sign up for event
+//Resident and higher: (Un)Sign up for event
 router.patch('/', jsonParser, [
     body('eventId').exists(),
     body('signUp').isIn([0,1]).toInt()
@@ -94,6 +100,81 @@ router.patch('/', jsonParser, [
             }
         });
     }
+});
+
+//Resident and higher: Retrieve user's categories
+router.get('/userCategories', async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.readSelf);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return;
+    }
+
+    User.findById(req.user.userId, 'subscribedCategories')
+        .lean()
+        .then(result => {
+            res.send(result.subscribedCategories);
+        })
+        .catch(err => {
+            res.status(500).send("Database Error");
+        })
+})
+
+//Resident and higher: Set user's categories
+router.patch('/userCategories', jsonParser, [
+    body('subscribedCategories').isArray(),
+], async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.updateSelf);
+    
+    //Check for input errors
+    const errors = validationResult(req);
+    
+    if (!permitted) {
+        res.sendStatus(401);
+        return;
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+        return;
+    }
+
+    User.findOneAndUpdate({ _id: req.user.userId }, { subscribedCategories: req.body.subscribedCategories.sort() }, { new: true })
+        .lean()
+        .then(resp => {
+            res.send(resp.subscribedCategories);
+        })
+        .catch(err => {
+            res.status(500).send("Database Error");
+        });
+});
+
+//Resident: View events with user categories
+router.post('/all/tags', jsonParser, [
+], async (req, res) => {
+    //Check for input errors
+
+    User.findOne({ _id: req.user.userId }).lean()
+        .then(user => {
+            const tags = user.subscribedCategories;
+            Event.byTenant(req.user.residence).find({}).lean()
+                .then(async resp => {
+                    try {
+                        const sendToUser = [];
+                        resp.forEach(event => {
+                            if (tags.some(x => event.categories.includes(x))) {
+                                sendToUser.push({
+                                    event
+                                });
+                            }
+                        });
+                        res.send(sendToUser);
+                    } catch (err) {
+                        res.status(500).send("Database Error");
+                    }
+                }).catch(err => {
+                    res.status(500).send("Database Error");
+                });
+        });
 });
 
 module.exports = router;

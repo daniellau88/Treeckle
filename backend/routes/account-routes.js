@@ -35,6 +35,9 @@ router.get('/', [
     query('pending').optional().isBoolean().toBoolean(),
     query('created').optional().isBoolean().toBoolean()
 ] ,async (req, res) => {
+    //Check for input errors
+    const errors = validationResult(req);
+
     const pending = (req.query.pending == undefined)? true : req.query.pending;
     const created = (req.query.created == undefined)? true : req.query.created;
 
@@ -43,6 +46,8 @@ router.get('/', [
 
     if (!permittedOne || !permittedTwo) {
         res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
     } else {
         try {
             let results = [];
