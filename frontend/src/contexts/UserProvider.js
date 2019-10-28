@@ -19,8 +19,6 @@ class UserProvider extends React.Component {
     };
     this.setUser = this.setUser.bind(this);
     this.resetUser = this.resetUser.bind(this);
-    console.log(token === null, token === "null");
-    console.log(this.state);
   }
 
   setUser(token, name, profilePic, role) {
