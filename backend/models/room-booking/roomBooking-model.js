@@ -37,7 +37,8 @@ const roomBookingSchema = new schema({
     end: {
         type: Date,
         required: true,
-        unique: false
+        unique: false,
+        index: { expires: '1y' }
     },
     createdDate: {
         type: Date,

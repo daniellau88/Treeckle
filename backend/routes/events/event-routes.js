@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const creationRoutes = require('./creation-routes');
 const galleryRoutes = require('./gallery-routes');
+const managementRoutes = require('./management-routes');
 const bodyParser = require('body-parser');
 const Event = require('../../models/events-model');
-const Category = require('../../models/category-model');
 const User = require('../../models/authentication/user-model');
 const shortId = require('shortid');
 const path = require('path');
@@ -27,6 +27,7 @@ const jsonParser = bodyParser.json();
 
 router.use('/gallery', galleryRoutes);
 router.use('/create', creationRoutes);
+router.use('/management', managementRoutes);
 
 //Organiser or above: Create new event
 router.post('/', jsonParser, [
@@ -62,27 +63,6 @@ router.post('/', jsonParser, [
             shortId: shortId.generate()
         };
 
-        const CategoryModel = Category.byTenant(req.user.residence);
-        if (req.body.categories) {
-            for (i = 0; i < req.body.categories.length; i++) {
-                const curr = req.body.categories[i];
-                CategoryModel.findOne({ "name": curr })
-                    .then(exists => {
-                        if (exists) {
-                            const previousCount = exists.upcomingEventCount;
-                            User.findOneAndUpdate({ "name": curr }, { upcomingEventCount: previousCount + 1 });
-                        } else {
-                            const newCategory = {
-                                "name": curr,
-                                upcomingEventCount: 0
-                            }
-                            const categoryInstance = new CategoryModel(newCategory);
-                            categoryInstance.save();
-                        }
-                    });
-            }
-        }
-
 
         const append = (file, rows = []) => {
             let csvFile = fs.createWriteStream(file, { flags: 'a', includeEndRowDelimiter: true })
@@ -116,7 +96,7 @@ router.post('/', jsonParser, [
     }
 });
 
-// Organiser and higher: Get self-created requests
+//Organiser and higher: Get self-created requests
 router.get('/', [
     query('historical').optional().isBoolean().toBoolean(),
     query('latestFirst').optional().isBoolean().toBoolean()
@@ -190,8 +170,76 @@ router.delete('/', jsonParser, [
                 res.sendStatus(404);
             }
         })
-        .catch(err => res.status(500).send("Database Error"));
+        .catch(err => {
+            if (err.name === 'CastError') {
+                res.sendStatus(404);
+            } else {
+                res.status(500).send("Database Error")
+            }
+        });
 });
+
+//Organiser and higher: Update a self-created event
+router.patch('/', jsonParser, [
+    body('eventId').exists(),
+    body('title').optional().not().isEmpty(),
+    body('description').optional().not().isEmpty(),
+    body('categories').optional().isArray(),
+    body('capacity').optional().isInt().toInt(),
+    body('organisedBy').optional().not().isEmpty(),
+    body('venue').optional(),
+    body('eventDate').optional().isInt().toInt(),
+    body('signupsAllowed').optional().isBoolean().toBoolean().isIn([true])
+], async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.updateSelf);
+
+    //Check for input errors
+    const errors = validationResult(req);
+
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        let updateObject = {};
+        if (req.body.title) updateObject.title = req.body.title;
+        if (req.body.description) updateObject.description = req.body.description;
+        if (req.body.categories) updateObject.categories = req.body.categories;
+        if (req.body.capacity) updateObject.capacity = req.body.capacity;
+        if (req.body.organisedBy) updateObject.organisedBy = req.body.organisedBy;
+        if (req.body.venue) updateObject.venue = req.body.venue;
+        if (req.body.eventDate) updateObject.eventDate = req.body.eventDate;
+        if (req.body.signupsAllowed) updateObject.signupsAllowed = req.body.signupsAllowed;
+
+        Event.byTenant(req.user.residence).findOneAndUpdate({ createdBy: req.user.userId, _id: req.body.eventId },
+            updateObject, {new: true}).lean()
+            .then(doc => {
+                if (!doc) {
+                    res.sendStatus(404);
+                } else {
+                    res.send({
+                        eventId: doc._id,
+                        title: doc.title,
+                        description: doc.description,
+                        categories: doc.categories,
+                        venue: doc.venue,
+                        capacity: doc.capacity,
+                        attendeesNames: doc.attendees.map(userDoc => userDoc.name),
+                        attendees: doc.attendees.length,
+                        organisedBy: doc.organisedBy,
+                        posterPath: doc.posterPath,
+                        eventDate: doc.eventDate.getTime(),
+                        signupsAllowed: doc.signupsAllowed,
+                        shortId: doc.shortId
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).send("Database Error");
+            })
+    }
+});
+
 
 //Organiser or above: Add poster for event
 router.patch('/image', upload.single('image'), [

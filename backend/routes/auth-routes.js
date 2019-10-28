@@ -180,7 +180,7 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
         fastCsv.parseFile(req.file.path)
         .on("error", (err) => res.sendStatus(500))
         .on("data", (row) => {
-            if (row.length === 2 && validator.isEmail(row[0]) && Object.values(constants.roles).includes([row[1]])) {
+            if (row.length === 2 && validator.isEmail(row[0]) && Object.values(constants.roles).includes(row[1])) {
                 acceptedRows.push(row);
             } else {
                 rejectedRows.push(row);
@@ -190,26 +190,35 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
             .on("error", (err) => res.sendStatus(500))
             .on("finish", async () => {
                 res.sendFile(path.resolve(req.file.path));
+                const promisesExistence = [];
                 const promises = [];
-
+                
                 for (let i = 0; i < acceptedRows.length; i++) {
-                    //Generate a shortid
-                    const id = shortid.generate();
-
-                    promises.push(CreateAccount({
-                        email: acceptedRows[i][0],
-                        uniqueURIcomponent: id,
-                        residence: req.user.residence,
-                        permissions: [acceptedRows[i][1]]
-                    }).save());
-
-                    promises.push(EmailService.sendText(acceptedRows[i][0], 'Account Creation for Treeckle',
-                    `<p>Dear User, please proceed with account creation using the following link:</p>
-                    <p>${keys.baseURI}/${constants.createURI}/${id}</p>
-                    <p>We look forward to having you in our community!</p>
-                    <p>Yours Sincerely,\n Treeckle Team</p>`));
+                    promisesExistence.push(User.countDocuments({ email: acceptedRows[i][0]}).lean().exec());
                 }
+
                 try {
+                    const results = await Promise.all(promisesExistence);
+
+                    for (let i = 0; i < acceptedRows.length; i++) {
+                        if (results[i] === 0) {
+                            //Generate a shortid
+                            const id = shortid.generate();
+
+                            promises.push(CreateAccount({
+                                email: acceptedRows[i][0],
+                                uniqueURIcomponent: id,
+                                residence: req.user.residence,
+                                role: acceptedRows[i][1]
+                            }).save());
+
+                            promises.push(EmailService.sendText(acceptedRows[i][0], 'Account Creation for Treeckle',
+                            `<p>Dear User, please proceed with account creation using the following link:</p>
+                            <p>${keys.baseURI}/${constants.createURI}/${id}</p>
+                            <p>We look forward to having you in our community!</p>
+                            <p>Yours Sincerely,\n Treeckle Team</p>`));
+                        }
+                    }
                     await Promise.all(promises);
                 } catch(err) {
                     console.log(err);

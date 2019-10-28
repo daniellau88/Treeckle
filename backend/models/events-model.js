@@ -32,7 +32,8 @@ const eventSchema = new schema({
     createdBy: {
         type: schema.Types.ObjectId,
         required: true,
-        unique: false
+        unique: false,
+        ref: 'user'
     },
     posterPath: {
         type: String,
@@ -53,7 +54,8 @@ const eventSchema = new schema({
     eventDate: {
         type: Date,
         required: true,
-        unique: false
+        unique: false,
+        index: { expires: '400 days' }
     },
     signupsAllowed: {
         type: Boolean,

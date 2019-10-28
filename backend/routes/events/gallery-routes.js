@@ -89,16 +89,11 @@ router.get('/recommended', [
                     dict[data[0]] = data[1];
                 })
                 .on("end", () => {
-                    console.log(dict);
-                    console.log(pastIds);
                     Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder).lean()
                         .then(resp => {
                             const sendToUser = [];
                             resp.forEach(doc => {
-                                console.log("future events", doc._id);
-                                console.log("pair event", dict[doc._id]);
                                 const pairEvent = dict[doc._id];
-                                console.log("checking ", pastIds[0]==pairEvent);
                                 canInclude = false;
                                 if (pairEvent != undefined) {
                                     pastIds.forEach(x => {

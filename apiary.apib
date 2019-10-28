@@ -1,0 +1,1806 @@
+FORMAT: 1A
+
+# Treeckle
+
+Treeckle is an application built for the Residential Colleges of NUS.
+
+#Group Accounts
+
+## Account Creation Request [/auth/newAccountRequest]
+
+### Request creation via email [POST]
+
+Required permission level: Admin
+
++ Request 
+
+    + Headers
+        Authorization: Bearer <JWT token>
+        Content-Type: application/json
+
+    + Body
+        {
+            "email": "example@example.com",
+        }
+    
++ Response 200 (application/json)
+    <!-- Email successfully delivered to user, with link to use for account creation -->
+    {
+        "message": "OK"
+    }
+    
++ Response 400 (text/plain)
+    <!-- Account with the specified email already exists -->
+    Bad Request
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    <!-- Error in creation and saving of new link -->
+    Database Error
+    
++ Response 503 (text/plain)
+    <!-- Error in email delivery -->
+    Service Unavailable
+
+
+
+## Bulk Account Creation Requests [/auth/newAccountRequestCSV]
+
+### Request creation via CSV [POST]
+
+Required permission level: Admin
+
+Note: Must be submitted as multipart/form-data with the fieldname "csvFile" 
+
+CSV should contain 2 columns (or comma-separated entries per row): email address, role
+Current roles include: ["Resident", "Organiser", "Admin"]
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        Content-Type: multipart/form-data
+        
+    + Body
+        file: abcdefg.csv
+        
++ Response 200 (text/csv)
+    .csv file containing invalid fields
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+
++ Response 500 (text/plain)
+    <!-- Possibility 1: Error processing csv files on server side -->
+    Internal Server Error
+
+
+
+## Direct Account Creation [/auth/newAccountsDirect]
+
+### Create Account Direct Form Submission [POST]
+
+Required permission level: Unauthenticated
+
+Note: to be used for pilot testing.
+
++ Request
+    
+    + Headers
+        Content-Type: application/json
+
+    + Body
+    
+        {
+            "name": "John Doe",
+            "email": "example@example.com",
+            "password": "examplee"
+        }
+        
++ Response 200 (application/json)
+    {
+        "message": "OK"
+    }
+        
++ Response 400 (application/json)
+    {
+        <!-- the user already exists -->
+        "message": "Invalid link."
+    }
+    
++ Response 422 (application/json)
+    {
+        "errors": [
+            {
+                "value": "",
+                "msg": "Invalid value",
+                "param": "name",
+                "location": "body"
+            },
+            {
+                "value": "2005fbe",
+                "msg": "Invalid value",
+                "param": "email",
+                "location": "body"
+            },
+            {
+                "value": "1234567",
+                "msg": "Invalid value",
+                "param": "password",
+                "location": "body"
+            }
+        ]
+    }
+
+## Account Creation [/auth/newAccounts]
+
+### Create Account Form Submission [POST]
+
+Required permission level: Unauthenticated
+
+For successful creation, must arrive from email link and sign up using that email address.
+
++ Request
+    
+    + Headers
+        Content-Type: application/json
+
+    + Body
+    
+        {
+            "name": "John Doe",
+            "email": "example@example.com",
+            "password": "examplee"
+            "uniqueURIcomponent": "abcdefg" <!-- Get this from url sent to Users i.e. https://treeckle.com/auth/newAccounts/${id} -->
+        }
+
++ Response 200 (application/json)
+    {
+        "message": "OK"
+    }
+        
++ Response 400 (application/json)
+    {
+        <!-- Either the user already exists, or the link and email signing up with don't match up -->
+        "message": "Invalid link."
+    }
+    
++ Response 422 (application/json)
+    {
+        "errors": [
+            {
+                "value": "",
+                "msg": "Invalid value",
+                "param": "name",
+                "location": "body"
+            },
+            {
+                "value": "2005fbe",
+                "msg": "Invalid value",
+                "param": "email",
+                "location": "body"
+            },
+            {
+                "value": "1234567",
+                "msg": "Invalid value",
+                "param": "password",
+                "location": "body"
+            }
+        ]
+    }
+
+## Reset Password Request [/auth/resetAccount]
+
+### Request password reset via email [POST]
+
+Required permission level: Unauthenticated
+
+Email containing a unique link sent out to the user if the email address exists within Treeckle.
+Reveals no information about whether user exists or if email has been delivered.
+
++ Request 
+
+    + Headers
+        Content-Type: application/json
+
+    + Body
+        {
+            "email": "example@example.com",
+        }
+        
++ Response 200 (application/json)
+    <!-- 200 signifies no errors during attempt to send an email -->
+    {
+        "message": "OK"
+    }
+
++ Response 422 (application/json)
+    {
+        "errors": [
+            {
+                "value": "emailaddress",
+                "msg": "Invalid value",
+                "param": "email",
+                "location": "body"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+
+## Password Reset [/auth/resetAttempt]
+
+### Reset Password Form Submission [POST]
+
+Required permission level: Unauthenticated
+
+Link expires upon first successful use or 1 hour since email has been sent, whichever is earlier.
+
++ Request 
+
+    + Headers
+        Content-Type: application/json
+
+    + Body
+        {
+            "email": "example@example.com",
+            "password": "examplee"
+            "uniqueURIcomponent": "abcdefg" <!-- Get this from url sent to Users i.e. https://treeckle.com/auth/newAccounts/${id} -->
+        }
+        
++ Response 200 (application/json)
+    <!-- Successful password reset -->
+    {
+        "message": "OK"
+    }
+    
++ Response 422 (application/json)
+    {
+        "errors": [
+            {
+                "value": "emailaddress",
+                "msg": "Invalid value",
+                "param": "email",
+                "location": "body"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    <!-- Possibility 1: Link has been used previously or has expired -->
+    Invalid Link.
+    
+    <!-- Possibility 2-->
+    Database Error
+
+## Login [/auth/accounts]
+
+### Sign in [POST]
+
+Required permission level: Unauthenticated
+
++ Request
+    
+    + Headers
+        Content-Type: application/json
+
+    + Body
+        {
+            "email": "example@example.com",
+            "password": "nothunter2"
+        }
+        
++ Response 200 (application/json)
+{
+    "name": "John Doe",
+    "token": <JWT_String>,
+    "role": <A string containing of one of possible roles, first letter Capitalized>,
+    "profilePic": {
+        "type": "Buffer",
+        "data": [
+            255,
+            216,
+            ...
+        ]
+    }
+}
+  
+  <binary> <!-- <img src={`data:image/jpeg;base64,${binary_data}`} /> -->
+}
+
++ Response 400 (text/plain)
+    <!-- Missing fields -->
+    Bad Request
+        
++ Response 401 (text/plain)
+    <!-- Incorrect credentials -->
+    Unauthorized
+    
++ Response 500 (application/json)
+    <!-- Generic server error -->
+    {
+        "message": "NoSaltValueStoredError" <!-- The only error for status 500 -->
+    }
+    
+
+## Profile picture [/api/accounts/profilePicture]
+
+### Update profile picture [PUT]
+
+Required permission level: Resident or above
+
+Note: Must be submitted as multipart/form-data with the fieldname "profilePicture"
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        Content-Type: multipart/form-data
+        
+    + Body
+        <!-- any image with mimetype image/jpeg or image/png, filesize <= 4096KB --> 
+        file: abcdefg.jpg
+        
++ Response 200 (application/octet-stream)
+    <!-- <img src={`data:image/jpeg;base64,${binary_data}`} /> -->
+    <binary>
+
++ Response 400 (text/plain)
+    <!-- incompatible mime type -->
+    Bad Request
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+
++ Response 500
+    <!-- Max file size exceeded or Database Error -->
+    <Error message, can be ignored safely>
+
+
+## Event categories [/api/events/gallery/categories]
+
+### View self-categories [GET]
+
+Required permission level: Resident or above
+
+Note: Response array is sorted according to lexicographical order.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+
++ Response 200 (application/json)
+    [
+        "3",
+        "cad",
+        "dad",
+        "lad"
+    ]
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 500 (text/plain)
+    Database Error
+
+### Set self-categories [PATCH]
+
+Required permission level: Resident or above
+
+Note: Use the response to update your state, as the backend sorts the input array for you.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+    {
+        "subscribedCategories": ["dad", "cad", "lad", 3]
+    }
+    
++ Response 200 (application/json)
+    [
+        "3",
+        "cad",
+        "dad",
+        "lad"
+    ]
+
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "query"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+#Group User management
+
+## Retrieve pending and created users under requestor's RC [/api/accounts{?pending,created}]
+
++ Parameters
+    
+   + pending (Optional) - 0 to exclude results containing users pending creation, default=1
+   + created (Optional) - 0 to exclude results containing created users, default=1
+    <!-- There is some freedom for input creativity here thanks to JS's truthy/falsy values -->
+
+### Get pending and created users [GET]
+
+Required permission level: Admin
+
+Note: This will not contain the requesting admin user, in order to prevent
+them from engaging in actions (like deleting their own account) that could potentially lock the RC out of admin accounts.
+
+Note 2: Stable sort by role first (Descending) and then lexographically (Ascending)
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+
++ Response 200 (application/json)
+    [
+        {
+            "name": "",
+            "email": "randomaccount@example123.com",
+            "role": "Resident"
+        },
+        {
+            "name": "Rollerblades",
+            "email": "rollerblades@example123.com",
+            "role": "Admin"
+        }
+    ]
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+## Manage pending and created users under requestor's RC [/api/accounts]
+
+### Update pending and current users [PATCH]
+
+Required permission level: Admin
+
+Note: Requesting admin user will not provided as part of GET call. Regardless, requesting admin user will not be able to make updates to their own account, despite receiving 200 OK.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+        {
+            <!-- only email is a mandatory field -->
+            "name": "resident", <!-- name will have no effect for pending accounts -->
+            "email": <email string>,
+            "role": "Resident"
+        }
+        
++ Response 200 (text/plain)
+    <!-- Delete queries went through successfully -->
+    OK
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing fields, here only email field -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+### Delete pending and current users [DELETE]
+
+Required permission level: Admin
+
+Note: Requesting admin user will not provided as part of GET call. Regardless, requesting admin user will not be able to delete their own account, despite receiving 200 OK.
+
+Note 2: Deleting a created account will not delete the user's requests.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+        {
+            "email": <email string>,
+        }
+        
++ Response 200 (text/plain)
+    <!-- Delete queries went through successfully -->
+    OK
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing fields, here only email field -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+    
+
+#Group Emails
+
+## Configure Email to CC for Transactions [/api/emails]
+
+Note: One email address for each residential college, and is account-independent.
+
+### Fetch email [GET]
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    {
+        "email": <email as String>
+    }
+    
++ Response 404 (text/plain)
+    Not Found <!-- not initialized/created yet -->
+
++ Response 500 (text/plain)
+    Database Error
+
+
+### Create or update email [PUT]
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "email": <email as String>
+        }
+
++ Response 200 (text/plain)
+    <!-- email updated -->
+    OK
+
++ Response 201 (text/plain)
+    <!-- email created (i.e. updated for the first time) -->
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+#Group Rooms
+
+## Room management [/api/rooms]
+
+### Create new room [POST]
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "name":"testRoom",
+            "category":"testRooms",
+            "recommendedCapacity": 691
+        }
+        
++ Response 200 (application/json)
+    {
+        "roomId": <roomId as a string>
+    }
+    
++ Response 400 (text/plain)
+    duplicated room name
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+### Modify room [PATCH]
+
+Required permission level: Admin
+
+Can be used to modify name, category and recommendedCapacity. These fields are optional, and this is an idempotent PATCH request.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+    {
+        "id": <id of room> <!-- The only mandatory field -->
+        "name":"testRoom",
+        "category":"testRooms",
+        "recommendedCapacity": 691
+    }
+
++ Response 200 (text/plain)
+    <!-- Update successful -->
+    OK 
+    
++ Response 400 (text/plain)
+    <!-- Provided id is invalid/does not exist -->
+    Bad Request
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (text/plain)
+    <!-- Some combination of invalid parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+
+### Delete room [DELETE]
+
+Required permission level: Admin
+
+Note: Does not delete associated bookings or other entries
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+    {
+        "id": <id of room>
+    }
+
++ Response 200 (text/plain)
+    <!-- Successfully deleted if it exists -->
+    OK
+    
++ Response 400 (text/plain)
+    <!-- Provided id is invalid/does not exist -->
+    Bad Request
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+
++ Response 422 (text/plain)
+    <!-- Some combination of invalid parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+    
+## Categories [/api/rooms/categories]
+
+### Get categories [GET]
+
+Required permission level: Resident or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    {
+        "categories": [
+            "seminar"
+        ]
+    }
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 500 (text/plain)
+    Database Error
+
+## Available rooms by category [/api/rooms/categories/:category]
+
+### View rooms [GET]
+
+Required permission level: Resident or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    <!-- array of room names, recommended capacity and ids belonging to the specified category --> 
+    [
+        {
+            "name": "seminarRoom",
+            "recommendedCapacity": 500,
+            "roomId": <String>
+        }
+    ]
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+
++ Response 500 (text/plain)
+    Database Error
+
+## Fetch a room's approved booking requests [/api/rooms/bookings/:roomId/:start-:end]
+
+### Interval-based, approved schedules filter [GET]
+
+Required permission level: Resident or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    <!-- Array of objects -->
+    [
+        {
+            "startDate": 1570927995000,
+            "endDate": 1570928995230
+        },
+        {
+            "startDate": 1570927997977,
+            "endDate": 1570928997977
+        }
+    ]
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+
++ Response 422 (application/json)
+    <!-- Possibility 1 : Some combination of invalid parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    <!-- Possibility 2 : Start is higher than End parameter -->
+    {
+        "ValueError": "start > end"
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+
+## Admin Fetch all booking requests [/api/rooms/bookings/all{?Pending,Approved,Rejected,Cancelled,startDateOnwards,page,limit,sortOrder}]
+
++ Parameters
+    
+   + Pending (Optional) - 0 to exclude results containing Pending requests default=1
+   + Approved (Optional) - 0 to exclude results containing Approved requests, default=1
+   + Rejected (Optional) - 0 to exclude results containing Rejected requests, default=1
+   + Cancelled (Optional) - 0 to exclude results containing Cancelled requests, default=1
+   + startDateOnwards (Optional) - Integer unix timestamp from JS Date() to ignore requests that start before provided time, default = Date(0)
+   + page (Optional) - The page of the resulting data to retrieve, default = 1
+   + limit (Optional) - The number of entries per page, default = 10
+   + sortOrder (Optional) - 1 or -1. To sort the returned data in ASCENDING (1) or DESCNEDING (0) order of creationDate. default=1
+
+
+### Fetch all requests [GET]
+
+Supports sorting, filtering and pagination through optional query parameters.
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    {
+        "totalBookings": 6,
+        "totalPages": 1,
+        "currentPage": 1,
+        "hasNextPage": false,
+        "nextPage": null,
+        "hasPreviousPage": false,
+        "previousPage": null,
+        "bookings": [
+            {
+                "bookingId": <bookingId : String>,
+                "roomName": <name of room : String>,
+                "description": <description : String>,
+                "contactNumber": <Phone number>,
+                "expectedAttendees": <Expected number of attendees/participants>,
+                "start": 1571892311516,
+                "end": 1571992311516,
+                "createdByName": <name of user : String>,
+                "createdByEmail": <email : String>,
+                "createdDate": 1571797745188,
+                "comments": [],
+                "approved": 3
+            }
+        ]
+    }
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "hello",
+                "msg": "Invalid value",
+                "param": "page",
+                "location": "query"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+    
+
+##Admin view what-if approved [/api/rooms/bookings/manage/:bookingRequestId]
+
+### Potential conflicts if bookingRequestId is approved [GET]
+
+Required permission level: Admin
+
+Note: Doesn't check against rejected and cancelled requests.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    <!-- array of request ids that will conflict -->
+    [
+        "reqId": <affected reqId as a String>
+    ]
+
++ Response 400 (text/plain)
+    <!-- bookingRequestId not found or invalid -->
+    Bad Request
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 500 (text/plain)
+    Database Error
+    
+
+## Admin update bookingRequest [/api/rooms/bookings/manage]
+
+### Set Approved/Pending/Rejected [PATCH]
+
+Required permission level: Admin
+
+Note: Setting Approve will auto-reject all conflict entries. Use what-if GET call to check for conflicts.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "id": <id of booking request as String>
+            "approved":0 <!-- 0 is to set pending, 1 is to set approved, 2 is to set rejected -->
+        }    
+        
++ Response 200 (application/json)
+    <--Possibility 1: Approved - Array of request ids that have been rejected -->
+    [
+        "reqId": <rejected reqId as a String>
+    ]
+    <--Possibility 2/3: Pending/Rejected -->
+    OK
+
++ Response 400 (text/plain)
+    <!-- Possibility 1: bookingRequestId not found -->
+    Bad Request
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 403 (text/plain)
+    <!-- Possibility 1: Trying to update a cancelled request -->
+    <!-- Possibility 2: approved field value sent is incorrect -->
+    Forbidden
+
++ Response 422 (application/json)
+    <!-- Some combination of invalid parameters -->
+    {
+        "errors": [
+            {
+                "value": "hello",
+                "msg": "Invalid value",
+                "param": "status",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+## Manage booking requests [/api/rooms/bookings]
+
+### Request Creation [POST]
+
+Required permission level: Resident or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "roomId": <roomId as a String>,
+            "description": "test",
+            "contactNumber": 12345678,
+            "expectedAttendees": 20,
+            "start": 1570928995233,
+            "end": 1570928995234
+        }
+        
++ Response 200 (text/plain)
+    OK
+    
++ Response 400 (text/plain)
+    Overlaps detected
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 404 (text/plain)
+    <!-- roomId is not associated to a room that exists -->
+    Not Found
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+    
+
+### Fetch user's own requests [GET]
+
+Required permission level: Resident or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    [
+        {
+            "bookingId": <bookingId as String>,
+            "roomName": "SR16", <!-- null if deleted room -->
+            "description": "testBooking1",
+            "contactNumber": <Phone number>,
+            "expectedAttendees": <Expected number of attendees/participants>,
+            "start": 1570928995231,
+            "end": 1570928995232,
+            "createdDate": 1571675313819,
+            "comments": [],
+            "approved": 0
+        },
+        {
+            "bookingId": <bookingId as String>,
+            "roomName": "SR16", <!-- null if deleted room -->
+            "description": "testBooking2",
+            "contactNumber": <Phone number>,
+            "expectedAttendees": <Expected number of attendees/participants>,
+            "start": 1570928995233,
+            "end": 1570928995234,
+            "createdDate": 1571675313819,
+            "comments": [],
+            "approved": 1
+        }
+    ]
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 500 (text/plain)
+    Database Error
+
+### Cancel own bookingRequest [PATCH]
+
+Required permission level: Resident or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "id": "5daa834d6f1c5a248ecd7e5"
+        }
+        
++ Response 200 (text/plain)
+    OK
+    
++ Response 400 (text/plain)
+    <!-- id provided is invalid -->
+    Bad Request
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 403 (text/plain)
+    <!-- bookingRequest was not created by this user -->
+    Forbidden
+
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+    
+
+### (Internal) Delete bookingRequest [DELETE]
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "bookingId": <Id as String>
+        }
+
++ Response 200 (text/plain)
+    OK
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 404 (text/plain)
+    <!-- Id not found -->
+    Not Found
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+# Group Events
+
+## Event organization [/api/events]
+
+### Create new event [POST]
+
+Required permission level: Organiser or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+        {
+            "title": "example", <!-- Required -->
+            "description": "example",
+            "capacity": 250,
+            "venue": "examplevenue",
+            "eventDate": 1572170797000, <!-- Required -->
+            "categories": [], <!-- Required: An array of String categories, can be empty -->
+            "organisedBy": "exampleGang123" <!-- Required -->
+            "signupsAllowed": true <!-- Required: Leave false if undecided at point of creation -->
+        }
+    
++ Response 200 (application/json)
+    {
+        "posterPath": "insertDefaultPicturePathHere", <!-- path/url to placeholder picture -->
+        "creationDate": 1572172724865, <!-- unix timestamp in milliseconds (JS Date) -->
+        "shortId": <String> <!-- human readable uuid for sharing -->
+    }
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+    
++ Response 500 (text/plain)
+    Database Error
+
+
+### Delete self-created events [DELETE]
+
+Required permission level: Organiser or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+        {
+            "eventId": <eventId as a String>
+        }
+
++ Response 200 (text/plain)
+    <!-- Event successfully deleted -->
+    OK
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 404 (text/plain)
+    <!-- Such an event does not exist or was not created by the requesting user -->
+    Not Found
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid/missing body parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+### Update self-created event [PATCH]
+
+Required permission level: Organiser or higher
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+        {
+            "eventId": <eventId as a String>, <!-- Only mandatory field -->
+            "title": <NON-EMPTY String>,
+            "description": <NON-EMPTY String>,
+            "categories": [<Array of strings, can be empty array>],
+            "capacity": <Integer>,
+            "organisedBy": <NON-EMPTY String or typecastable to String>,
+            "venue": <String>,
+            "eventDate": <Integer, unix timestamp in milliseconds from JS Date object>,
+            "signupsAllowed": true <!-- This can only be true, cannot set to false -->
+        }
+
++ Response 200 (application/json)
+    <!-- Updated document -->
+    {
+        "eventId": <UUID: String>,
+        "title": <String>",
+        "description": "No description provided.",
+        "categories": [],
+        "capacity": 0 <!-- Optional, only if field exists -->
+        "venue": "here", <!-- Optional, only if field exists -->
+        "attendeesNames": [Array of names of attendees (Strings)],
+        "attendees": 0, <!-- Number of attendees -->
+        "organisedBy": <String>,
+        "posterPath": "insertDefaultPicturePathHere",
+        "eventDate": 1572172724867,
+        "signupsAllowed": false,
+        "shortId": <String>
+    }
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 404 (text/plain)
+    <!-- Such an event does not exist or was not created by the requesting user -->
+    Not Found
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+## Event organization w/ customisation [/api/events/{?historical,latestFirst}]
+
++ Parameters
+   
+   + historical (Optional) - shows events in the past, default=false
+   + latestFirst (Optional) - true to sort by the furthest/latest event first, default=false
+
+### View self-created events [GET]
+
+Required permission level: Organiser or higher
+
+Sorted according to closest event first (flexible via query param). Can optionally
+show past event data.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    <!-- Array of event documents -->
+    [
+        {
+            "eventId": <UUID: String>,
+            "title": <String>",
+            "description": "No description provided.",
+            "categories": [],
+            "capacity": 0 <!-- Optional, only if field exists -->
+            "venue": "here", <!-- Optional, only if field exists -->
+            "attendeesNames": [Array of names of attendees (Strings)],
+            "attendees": 0, <!-- Number of attendees -->
+            "organisedBy": <String>,
+            "posterPath": "insertDefaultPicturePathHere",
+            "eventDate": 1572172724867,
+            "signupsAllowed": false,
+            "shortId": <String>
+        },
+    ]
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+## Event management [/api/events/management]
+
+### Update any event [PATCH]
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+        {
+            "eventId": <eventId as a String>, <!-- Only mandatory field -->
+            "title": <NON-EMPTY String>,
+            "description": <NON-EMPTY String>,
+            "categories": [<Array of strings, can be empty array>],
+            "capacity": <Integer>,
+            "organisedBy": <NON-EMPTY String or typecastable to String>,
+            "venue": <String>,
+            "eventDate": <Integer, unix timestamp in milliseconds from JS Date object>,
+            "signupsAllowed": true <!-- This can only be true, cannot set to false -->
+        }
+
++ Response 200 (application/json)
+    <!-- Updated document -->
+    {
+        "eventId": <UUID: String>,
+        "title": <String>",
+        "description": "No description provided.",
+        "categories": [],
+        "capacity": 0 <!-- Optional, only if field exists -->
+        "venue": "here", <!-- Optional, only if field exists -->
+        "attendeesNames": [Array of names of attendees (Strings)],
+        "attendees": 0, <!-- Number of attendees -->
+        "organisedBy": <String>,
+        "createdBy": {
+            "email": <creator email>,
+            "name": <creator name>
+        },
+        "posterPath": "insertDefaultPicturePathHere",
+        "eventDate": 1572172724867,
+        "signupsAllowed": false,
+        "shortId": <String>
+    }
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 404 (text/plain)
+    <!-- Such an event does not exist -->
+    Not Found
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+### Delete any event [DELETE]
+
+Required permission level: Admin
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+    
+    + Body
+        {
+            "eventId": <eventId as a String>
+        }
+
++ Response 200 (text/plain)
+    <!-- Event successfully deleted -->
+    OK
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 404 (text/plain)
+    <!-- Such an event does not exist -->
+    Not Found
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid/missing body parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+## Event management w/ customisation [/api/events/management/{?historical,latestFirst}]
+
++ Parameters
+   
+   + historical (Optional) - shows events in the past, default=false
+   + latestFirst (Optional) - true to sort by the furthest/latest event first, default=false
+
+### View all events [GET]
+
+Required permission level: Admin
+
+Sorted according to closest event first (flexible via query param). Can optionally
+show past event data.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
++ Response 200 (application/json)
+    <!-- Array of event documents -->
+    [
+        {
+            "eventId": <UUID: String>,
+            "title": <String>",
+            "description": "No description provided.",
+            "categories": [],
+            "capacity": 0 <!-- Optional, only if field exists -->
+            "venue": "here", <!-- Optional, only if field exists -->
+            "attendeesNames": [Array of names of attendees (Strings)],
+            "attendees": 0, <!-- Number of attendees -->
+            "organisedBy": <String>,
+            "createdBy": {
+                "email": <creator email>,
+                "name": <creator name>
+            },
+            "posterPath": "insertDefaultPicturePathHere",
+            "eventDate": 1572172724867,
+            "signupsAllowed": false,
+            "shortId": <String>
+        },
+    ]
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+## Event interactions [/api/events/gallery]
+
+### Sign up or revoke sign up for an event [PATCH]
+
+Required permission level: Resident or higher
+
+Cannot modify sign up status for past events or events that disallow signups.
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+    {
+        "eventId": <ID as String>,
+        "signUp": 0 <!-- 0 to unsignUp, 1 to signUp -->
+    }
+
++ Response 200 (application/json)
+    <!-- contains a value within [-1,0,1], which indicates the change to the #attendees -->
+    <!-- can be used to locally update your counter -->
+    {
+        "counterAddition": 0
+    }
+    
++ Response 400 (text/plain)
+    <-- Id invalid or event is not open for signups/happened in the past -->
+    Bad Request
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+
++ Response 422 (application/json)
+    <!-- Some combination of invalid or missing parameters/fields -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+
+## Event interactions w/ customisation [/api/events/gallery{?latestFirst}]
+
++ Parameters
+
+   + latestFirst (Optional) - true to sort by the furthest/latest event first, default=false
+
+### View all upcoming events [GET]
+
+Required permission level: Resident or higher
+
+Sorted according to closest/earliest event first by default (can be reversed via query param).
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+
++ Response 200 (application/json)
+    <!-- Array of events with unprivileged fields -->
+    [
+        {
+            "eventId": <UUID: String>,
+            "title": <String>,
+            "description": "No description provided.",
+            "categories": [],
+            "venue": "here", <!-- Optional, only if field exists -->
+            "capacity" 250 <!-- Optional, only if field exists -->
+            "attendees": 0,
+            "organisedBy": <String>,
+            "posterPath": "insertPicturePathHere",
+            "eventDate": 1572172724865,
+            "signupsAllowed": false,
+            "shortId": <String>
+        },
+        {
+            "eventId": <UUID: String>,
+            "title": <String>,
+            "description": "Meet us at the foyer!",
+            "categories": [],
+            "attendees": 1,
+            "organisedBy": <String>,
+            "posterPath": "insertPicturePathHere",
+            "eventDate": 1572172724867,
+            "signupsAllowed": true,
+            "shortId": <String>
+        }
+    ]
+    
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
+
+## View Upcoming Events filtered by categories [/api/events/gallery/categories]
+
+### Filter by user-defined categories [POST]
+
+Required permission level: Resident or higher
+
+Use cases:
+1) Combine this with get users categories to filter by user's subscribed categories
+2) Filter by specific category(ies) selected by user (e.g. if user clicks on "sports", send ["sports"])
+
+
+Sorted according to closest/earliest event first by default (can be reversed via optional body field).
+
++ Request
+    + Headers
+        Authorization: Bearer <JWT token>
+        
+    + Body
+    {
+        "filterCategories": ["3", "cad", "dad", "lad"],
+        "latestFirst: true <!-- Optional, false by default -->
+    }
+        
++ Response 200 (application/json)
+    <!-- Array of events with unprivileged fields -->
+    [
+        {
+            "eventId": <UUID: String>,
+            "title": <String>,
+            "description": "No description provided.",
+            "categories": [insert category strings here],
+            "venue": "here", <!-- Optional, only if field exists -->
+            "capacity" 250 <!-- Optional, only if field exists -->
+            "attendees": 0,
+            "organisedBy": <String>,
+            "posterPath": "insertPicturePathHere",
+            "eventDate": 1572172724865,
+            "signupsAllowed": false,
+            "shortId": <String>
+        },
+        {
+            "eventId": <UUID: String>,
+            "title": <String>,
+            "description": "Meet us at the foyer!",
+            "categories": [insert category strings here],
+            "attendees": 1,
+            "organisedBy": <String>,
+            "posterPath": "insertPicturePathHere",
+            "eventDate": 1572172724867,
+            "signupsAllowed": true,
+            "shortId": <String>
+        }
+    ]
+
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
++ Response 422 (application/json)
+    <!-- Some combination of invalid query parameters -->
+    {
+        "errors": [
+            {
+                "value": "test",
+                "msg": "Invalid value",
+                "param": "start",
+                "location": "params"
+            }
+        ]
+    }
+
++ Response 500 (text/plain)
+    Database Error
