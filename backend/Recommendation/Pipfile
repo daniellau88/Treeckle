@@ -12,6 +12,7 @@ pandas = "*"
 ipykernel = "*"
 rake-nltk = "*"
 scikit-learn = "*"
+wikipedia = "*"
 
 [requires]
 python_version = "3.7"

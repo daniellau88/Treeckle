@@ -96,4 +96,5 @@ typings/
 # Additional
 /config/keys.js
 /uploads
-/public
+/public/*
+!public/EventPoster.png

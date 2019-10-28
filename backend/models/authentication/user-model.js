@@ -34,11 +34,10 @@ const userSchema = new schema({
         required: true,
         unique: true
     },
-    participatedEventsIds: {
-        type: [schema.Types.ObjectId],
-        required: false,
-        unique: false
-    },
+    participatedEventsIds: [{
+        type: schema.Types.ObjectId,
+        ref: 'event'
+    }],
     subscribedCategories: {
         type: [String],
         required: false,
