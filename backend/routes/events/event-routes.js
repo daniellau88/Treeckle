@@ -9,7 +9,7 @@ const shortId = require('shortid');
 const path = require('path');
 const constants = require('../../config/constants');
 const { isPermitted } = require('../../services/auth-service');
-const { body, validationResult } = require('express-validator');
+const { body, query, validationResult } = require('express-validator');
 const multer = require('multer');
 
 const storage = multer.diskStorage({
@@ -100,7 +100,10 @@ router.post('/', jsonParser, [
 });
 
 // Organiser and higher: Get self-created requests
-router.get('/', async (req, res) => {
+router.get('/', [
+    query('historical').optional().isBoolean().toBoolean(),
+    query('latestFirst').optional().isBoolean().toBoolean()
+], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.readSelf);
 
     if (!permitted) {
@@ -108,7 +111,10 @@ router.get('/', async (req, res) => {
         return;
     }
 
-    Event.byTenant(req.user.residence).find({ createdBy: req.user.userId }, '-createdBy -__v -tenantId', { sort: { eventDate: 1 } })
+    const filter = (req.query.historical)? { createdBy: req.user.userId } : { createdBy: req.user.userId, eventDate : { $gte : Date.now() }};
+    const sortOrder = (req.query.latestFirst)? {sort: {eventDate : -1}} : {sort: {eventDate : 1}};
+
+    Event.byTenant(req.user.residence).find(filter, '-createdBy -__v -tenantId', sortOrder)
         .populate('attendees', 'name').lean()
         .then(results => {
             const sendToUser = [];
