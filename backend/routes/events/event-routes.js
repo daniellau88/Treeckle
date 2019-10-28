@@ -136,7 +136,7 @@ router.get('/', async (req, res) => {
         })
 })
 
-//Resident: Set category tags
+//Resident: View all category tags
 router.get('/tags', jsonParser, [
 ], async (req, res) => {
     //Check for input errors
@@ -152,7 +152,7 @@ router.get('/tags', jsonParser, [
 
 });
 
-//Resident: View all available categories
+//Resident: Set available categories
 router.get('/set/tags', jsonParser, [
     body("categories").exists()
 ], async (req, res) => {
