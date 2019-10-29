@@ -68,7 +68,12 @@ router.patch('/', jsonParser, [
     body('roomId').exists(),
     body('name').optional().isString(),
     body('category').optional().isString(),
-    body('recommendedCapacity').optional().isInt()
+    body('recommendedCapacity').optional().isInt(),
+    body('contactName').optional().isString(),
+    body('contactEmail').optional().isEmail(),
+    body('contactNumber').optional().isInt().toInt(),
+    body('checklist').optional().isArray(),
+    body('placeholderText').optional()
 ] , async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
@@ -82,7 +87,12 @@ router.patch('/', jsonParser, [
         Room.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.roomId }, { 
             name: req.body.name,
             category: req.body.category,
-            recommendedCapacity: req.body.recommendedCapacity
+            recommendedCapacity: req.body.recommendedCapacity,
+            contactName: req.body.contactName,
+            contactEmail: req.body.contactEmail,
+            contactNumber: req.body.contactNumber,
+            checklist: req.body.checklist,
+            placeholderText: req.body.placeholderText
         }, {omitUndefined: true}).lean()
         .then(result => {
             if (result) {
