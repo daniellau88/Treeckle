@@ -47,7 +47,8 @@ const UpcomingCarousellCards = () => {
     date: "Tues Night",
     location: "Dining Hall",
     image:
-      "http://www.nusinvest.com/wp-content/uploads/2016/03/General-poster.jpg"
+      "http://www.nusinvest.com/wp-content/uploads/2016/03/General-poster.jpg",
+    categories: ["test", "cat"]
   };
 
   const eventTwo = {
@@ -56,7 +57,8 @@ const UpcomingCarousellCards = () => {
     date: "yesterday Night",
     location: "zouk Hall",
     image:
-      "https://weezevent.com/wp-content/uploads/2019/01/12145054/organiser-soiree.jpg"
+      "https://weezevent.com/wp-content/uploads/2019/01/12145054/organiser-soiree.jpg",
+    categories: ["test", "cat"]
   };
 
   const eventThree = {
@@ -65,7 +67,8 @@ const UpcomingCarousellCards = () => {
     date: "tmr Night",
     location: "library hall Hall",
     image:
-      "http://www.orlandonorthsports.com/assets/images/placeholders/placeholder-event.png"
+      "http://www.orlandonorthsports.com/assets/images/placeholders/placeholder-event.png",
+    categories: ["test", "cat"]
   };
 
 
@@ -112,7 +115,8 @@ const UpcomingCarousellCards = () => {
               desc: value.description,
               date: value.eventDate,
               location: value.venue,
-              image: "/ftp/" + value.posterPath
+              image: "/ftp/" + value.posterPath,
+              categories: value.categories
             }} />
           </a>
         })}

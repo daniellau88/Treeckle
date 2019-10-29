@@ -54,15 +54,11 @@ const EventCard = props => {
             <Header>{curr.title}</Header>
             <p>{curr.desc}</p>
             <h5>
-              <Label  color='teal' tag>
-                Featured
+              {curr.categories.map((value, index) => {
+                return <Label color='teal' tag>
+                {value}
               </Label>
-              <Label color='yellow' tag>
-                Food
-              </Label>
-              <Label  color='green' tag>
-                Free
-              </Label>
+              })}
             </h5>
           </Modal.Content>
         </Modal>
@@ -95,7 +91,7 @@ const EventCard = props => {
                 <Icon name='heart' />
                 Withdraw
                       </Button>
-              <Label  basic color='blue' pointing='left' style={{
+              <Label basic color='blue' pointing='left' style={{
                 "border-bottom-right-radius": "1.1rem",
                 "border-top-right-radius": "1.1rem"
               }}>
@@ -111,7 +107,7 @@ const EventCard = props => {
                   <Icon name="heart" />
                   Sign up
               </Button>
-                <Label  basic color="red" pointing="left" style={{ "border-bottom-right-radius": "1.1rem" }}>
+                <Label basic color="red" pointing="left" style={{ "border-bottom-right-radius": "1.1rem" }}>
                   {pax}
                 </Label>
               </Button>
