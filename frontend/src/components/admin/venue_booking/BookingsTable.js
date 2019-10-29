@@ -36,7 +36,7 @@ class BookingsTable extends React.Component {
 
   retrieveRemainingRequests() {
     return axios.get(
-      `api/rooms/bookings/all?Pending=0&limit=1000&sortOrder=0`,
+      `api/rooms/bookings/all?Pending=0&limit=1000&sortOrder=-1`,
       {
         headers: { Authorization: `Bearer ${this.context.token}` }
       }

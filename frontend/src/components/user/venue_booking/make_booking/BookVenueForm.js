@@ -9,6 +9,7 @@ const SUCCESS_MSG = "Your booking request has been successfully made.";
 const OVERLAP_CONFLICT_MSG =
   "Your requested booking period is unavailable. Please amend your booking period.";
 const UNKNOWN_ERROR_MSG = "An unknown error has occurred. Please try again.";
+const TR2_LABEL = "Name and house of TR2-trained personnel";
 
 class BookVenueForm extends React.Component {
   static contextType = Context;
@@ -17,9 +18,7 @@ class BookVenueForm extends React.Component {
 
     this.state = this.getInitialState();
 
-    this.onContactNumberChange = this.onContactNumberChange.bind(this);
-    this.onNumParticipantsChange = this.onNumParticipantsChange.bind(this);
-    this.onPurposeChange = this.onPurposeChange.bind(this);
+    this.onChange = this.onChange.bind(this);
     this.onSubmitting = this.onSubmitting.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.toggleConfirmation = this.toggleConfirmation.bind(this);
@@ -31,6 +30,7 @@ class BookVenueForm extends React.Component {
       contactNumber: 0,
       numParticipants: 0,
       purpose: "",
+      tr2Trained: "",
       success: false
     };
     return initialState;
@@ -51,19 +51,9 @@ class BookVenueForm extends React.Component {
     );
   }
 
-  onPurposeChange(event, { value }) {
-    CONSOLE_LOGGING && console.log("Booking purpose changed:", value);
-    this.setState({ purpose: value });
-  }
-
-  onContactNumberChange(event, { value }) {
-    CONSOLE_LOGGING && console.log("Contact number changed:", value);
-    this.setState({ contactNumber: value });
-  }
-
-  onNumParticipantsChange(event, { value }) {
-    CONSOLE_LOGGING && console.log("Number of participants changed:", value);
-    this.setState({ numParticipants: value });
+  onChange(event, { name, value }) {
+    CONSOLE_LOGGING && console.log(`${name} changed:`, value);
+    this.setState({ [name]: value });
   }
 
   async onSubmitting() {
@@ -76,7 +66,10 @@ class BookVenueForm extends React.Component {
       .then(() => {
         const data = {
           roomId: this.props.bookingPeriod.venue.roomId,
-          description: this.state.purpose,
+          description:
+            (this.isTr2()
+              ? `TR2-trained personnel: ${this.state.tr2Trained}\n\n`
+              : "") + this.state.purpose,
           contactNumber: this.state.contactNumber,
           expectedAttendees: this.state.numParticipants,
           start: this.props.bookingPeriod.start,
@@ -120,6 +113,10 @@ class BookVenueForm extends React.Component {
     this.setState({ confirming: !this.state.confirming });
   }
 
+  isTr2() {
+    return this.props.bookingPeriod.venue.name === "Theme Room 2";
+  }
+
   render() {
     return (
       <Card raised style={{ margin: "0 0 1em 0" }}>
@@ -135,24 +132,37 @@ class BookVenueForm extends React.Component {
               icon="phone"
               type="number"
               iconPosition="left"
-              onChange={this.onContactNumberChange}
+              onChange={this.onChange}
               required
+              name="contactNumber"
             />
             <Form.Input
               label="Expected number of attendees/participants"
               icon="users"
               type="number"
               iconPosition="left"
-              onChange={this.onNumParticipantsChange}
+              onChange={this.onChange}
               required
+              name="numParticipants"
             />
+            {this.isTr2() && (
+              <Form.Input
+                label={TR2_LABEL}
+                icon="user"
+                iconPosition="left"
+                onChange={this.onChange}
+                required
+                name="tr2Trained"
+              />
+            )}
             <Form.TextArea
               rows={8}
               label="Booking purpose"
               placeholder="Briefly describe the purpose for this booking..."
-              onChange={this.onPurposeChange}
+              onChange={this.onChange}
               disabled={this.state.success}
               required
+              name="purpose"
             />
           </Form>
         </Card.Content>
