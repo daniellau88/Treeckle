@@ -608,6 +608,10 @@ Required permission level: Admin
         "email": <email as String>
     }
     
++ Response 401 (text/plain)
+    <!-- JWT missing/invalid/expired/insufficient permissions -->
+    Unauthorized
+    
 + Response 404 (text/plain)
     Not Found <!-- not initialized/created yet -->
 
@@ -671,7 +675,12 @@ Required permission level: Admin
         {
             "name":"testRoom",
             "category":"testRooms",
-            "recommendedCapacity": 691
+            "recommendedCapacity": 691,
+            "contactName": "sujay",  <!-- Optional -->
+            "contactEmail": "rssujaydev@gmail.com",
+            "contactNumber": 12345678, <!-- Optional -->
+            "checklist": ["Agree1", "Agree2"], <!-- Optional, default = [] -->
+            "placeholderText": "Please book me" <!-- Optional, default = "Briefly describe the purpose of this booking ..." -->
         }
         
 + Response 200 (application/json)
@@ -706,7 +715,7 @@ Required permission level: Admin
 
 Required permission level: Admin
 
-Can be used to modify name, category and recommendedCapacity. These fields are optional, and this is an idempotent PATCH request.
+Can be used to modify name, category and recommendedCapacity and other suitable fields. These fields are optional, and this is an idempotent PATCH request.
 
 + Request
     + Headers
@@ -718,6 +727,11 @@ Can be used to modify name, category and recommendedCapacity. These fields are o
         "name":"testRoom",
         "category":"testRooms",
         "recommendedCapacity": 691
+        "contactName": <String: new contact name>,
+        "contactEmail": <String: new email address>,
+        "contactNumber": 123456789,
+        "checklist": [], <!-- Array can be empty, think of this as an overwrite -->
+        "placeholderText": "hello"
     }
 
 + Response 200 (text/plain)
@@ -828,12 +842,20 @@ Required permission level: Resident or higher
         Authorization: Bearer <JWT token>
         
 + Response 200 (application/json)
-    <!-- array of room names, recommended capacity and ids belonging to the specified category --> 
+    <!-- array of room details belonging to the specified category, sorted by name (ASCENDING) --> 
     [
         {
+            "roomId": <String>,
             "name": "seminarRoom",
             "recommendedCapacity": 500,
-            "roomId": <String>
+            "contactName": "sujay",
+            "contactEmail": "rssujaydev@gmail.com",
+            "contactNumber": 12345678,
+            "checklist": [
+                "AgreeToThis1",
+                "AgreeToThis2"
+            ],
+            "placeholderText": "Please use the following format: ..."
         }
     ]
 
@@ -903,7 +925,7 @@ Required permission level: Resident or higher
    + startDateOnwards (Optional) - Integer unix timestamp from JS Date() to ignore requests that start before provided time, default = Date(0)
    + page (Optional) - The page of the resulting data to retrieve, default = 1
    + limit (Optional) - The number of entries per page, default = 10
-   + sortOrder (Optional) - 1 or -1. To sort the returned data in ASCENDING (1) or DESCNEDING (0) order of creationDate. default=1
+   + sortOrder (Optional) - 1 or -1. To sort the returned data in ASCENDING (1) or DESCENDING (-1) order of creationDate. default=1
 
 
 ### Fetch all requests [GET]
