@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        RoomBooking.byTenant(req.user.residence).find({ createdBy: req.user.userId }).lean()
+        RoomBooking.byTenant(req.user.residence).find({ createdBy: req.user.userId }, null, {sort: { createdDate: -1 }}).lean()
         .then(async resp => {
             const idToRoom = new Map();
             const roomPromises = [];
