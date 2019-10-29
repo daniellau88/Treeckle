@@ -76,6 +76,9 @@ class Dashboard extends React.Component {
             .
           </text>
         </Container>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }

@@ -5,6 +5,7 @@ import { Context } from "../../../contexts/UserProvider";
 import ChangeRoleButton from "./ChangeRoleButton";
 import DeleteUserButton from "./DeleteUserButton";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
+import "../../../styles/ScrollableTable.scss";
 
 class UserAccountsTable extends React.Component {
   static contextType = Context;
@@ -60,90 +61,93 @@ class UserAccountsTable extends React.Component {
   }
 
   render() {
-    return this.state.isLoading ? (
-      <Table style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}>
-        <Table.Row>
-          <Table.Cell>
-            <Placeholder>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-            </Placeholder>
-          </Table.Cell>
-          <Table.Cell>
-            <Placeholder>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-            </Placeholder>
-          </Table.Cell>
-          <Table.Cell>
-            <Placeholder>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-            </Placeholder>
-          </Table.Cell>
-          <Table.Cell>
-            <Placeholder>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-              <Placeholder.Paragraph>
-                <Placeholder.Line />
-                <Placeholder.Line />
-                <Placeholder.Line />
-              </Placeholder.Paragraph>
-            </Placeholder>
-          </Table.Cell>
-        </Table.Row>
-      </Table>
-    ) : (
-      <Table
-        style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}
-        fixed
-        headerRow={
-          <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Role</Table.HeaderCell>
-            <Table.HeaderCell textAlign="right">Actions</Table.HeaderCell>
-          </Table.Row>
-        }
-        renderBodyRow={this.renderBodyRow}
-        tableData={this.state.allAccounts}
-      />
+    return (
+      <div className="scrollable-table" style={{ maxHeight: "35em" }}>
+        {this.state.isLoading ? (
+          <Table>
+            <Table.Row>
+              <Table.Cell>
+                <Placeholder>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                </Placeholder>
+              </Table.Cell>
+              <Table.Cell>
+                <Placeholder>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                </Placeholder>
+              </Table.Cell>
+              <Table.Cell>
+                <Placeholder>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                </Placeholder>
+              </Table.Cell>
+              <Table.Cell>
+                <Placeholder>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                  </Placeholder.Paragraph>
+                </Placeholder>
+              </Table.Cell>
+            </Table.Row>
+          </Table>
+        ) : (
+          <Table
+            fixed
+            headerRow={
+              <Table.Row>
+                <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>Email</Table.HeaderCell>
+                <Table.HeaderCell>Role</Table.HeaderCell>
+                <Table.HeaderCell textAlign="right">Actions</Table.HeaderCell>
+              </Table.Row>
+            }
+            renderBodyRow={this.renderBodyRow}
+            tableData={this.state.allAccounts}
+          />
+        )}
+      </div>
     );
   }
 }

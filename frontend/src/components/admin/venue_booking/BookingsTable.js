@@ -5,6 +5,7 @@ import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../../common/StatusButton";
 import { toDateTimeString } from "../../../util/DateUtil";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
+import "../../../styles/ScrollableTable.scss";
 
 class BookingsTable extends React.Component {
   static contextType = Context;
@@ -87,35 +88,38 @@ class BookingsTable extends React.Component {
   }
 
   render() {
-    return this.state.allRequests.length > 0 ? (
-      <Table
-        style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}
-        headerRow={
-          <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Contact number</Table.HeaderCell>
-            <Table.HeaderCell>Venue</Table.HeaderCell>
-            <Table.HeaderCell>Start</Table.HeaderCell>
-            <Table.HeaderCell>End</Table.HeaderCell>
-            <Table.HeaderCell>Number of participants</Table.HeaderCell>
-            <Table.HeaderCell>Purpose</Table.HeaderCell>
-            <Table.HeaderCell>Submitted at</Table.HeaderCell>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-          </Table.Row>
-        }
-        tableData={this.state.allRequests}
-        renderBodyRow={this.renderBodyRow}
-      />
-    ) : (
-      <Segment
-        placeholder
-        textAlign="center"
-        size="huge"
-        loading={this.state.isLoading}
-      >
-        There are currently no booking requests
-      </Segment>
+    return (
+      <div className="scrollable-table" style={{ maxHeight: "45em" }}>
+        {this.state.allRequests.length > 0 ? (
+          <Table
+            headerRow={
+              <Table.Row>
+                <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>Email</Table.HeaderCell>
+                <Table.HeaderCell>Contact number</Table.HeaderCell>
+                <Table.HeaderCell>Venue</Table.HeaderCell>
+                <Table.HeaderCell>Start</Table.HeaderCell>
+                <Table.HeaderCell>End</Table.HeaderCell>
+                <Table.HeaderCell>Number of participants</Table.HeaderCell>
+                <Table.HeaderCell>Purpose</Table.HeaderCell>
+                <Table.HeaderCell>Submitted at</Table.HeaderCell>
+                <Table.HeaderCell>Status</Table.HeaderCell>
+              </Table.Row>
+            }
+            tableData={this.state.allRequests}
+            renderBodyRow={this.renderBodyRow}
+          />
+        ) : (
+          <Segment
+            placeholder
+            textAlign="center"
+            size="huge"
+            loading={this.state.isLoading}
+          >
+            There are currently no booking requests
+          </Segment>
+        )}
+      </div>
     );
   }
 }

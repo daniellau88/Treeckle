@@ -5,6 +5,7 @@ import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../../../common/StatusButton";
 import { toDateTimeString } from "../../../../util/DateUtil";
 import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
+import "../../../../styles/ScrollableTable.scss";
 
 class UserBookingsTable extends React.Component {
   static contextType = Context;
@@ -78,22 +79,28 @@ class UserBookingsTable extends React.Component {
 
   render() {
     return this.state.bookings.length > 0 ? (
-      <Table
-        style={{ boxShadow: "2px 2px 10px 0 rgba(34,36,38,.85)" }}
-        headerRow={
-          <Table.Row>
-            <Table.HeaderCell>Venue</Table.HeaderCell>
-            <Table.HeaderCell>Start</Table.HeaderCell>
-            <Table.HeaderCell>End</Table.HeaderCell>
-            <Table.HeaderCell>Number of participants</Table.HeaderCell>
-            <Table.HeaderCell>Purpose</Table.HeaderCell>
-            <Table.HeaderCell>Submitted at</Table.HeaderCell>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-          </Table.Row>
-        }
-        tableData={this.state.bookings}
-        renderBodyRow={this.renderBodyRow}
-      />
+      <div
+        className="scrollable-table"
+        style={{
+          maxHeight: "35em"
+        }}
+      >
+        <Table
+          headerRow={
+            <Table.Row>
+              <Table.HeaderCell>Venue</Table.HeaderCell>
+              <Table.HeaderCell>Start</Table.HeaderCell>
+              <Table.HeaderCell>End</Table.HeaderCell>
+              <Table.HeaderCell>Number of participants</Table.HeaderCell>
+              <Table.HeaderCell>Purpose</Table.HeaderCell>
+              <Table.HeaderCell>Submitted at</Table.HeaderCell>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+            </Table.Row>
+          }
+          tableData={this.state.bookings}
+          renderBodyRow={this.renderBodyRow}
+        />
+      </div>
     ) : (
       <Segment
         placeholder

@@ -21,6 +21,9 @@ class ProfilePage extends React.Component {
         <div style={{ margin: "2em 2em" }}>
           <ProfileCard user={this.user1} />
         </div>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }

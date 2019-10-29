@@ -25,6 +25,9 @@ const VenueBookingPage = props => {
         {!creating && <h1 style={{ color: "#FDFDFD" }}>My Bookings</h1>}
         {!creating ? <UserBookingsTable /> : <CreateBookingRequest />}
       </Container>
+      <br />
+      <br />
+      <br />
     </main>
   );
 };

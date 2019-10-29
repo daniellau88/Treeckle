@@ -2,7 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Card, Button, Form, Table } from "semantic-ui-react";
 import DatePicker from "../../../common/DatePicker";
-import "../../../../styles/VenueAvailabilityCard.scss";
+import "../../../../styles/ScrollableTable.scss";
 import { Context } from "../../../../contexts/UserProvider";
 import { getUpdatedAvailabilityOptions } from "../../../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../../../util/Constants";
@@ -229,9 +229,9 @@ class VenueAvailabilityCard extends React.Component {
                   Date: {toDateString(this.state.endDate)}
                 </div>
                 <div
+                  className="scrollable-table"
                   style={{
-                    overflowY: "auto",
-                    maxHeight: "19em"
+                    maxHeight: "20em"
                   }}
                 >
                   <Table
