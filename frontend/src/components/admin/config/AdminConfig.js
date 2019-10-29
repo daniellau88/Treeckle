@@ -1,157 +1,137 @@
 import React from "react";
 import axios from "axios";
-import * as yup from "yup";
 import { Context } from "../../../contexts/UserProvider";
-import { Button, Form, Segment } from "semantic-ui-react";
+import { Button, Form, Segment, Message } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
 
 class AdminConfig extends React.Component {
   static contextType = Context;
-  state = {
-    currentEmail: "",
-    emailError: null,
-    disabled: true,
-    email: "",
-    submittedEmail: ""
-  };
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      email: "",
+      errorMsg: "",
+      isDisabled: true,
+      isLoading: true
+    };
+
+    this.handleEmailChange = this.handleEmailChange.bind(this);
     this.toggleField = this.toggleField.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${this.context.token}`
-      }
-    };
-    axios.get("/api/emails", config).then(res => {
-      if (res.status === 200) {
-        this.setState({
-          currentEmail: res.data.email,
-          email: res.data.email
-        });
-      }
-    });
+    axios
+      .get("/api/emails", {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
+      .then(response => {
+        CONSOLE_LOGGING && console.log("GET CC email:", response);
+        if (response.status === 200) {
+          this.setState({ email: response.data.email, isLoading: false });
+        }
+      })
+      .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("GET CC email error:", response);
+        if (response.status === 500) {
+          this.setState({
+            errorMsg: "An unknown error has occurred.",
+            isLoading: false
+          });
+        } else {
+          this.setState({ isLoading: false });
+        }
+      });
   }
 
-  EmailSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email()
-      .required()
-  });
-
-  handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value });
-    let inputData = { email: this.state.email };
-    this.EmailSchema.isValid(inputData).then(valid => {
-      if (valid) {
-        this.setState({ emailError: null });
-      } else {
-        this.setState({
-          emailError: { content: "Please enter a valid email." }
-        });
-      }
-    });
-  };
+  handleEmailChange(event, { value }) {
+    CONSOLE_LOGGING && console.log("Email changed:", value);
+    this.setState({ email: value, errorMsg: "" });
+  }
 
   toggleField() {
-    this.setState({ disabled: !this.state.disabled, emailError: null });
-    if (this.state.submittedEmail === "") {
-      this.setState({ email: this.state.currentEmail });
-    }
+    this.setState({ isDisabled: !this.state.isDisabled, error: "" });
   }
 
-  handleSubmit = () => {
-    const { email } = this.state;
-    this.setState({
-      submittedEmail: email,
-      emailError: null
-    });
-    CONSOLE_LOGGING && console.log(this.state.email);
-    const config = {
-      headers: {
-        Authorization: `Bearer ${this.context.token}`
-      }
-    };
-    let inputData = { email: this.state.email };
-    this.EmailSchema.isValid(inputData).then(valid => {
-      if (valid) {
-        CONSOLE_LOGGING && console.log("yell hea!");
-        axios
-          .put(
-            "/api/emails",
-            {
-              email: this.state.email
-            },
-            config
-          )
-          .then(res => {
-            if (res.status === 200) {
-              alert(
-                "CSS email updated! Now all receipts will be sent to the specified email."
-              );
-            }
-          })
-          .catch(err => {
-            CONSOLE_LOGGING && console.log(err);
-            if (err.response.status === 401) {
-              alert("Your current session has expired. Please log in again.");
-              this.context.resetUser();
-            }
-          });
-      } else {
-        this.setState({
-          emailError: { content: "Please enter a valid email." }
-        });
-      }
-    });
-  };
+  handleSubmit() {
+    axios
+      .put(
+        "/api/emails",
+        {
+          email: this.state.email
+        },
+        { headers: { Authorization: `Bearer ${this.context.token}` } }
+      )
+      .then(response => {
+        CONSOLE_LOGGING && console.log("PUT update CC email:", response);
+        if (response.status === 200) {
+          this.toggleField();
+          alert(
+            "CC email updated! Now all receipts will be sent to the specified email."
+          );
+        }
+      })
+      .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("PUT update CC email error:", response);
+        switch (response.status) {
+          case 401:
+            alert("Your current session has expired. Please log in again.");
+            this.context.resetUser();
+            break;
+          case 422:
+            this.setState({ errorMsg: "Invalid email." });
+            break;
+          default:
+            this.setState({
+              errorMsg: "An unknown error has occurred. Please try again."
+            });
+        }
+      });
+  }
 
   render() {
-    const {
-      currentEmail,
-      emailError,
-      disabled,
-      email,
-      submittedEmail
-    } = this.state;
     return (
       <Segment placeholder>
-        <Form error textAlign="center">
-          <text>
+        <Form textAlign="center" onSubmit={this.handleSubmit}>
+          <h4>
             The below email is assigned to receive receipts for the creation or
             change in status of all bookings.
-          </text>
-          <br />
-          <br />
+          </h4>
           <Form.Input
-            error={emailError}
-            placeholder="CC Email"
-            name="email"
-            value={email === "" ? "Loading..." : email}
-            onChange={this.handleChange}
-            disabled={disabled}
+            placeholder="Enter a CC email"
+            loading={this.state.isLoading}
+            value={this.state.email}
+            onChange={this.handleEmailChange}
+            disabled={this.state.isDisabled}
+            type="email"
           />
-          <div
-            style={{ width: "100%", justifyContent: "center", display: "flex" }}
-          >
-            <Button.Group style={{ display: "flex" }}>
+          {this.state.errorMsg && (
+            <Message
+              error
+              content={this.state.errorMsg}
+              style={{
+                display: "block",
+                maxWidth: "210px",
+                margin: "1em auto"
+              }}
+            />
+          )}
+          <div style={{ justifyContent: "center", display: "flex" }}>
+            <Button.Group>
               <Button
                 secondary
-                content="Edit CC Email"
+                content="Edit CC email"
                 onClick={this.toggleField}
                 style={{ border: "1px solid #dfdfdf" }}
+                type="button"
               />
               <Button
                 primary
                 content="Confirm"
-                disabled={emailError || disabled}
-                onClick={this.handleSubmit}
+                disabled={this.state.isDisabled}
+                type="submit"
                 style={{ border: "1px solid #dfdfdf" }}
               />
             </Button.Group>
@@ -161,5 +141,25 @@ class AdminConfig extends React.Component {
     );
   }
 }
+
+/*
+
+            <Button.Group >
+              <Form.Button
+                secondary
+                content="Edit CC email"
+                onClick={this.toggleField}
+                style={{ border: "1px solid #dfdfdf" }}
+              />
+              <Form.Button
+                primary
+                content="Confirm"
+                disabled={emailError || disabled}
+                onClick={this.handleSubmit}
+                style={{ border: "1px solid #dfdfdf" }}
+              />
+            </Button.Group>
+          </div>
+          */
 
 export default AdminConfig;
