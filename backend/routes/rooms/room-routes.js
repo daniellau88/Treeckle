@@ -16,7 +16,12 @@ router.use('/bookings', bookingRoutes);
 router.post('/', jsonParser, [
     body('name').exists(),
     body('category').exists(),
-    body('recommendedCapacity').exists().isInt()
+    body('recommendedCapacity').exists().isInt(),
+    body('contactName').optional().isString(),
+    body('contactEmail').isEmail(),
+    body('contactNumber').optional().isInt().toInt(),
+    body('checklist').optional().isArray(),
+    body('placeholderText').optional()
 ], async (req, res) => {
     //Check for input errors
     const errors = validationResult(req);
@@ -33,6 +38,12 @@ router.post('/', jsonParser, [
             recommendedCapacity: req.body.recommendedCapacity,
             createdBy: req.user.userId
         }
+
+        if (req.body.contactName) newRoom.contactName = req.body.contactName;
+        if (req.body.contactEmail) newRoom.contactEmail = req.body.contactEmail;
+        if (req.body.contactNumber) newRoom.contactNumber = req.body.contactNumber;
+        if (req.body.checklist) newRoom.checklist = req.body.checklist;
+        if (req.body.placeholderText) newRoom.placeholderText = req.body.placeholderText;
 
         const room = Room.byTenant(req.user.residence);
         const roomInstance = new room(newRoom);
