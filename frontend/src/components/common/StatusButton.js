@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../DevelopmentView";
@@ -16,8 +16,8 @@ class StatusButton extends React.Component {
 
   // 0 => pending, 1 => approved, 2 => rejected, 3 => cancelled
   renderStatusButton() {
-    var color;
-    var statusLabel;
+    let color;
+    let statusLabel;
 
     switch (this.props.status) {
       case 0:
@@ -56,9 +56,10 @@ class StatusButton extends React.Component {
       id: this.props.bookingId,
       approved: newStatus
     };
-    Axios.patch("api/rooms/bookings/manage", data, {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
+    axios
+      .patch("api/rooms/bookings/manage", data, {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
       .then(response => {
         CONSOLE_LOGGING && console.log("PATCH update status:", response);
         if (response.status === 200) {
@@ -78,9 +79,10 @@ class StatusButton extends React.Component {
     const data = {
       id: this.props.bookingId
     };
-    Axios.patch("api/rooms/bookings", data, {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
+    axios
+      .patch("api/rooms/bookings", data, {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
       .then(response => {
         CONSOLE_LOGGING && console.log("PATCH cancel booking:", response);
         if (response.status === 200) {

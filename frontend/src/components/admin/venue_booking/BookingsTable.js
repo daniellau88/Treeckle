@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../../contexts/UserProvider";
 import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../../common/StatusButton";
@@ -25,19 +25,55 @@ class BookingsTable extends React.Component {
     this.retrieveAllRequests();
   }
 
+  retrievePendingRequests() {
+    return axios.get(
+      `api/rooms/bookings/all?Approved=0&Rejected=0&Cancelled=0&limit=1000`,
+      {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      }
+    );
+  }
+
+  retrieveRemainingRequests() {
+    return axios.get(
+      `api/rooms/bookings/all?Pending=0&limit=1000&sortOrder=0`,
+      {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      }
+    );
+  }
+
   retrieveAllRequests() {
-    Axios.get(`api/rooms/bookings/all?limit=100`, {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
-      .then(response => {
-        CONSOLE_LOGGING && console.log("GET all booking requests:", response);
-        if (response.status === 200) {
-          this.setState({
-            allRequests: response.data.bookings,
-            isLoading: false
-          });
-        }
-      })
+    axios
+      .all([this.retrievePendingRequests(), this.retrieveRemainingRequests()])
+      .then(
+        axios.spread((pendingRequestsResponse, remainingRequestsResponse) => {
+          CONSOLE_LOGGING &&
+            console.log(
+              "GET pending booking requests:",
+              pendingRequestsResponse
+            );
+          CONSOLE_LOGGING &&
+            console.log(
+              "GET remaining booking requests",
+              remainingRequestsResponse
+            );
+          if (
+            pendingRequestsResponse.status === 200 &&
+            remainingRequestsResponse.status === 200
+          ) {
+            const allRequests = [
+              ...pendingRequestsResponse.data.bookings,
+              ...remainingRequestsResponse.data.bookings
+            ];
+            this.setState({
+              allRequests,
+              isLoading: false
+            });
+          }
+        })
+      )
+
       .catch(({ response }) => {
         CONSOLE_LOGGING &&
           console.log("GET all booking requests error:", response);
@@ -89,9 +125,10 @@ class BookingsTable extends React.Component {
 
   render() {
     return (
-      <div className="scrollable-table" style={{ maxHeight: "45em" }}>
+      <div className="scrollable-table" style={{ maxHeight: "44em" }}>
         {this.state.allRequests.length > 0 ? (
           <Table
+            selectable
             headerRow={
               <Table.Row>
                 <Table.HeaderCell>Name</Table.HeaderCell>

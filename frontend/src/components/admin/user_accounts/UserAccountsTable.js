@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Placeholder, Table } from "semantic-ui-react";
 import { Context } from "../../../contexts/UserProvider";
 import ChangeRoleButton from "./ChangeRoleButton";
@@ -26,17 +26,19 @@ class UserAccountsTable extends React.Component {
   }
 
   retrieveAccounts() {
-    Axios.get("api/accounts", {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    }).then(response => {
-      CONSOLE_LOGGING && console.log("GET all accounts", response);
-      if (response.status === 200) {
-        this.setState({
-          allAccounts: response.data,
-          isLoading: false
-        });
-      }
-    });
+    axios
+      .get("api/accounts", {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
+      .then(response => {
+        CONSOLE_LOGGING && console.log("GET all accounts", response);
+        if (response.status === 200) {
+          this.setState({
+            allAccounts: response.data,
+            isLoading: false
+          });
+        }
+      });
   }
 
   renderBodyRow(data, index) {
@@ -62,7 +64,7 @@ class UserAccountsTable extends React.Component {
 
   render() {
     return (
-      <div className="scrollable-table" style={{ maxHeight: "35em" }}>
+      <div className="scrollable-table" style={{ maxHeight: "37em" }}>
         {this.state.isLoading ? (
           <Table>
             <Table.Row>
@@ -135,6 +137,7 @@ class UserAccountsTable extends React.Component {
         ) : (
           <Table
             fixed
+            selectable
             headerRow={
               <Table.Row>
                 <Table.HeaderCell>Name</Table.HeaderCell>

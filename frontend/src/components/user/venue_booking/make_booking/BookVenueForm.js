@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Card, Form, Button, Confirm } from "semantic-ui-react";
 import { Context } from "../../../../contexts/UserProvider";
 import "../../../../styles/BookVenueForm.scss";
@@ -82,9 +82,10 @@ class BookVenueForm extends React.Component {
           start: this.props.bookingPeriod.start,
           end: this.props.bookingPeriod.end
         };
-        Axios.post("api/rooms/bookings", data, {
-          headers: { Authorization: `Bearer ${this.context.token}` }
-        })
+        axios
+          .post("api/rooms/bookings", data, {
+            headers: { Authorization: `Bearer ${this.context.token}` }
+          })
           .then(response => {
             CONSOLE_LOGGING && console.log("POST form submission:", response);
             if (response.status === 200) {
@@ -95,7 +96,7 @@ class BookVenueForm extends React.Component {
           .catch(({ response }) => {
             CONSOLE_LOGGING &&
               console.log("POST form submission error:", response);
-            var msg;
+            let msg;
             switch (response.status) {
               case 400:
                 msg = OVERLAP_CONFLICT_MSG;

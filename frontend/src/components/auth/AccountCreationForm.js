@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import Axios from "axios";
-import { Button, Form, Header, Message } from "semantic-ui-react";
+import axios from "axios";
+import { Form, Header, Message } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../DevelopmentView";
 import { UNKNOWN_ERROR } from "../../util/Constants";
 
@@ -32,7 +32,8 @@ const AccountCreationForm = props => {
       password: password
     };
     CONSOLE_LOGGING && console.log("Submission data", data);
-    Axios.post("/auth/newAccountsDirect", data)
+    axios
+      .post("/auth/newAccountsDirect", data)
       .then(response => {
         CONSOLE_LOGGING && console.log("POST create account direct:", response);
         if (response.status === 200) {
@@ -42,7 +43,7 @@ const AccountCreationForm = props => {
       .catch(({ response }) => {
         CONSOLE_LOGGING &&
           console.log("POST create account direct error:", response);
-        var msg;
+        let msg;
         switch (response.status) {
           case 400:
             msg = USER_EXISTS;
@@ -65,7 +66,8 @@ const AccountCreationForm = props => {
       uniqueURIcomponent: props.uniqueId
     };
     CONSOLE_LOGGING && console.log("Submission data", data);
-    Axios.post("/auth/newAccounts", data)
+    axios
+      .post("/auth/newAccounts", data)
       .then(response => {
         CONSOLE_LOGGING && console.log("POST create account link:", response);
         if (response.status === 200) {
@@ -75,7 +77,7 @@ const AccountCreationForm = props => {
       .catch(({ response }) => {
         CONSOLE_LOGGING &&
           console.log("POST create account link error:", response);
-        var msg;
+        let msg;
         switch (response.status) {
           case 400:
             msg = USER_EMAIL_ERROR;

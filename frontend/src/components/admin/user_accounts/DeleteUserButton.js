@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
@@ -19,10 +19,11 @@ class DeleteUserButton extends React.Component {
     const data = {
       email: this.props.email
     };
-    Axios.delete("api/accounts", {
-      data: data,
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
+    axios
+      .delete("api/accounts", {
+        data: data,
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
       .then(response => {
         CONSOLE_LOGGING && console.log("DELETE user", response);
         if (response.status === 200) {

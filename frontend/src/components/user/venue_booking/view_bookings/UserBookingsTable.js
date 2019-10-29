@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../../../contexts/UserProvider";
 import { Table, Segment } from "semantic-ui-react";
 import StatusButton from "../../../common/StatusButton";
@@ -26,9 +26,10 @@ class UserBookingsTable extends React.Component {
   }
 
   retrieveBookings() {
-    Axios.get("api/rooms/bookings", {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
+    axios
+      .get("api/rooms/bookings", {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
       .then(response => {
         CONSOLE_LOGGING && console.log("GET own bookings:", response);
         if (response.status === 200) {
@@ -82,10 +83,11 @@ class UserBookingsTable extends React.Component {
       <div
         className="scrollable-table"
         style={{
-          maxHeight: "35em"
+          maxHeight: "37em"
         }}
       >
         <Table
+          selectable
           headerRow={
             <Table.Row>
               <Table.HeaderCell>Venue</Table.HeaderCell>

@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
@@ -20,9 +20,10 @@ class ChangeRoleButton extends React.Component {
       email: this.props.email,
       role: newRole
     };
-    Axios.patch("api/accounts", data, {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
+    axios
+      .patch("api/accounts", data, {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
       .then(response => {
         CONSOLE_LOGGING && console.log("PATCH update user role", response);
         if (response.status === 200) {

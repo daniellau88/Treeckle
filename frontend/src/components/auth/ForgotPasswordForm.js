@@ -25,7 +25,7 @@ const ForgotPasswordForm = props => {
       })
       .catch(({ response }) => {
         CONSOLE_LOGGING && console.log("POST reset password:", response);
-        var msg;
+        let msg;
         switch (response.status) {
           case 422:
             msg = INVALID_EMAIL;

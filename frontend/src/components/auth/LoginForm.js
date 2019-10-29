@@ -32,7 +32,7 @@ const LoginForm = props => {
       })
       .catch(({ response }) => {
         CONSOLE_LOGGING && console.log("POST sign in error:", response);
-        var msg;
+        let msg;
         switch (response.status) {
           case 400:
             msg = MISSING_FIELDS;

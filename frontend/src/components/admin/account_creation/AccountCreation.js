@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../../contexts/UserProvider";
 import { Form, Grid, Segment, Header, Message } from "semantic-ui-react";
 import UploadCsv from "./UploadCsv";
@@ -29,13 +29,14 @@ class AccountCreation extends React.Component {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.context.token}`
     };
-    Axios.post(
-      "/auth/newAccountRequest",
-      {
-        email: this.state.email
-      },
-      { headers: headers }
-    )
+    axios
+      .post(
+        "/auth/newAccountRequest",
+        {
+          email: this.state.email
+        },
+        { headers: headers }
+      )
       .then(response => {
         CONSOLE_LOGGING && console.log("POST new account:", response);
         if (response.status === 200) {
@@ -44,7 +45,7 @@ class AccountCreation extends React.Component {
       })
       .catch(({ response }) => {
         CONSOLE_LOGGING && console.log("POST new account error:", response);
-        var msg;
+        let msg;
         switch (response.status) {
           case 400:
             msg = "Account with the specified email already exists.";

@@ -1,5 +1,5 @@
 import React from "react";
-import Axios from "axios";
+import axios from "axios";
 import { Card, Button, Form, Table } from "semantic-ui-react";
 import DatePicker from "../../../common/DatePicker";
 import "../../../../styles/ScrollableTable.scss";
@@ -104,15 +104,16 @@ class VenueAvailabilityCard extends React.Component {
 
   updateAvailabilityOptions() {
     if (this.state.endDate) {
-      Axios.get(
-        `api/rooms/bookings/${
-          this.props.venue.roomId
-        }/${this.state.endDate.getTime()}-${this.state.endDate.getTime() +
-          DAY_MILLISECONDS}`,
-        {
-          headers: { Authorization: `Bearer ${this.context.token}` }
-        }
-      )
+      axios
+        .get(
+          `api/rooms/bookings/${
+            this.props.venue.roomId
+          }/${this.state.endDate.getTime()}-${this.state.endDate.getTime() +
+            DAY_MILLISECONDS}`,
+          {
+            headers: { Authorization: `Bearer ${this.context.token}` }
+          }
+        )
         .then(response => {
           CONSOLE_LOGGING && console.log("GET room bookings:", response);
           if (response.status === 200) {
@@ -231,7 +232,8 @@ class VenueAvailabilityCard extends React.Component {
                 <div
                   className="scrollable-table"
                   style={{
-                    maxHeight: "20em"
+                    maxHeight: "21em",
+                    boxShadow: "none"
                   }}
                 >
                   <Table

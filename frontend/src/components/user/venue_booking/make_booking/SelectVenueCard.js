@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Button, Container, Accordion } from "semantic-ui-react";
-import Axios from "axios";
+import axios from "axios";
 import { Context } from "../../../../contexts/UserProvider";
 import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
 
@@ -18,9 +18,10 @@ class SelectVenueCard extends React.Component {
   }
 
   componentDidMount() {
-    Axios.get("api/rooms/categories", {
-      headers: { Authorization: `Bearer ${this.context.token}` }
-    })
+    axios
+      .get("api/rooms/categories", {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      })
       .then(response => {
         CONSOLE_LOGGING && console.log("GET categories response:", response);
         if (response.status === 200) {
@@ -47,9 +48,10 @@ class SelectVenueCard extends React.Component {
   handleOnCategoryClick(event, { active, content }) {
     if (!active) {
       const selectedCategory = content;
-      Axios.get(`api/rooms/categories/${selectedCategory}`, {
-        headers: { Authorization: `Bearer ${this.context.token}` }
-      })
+      axios
+        .get(`api/rooms/categories/${selectedCategory}`, {
+          headers: { Authorization: `Bearer ${this.context.token}` }
+        })
         .then(response => {
           CONSOLE_LOGGING && console.log("GET venues response:", response);
           if (response.status === 200) {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import Axios from "axios";
-import { Button, Form, Header, Message } from "semantic-ui-react";
+import axios from "axios";
+import { Form, Header, Message } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../DevelopmentView";
 import { UNKNOWN_ERROR } from "../../util/Constants";
 
@@ -26,7 +26,8 @@ const ResetPasswordForm = props => {
       uniqueURIcomponent: props.uniqueId
     };
     CONSOLE_LOGGING && console.log("Submission data", data);
-    Axios.post("/auth/resetAttempt", data)
+    axios
+      .post("/auth/resetAttempt", data)
       .then(response => {
         CONSOLE_LOGGING && console.log("POST reset account:", response);
         if (response.status === 200) {
@@ -35,7 +36,7 @@ const ResetPasswordForm = props => {
       })
       .catch(({ response }) => {
         CONSOLE_LOGGING && console.log("POST reset account error:", response);
-        var msg;
+        let msg;
         switch (response.status) {
           case 422:
             msg = INVALID_FIELDS;
