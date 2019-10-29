@@ -55,7 +55,7 @@ const ForgotPasswordForm = props => {
         }}
         type="email"
       />
-      {console.log(status)}
+
       {status !== null && (
         <Message
           error={!status.success}

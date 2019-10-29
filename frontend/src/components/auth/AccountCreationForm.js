@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { Form, Header, Message } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../DevelopmentView";
 import { UNKNOWN_ERROR } from "../../util/Constants";
+import { Context } from "../../contexts/UserProvider";
 
 const USER_EXISTS = "An account with this email already exists.";
 const USER_EMAIL_ERROR =
@@ -11,6 +12,7 @@ const USER_EMAIL_ERROR =
 const INVALID_FIELDS = "Invalid fields.";
 
 const AccountCreationForm = props => {
+  const context = useContext(Context);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -175,7 +177,10 @@ const AccountCreationForm = props => {
         <Form.Button
           fluid
           content="Login here"
-          onClick={() => history.push("/")}
+          onClick={() => {
+            context.resetUser();
+            history.push("/");
+          }}
           primary
           type="button"
         />

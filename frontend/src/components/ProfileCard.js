@@ -12,13 +12,8 @@ import {
   Icon,
   Popup
 } from "semantic-ui-react";
-import { DEVELOPMENT_VIEW } from "../DevelopmentView";
-
-function getBase64IntArray(arr) {
-  let TYPED_ARRAY = new Uint8Array(arr);
-  const STRING_CHAR = String.fromCharCode.apply(null, TYPED_ARRAY);
-  return btoa(STRING_CHAR);
-}
+import { DEVELOPMENT_VIEW, CONSOLE_LOGGING } from "../DevelopmentView";
+import { intArrayToBase64 } from "../util/EncodingUtil";
 
 function getIntArrayBase64(str) {
   let STRING_CHAR = Array.from(atob(str));
@@ -40,7 +35,7 @@ class ProfileCard extends React.Component {
 
   fileChange = e => {
     this.setState({ file: e.target.files[0] }, () => {
-      console.log("File chosen --->", this.state.file);
+      CONSOLE_LOGGING && console.log("File chosen --->", this.state.file);
     });
     if (e.target.files[0].size >= 4000000) {
       alert("Please ensure that the file size is below 4 MB.");
@@ -57,13 +52,13 @@ class ProfileCard extends React.Component {
         }
       };
       reader.onloadend = () => {
-        console.log(reader.result);
+        CONSOLE_LOGGING && console.log(reader.result);
         newProfilePic = getIntArrayBase64(reader.result.substring(22));
         axios
           .put("/api/accounts/profilePicture", data, config)
           .then(res => {
             if (res.status === 200) {
-              console.log("Success!");
+              CONSOLE_LOGGING && console.log("Success!");
               this.context.setUser(
                 this.context.token,
                 this.context.name,
@@ -73,7 +68,7 @@ class ProfileCard extends React.Component {
             }
           })
           .catch(err => {
-            console.log(err);
+            CONSOLE_LOGGING && console.log(err);
           });
       };
     }
@@ -89,7 +84,7 @@ class ProfileCard extends React.Component {
                 <Popup
                   trigger={
                     <Image
-                      src={`data:image/jpeg;base64,${getBase64IntArray(
+                      src={`data:image/*;base64,${intArrayToBase64(
                         this.context.profilePic
                       )}`}
                       size="medium"
@@ -108,7 +103,7 @@ class ProfileCard extends React.Component {
                           <Icon name="camera" />
                         </Button.Content>
                         <Button.Content visible>
-                          Upload Profile Picture (PNG)
+                          Upload profile picture (png)
                         </Button.Content>
                       </Button>
                       <input
@@ -116,6 +111,7 @@ class ProfileCard extends React.Component {
                         type="file"
                         hidden
                         onChange={this.fileChange}
+                        accept="image/png"
                       />
                     </div>
                   }

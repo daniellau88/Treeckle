@@ -6,13 +6,8 @@ import logo from "../images/treeckle_logo.png";
 import { Context } from "../contexts/UserProvider";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW } from "../DevelopmentView";
+import { intArrayToBase64 } from "../util/EncodingUtil";
 //import { srcToFile } from "../util/ValidationUtil";
-
-function getBase64IntArray(arr) {
-  let TYPED_ARRAY = new Uint8Array(arr);
-  const STRING_CHAR = String.fromCharCode.apply(null, TYPED_ARRAY);
-  return btoa(STRING_CHAR);
-}
 
 class NavigationBar extends React.Component {
   static contextType = Context;
@@ -150,7 +145,7 @@ class NavigationBar extends React.Component {
               trigger={
                 <Image
                   size="mini"
-                  src={`data:image/jpeg;base64,${getBase64IntArray(
+                  src={`data:image/*;base64,${intArrayToBase64(
                     this.context.profilePic
                   )}`}
                   avatar

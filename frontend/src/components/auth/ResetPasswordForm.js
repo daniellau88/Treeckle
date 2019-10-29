@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { Form, Header, Message } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../DevelopmentView";
 import { UNKNOWN_ERROR } from "../../util/Constants";
+import { Context } from "../../contexts/UserProvider";
 
 const INVALID_FIELDS = "Invalid fields.";
 
 const ResetPasswordForm = props => {
+  const context = useContext(Context);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -122,7 +124,10 @@ const ResetPasswordForm = props => {
         <Form.Button
           fluid
           content="Login here"
-          onClick={() => history.push("/")}
+          onClick={() => {
+            context.resetUser();
+            history.push("/");
+          }}
           primary
           type="button"
         />
