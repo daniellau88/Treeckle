@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Card,
   Icon,
@@ -13,19 +13,44 @@ import {
 } from "semantic-ui-react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Axios from "axios";
+import { Context } from "../contexts/UserProvider";
+import { CONSOLE_LOGGING } from "../DevelopmentView";
 
 const EventCard = props => {
+  const curr = props.event;
+  const user = useContext(Context);
+
   const [modal, setModal] = useState(false);
-  const [attending, setAttending] = useState(false);
-  const [pax, setPax] = useState(127);
+  const [attending, setAttending] = useState(curr.attending);
+  const [pax, setPax] = useState(curr.attendees);
   const [isCreator, setCreator] = useState(false);
 
-  const curr = props.event;
 
   const signup = () => {
     setAttending(true);
-    //Fire call to sign up
-    setPax(pax + 1);
+    console.log(curr.eventId, curr.attending);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${user.token}`
+    };
+    const data = {
+      eventId: curr.eventId,
+      signUp: 1
+    };
+    Axios.patch("/api/events/gallery", data, {
+      headers
+    })
+    .then(response => {
+      CONSOLE_LOGGING && console.log("PATCH signing up", response);
+      if (response.status === 200) {
+        setPax(pax + 1);
+      }
+    })
+    .catch(({ response }) => {
+      CONSOLE_LOGGING && console.log("PATCH signing up error:", response);
+    });
+    
   };
 
   const withdraw = () => {
@@ -56,8 +81,8 @@ const EventCard = props => {
             <h5>
               {curr.categories.map((value, index) => {
                 return <Label color='teal' tag>
-                {value}
-              </Label>
+                  {value}
+                </Label>
               })}
             </h5>
           </Modal.Content>
