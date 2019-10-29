@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import CarousellCards from "../components/CarousellCards";
+import UpcomingCarousellCards from "../components/UpcomingCarousellCards";
+import RecommendedCarousellCards from "../components/RecommendedCarousellCards";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Card, Icon, Image, Header, Menu } from "semantic-ui-react";
@@ -14,29 +15,17 @@ const EventsPage = props => {
       <div className="placeholder">
 
         <br /><br />
-        <Header style={{ margin: "1em 1em" }}>Recommended Events</Header>
-        <CarousellCards />
-        <br /><br />
-        <br /><br />
-
-        <br /><br />
         <Header style={{ margin: "1em 1em" }}>Upcoming Events</Header>
-        <CarousellCards />
+        <UpcomingCarousellCards />
         <br /><br />
         <br /><br />
 
         <br /><br />
-        <Header style={{ margin: "1em 1em" }}>Events you've signed up for</Header>
-        <CarousellCards />
+        <Header style={{ margin: "1em 1em" }}>Recommended Events</Header>
+        <RecommendedCarousellCards />
         <br /><br />
         <br /><br />
-
-        <div style={{ margin: "auto 10vw" }}>
-          <Header style={{ margin: "1em 1em" }}>Your Created Events</Header>
-          <EventList />
-          <br /><br />
-          <br /><br />
-        </div>
+        
       </div>
     </main>
   );

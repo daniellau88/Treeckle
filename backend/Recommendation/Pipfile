@@ -13,6 +13,7 @@ ipykernel = "*"
 rake-nltk = "*"
 scikit-learn = "*"
 wikipedia = "*"
+python-crontab = "*"
 
 [requires]
 python_version = "3.7"

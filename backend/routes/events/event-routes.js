@@ -258,7 +258,7 @@ router.patch('/image', upload.single('image'), [
     } else {
         Event.byTenant(req.user.residence).findOneAndUpdate(
             { _id: req.body.eventId, createdBy: req.user.userId, },
-            { posterPath: req.file.path }
+            { posterPath: req.file.filename }
         ).then(resp => {
             res.send(resp);
         }).catch(err => {
