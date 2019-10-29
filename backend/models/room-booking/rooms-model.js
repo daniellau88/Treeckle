@@ -6,7 +6,7 @@ const roomSchema = new schema ({
     name: {
         type: String,
         required: true,
-        unique: true
+        unique: false
     },
     category: {
         type: String,
@@ -22,6 +22,33 @@ const roomSchema = new schema ({
         type: schema.Types.ObjectId,
         required: true,
         unique: false
+    },
+    contactName: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    contactEmail: {
+        type: mongoose.SchemaTypes.Email,
+        required: true,
+        unique: false
+    },
+    contactNumber: {
+        type: Number,
+        required: false,
+        unique: false
+    },
+    checklist: {
+        type: [String],
+        required: false,
+        unique: false,
+        default: []
+    },
+    placeholderText: {
+        type: String,
+        required: false,
+        unique: false,
+        default: "Briefly describe the purpose of this booking ..."
     }
 });
 
