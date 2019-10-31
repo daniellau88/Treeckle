@@ -1,8 +1,9 @@
 import React from "react";
 import axios from "axios";
-import { Card, Button, Form, Table } from "semantic-ui-react";
+import { Card, Button, Form, Table, Icon } from "semantic-ui-react";
 import DatePicker from "../../../common/DatePicker";
 import "../../../../styles/ScrollableTable.scss";
+import "../../../../styles/VenueAvailabilityCard.scss";
 import { Context } from "../../../../contexts/UserProvider";
 import { getUpdatedAvailabilityOptions } from "../../../../util/BookingUtil";
 import { DAY_MILLISECONDS } from "../../../../util/Constants";
@@ -152,7 +153,6 @@ class VenueAvailabilityCard extends React.Component {
   async onEdit() {
     this.setState({
       endDate: this.state.startDate,
-      startDateTime: null,
       endDateTime: null
     });
   }
@@ -191,34 +191,41 @@ class VenueAvailabilityCard extends React.Component {
                 />
               </Form.Field>
               {this.state.startDateTime && (
-                <Form.Field width={7}>
-                  <label>Start time</label>
-                  <input
-                    basic
-                    readOnly
-                    placeholder={toTimeString(this.state.startDateTime)}
-                  />
-                </Form.Field>
+                <Form.Input
+                  width={7}
+                  label="Start time"
+                  basic
+                  value={toTimeString(this.state.startDateTime)}
+                  readOnly
+                  iconPosition="right"
+                  icon={
+                    this.state.endDateTime === null && (
+                      <Icon
+                        link
+                        name="cancel"
+                        onClick={() => this.setState({ startDateTime: null })}
+                      />
+                    )
+                  }
+                />
               )}
             </Form.Group>
             {this.state.endDateTime && (
               <Form.Group>
-                <Form.Field width={9}>
-                  <label>End date</label>
-                  <input
-                    basic
-                    readOnly
-                    placeholder={toDateString(this.state.endDateTime)}
-                  />
-                </Form.Field>
-                <Form.Field width={7}>
-                  <label>End time</label>
-                  <input
-                    basic
-                    readOnly
-                    placeholder={toTimeString(this.state.endDateTime)}
-                  />
-                </Form.Field>
+                <Form.Input
+                  width={9}
+                  label="End date"
+                  basic
+                  readOnly
+                  value={toDateString(this.state.endDateTime)}
+                />
+                <Form.Input
+                  width={7}
+                  label="End time"
+                  basic
+                  readOnly
+                  value={toTimeString(this.state.endDateTime)}
+                />
               </Form.Group>
             )}
             {!this.state.endDateTime && this.state.startDate && (
