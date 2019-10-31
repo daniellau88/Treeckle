@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Container, Accordion } from "semantic-ui-react";
+import { Card, Button, Container, Accordion, Segment } from "semantic-ui-react";
 import axios from "axios";
 import { Context } from "../../../../contexts/UserProvider";
 import { CONSOLE_LOGGING } from "../../../../DevelopmentView";
@@ -10,7 +10,12 @@ class SelectVenueCard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { categories: [], venues: [], activeButton: "" };
+    this.state = {
+      categories: [],
+      venues: [],
+      activeButton: "",
+      isLoading: true
+    };
 
     this.handleOnCategoryClick = this.handleOnCategoryClick.bind(this);
     this.updateActiveButton = this.updateActiveButton.bind(this);
@@ -32,7 +37,7 @@ class SelectVenueCard extends React.Component {
               content: null
             };
           });
-          this.setState({ categories });
+          this.setState({ categories, isLoading: false });
           CONSOLE_LOGGING && console.log("Categories updated", categories);
         }
       })
@@ -108,7 +113,6 @@ class SelectVenueCard extends React.Component {
   }
 
   handleButtonClick(event, data) {
-    console.log(data);
     const { roomId, venue, category } = data;
     this.updateActiveButton(roomId).then(() =>
       this.updateCategory(category, this.state.venues)
@@ -123,11 +127,15 @@ class SelectVenueCard extends React.Component {
           <Card.Header textAlign="center">Select a venue</Card.Header>
         </Card.Content>
         <Card.Content style={{ flexGrow: 0 }}>
-          <Accordion
-            styled
-            panels={this.state.categories}
-            onTitleClick={this.handleOnCategoryClick}
-          />
+          {this.state.isLoading ? (
+            <Segment style={{ boxShadow: "none" }} placeholder loading />
+          ) : (
+            <Accordion
+              styled
+              panels={this.state.categories}
+              onTitleClick={this.handleOnCategoryClick}
+            />
+          )}
         </Card.Content>
       </Card>
     );
