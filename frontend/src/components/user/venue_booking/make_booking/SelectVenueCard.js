@@ -89,7 +89,7 @@ class SelectVenueCard extends React.Component {
       return (
         <Button
           roomId={venue.roomId}
-          name={venue.name}
+          venue={venue}
           active={this.state.activeButton === venue.roomId}
           onClick={this.handleButtonClick}
           category={category}
@@ -107,14 +107,12 @@ class SelectVenueCard extends React.Component {
     this.setState({ activeButton });
   }
 
-  handleButtonClick(event, { roomId, name, category }) {
+  handleButtonClick(event, data) {
+    console.log(data);
+    const { roomId, venue, category } = data;
     this.updateActiveButton(roomId).then(() =>
       this.updateCategory(category, this.state.venues)
     );
-    const venue = {
-      roomId: roomId,
-      name: name
-    };
     this.props.renderVenueAvailabilityCard(venue);
   }
 
