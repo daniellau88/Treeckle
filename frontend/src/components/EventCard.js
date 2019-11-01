@@ -37,7 +37,7 @@ const EventCard = props => {
   return (
     <Container
       text="true"
-      style={{ padding: "5px 5px 5px 5px", width: "auto" }}
+      style={{ padding: "50px 50px 15px 15px", width: "auto" }}
     >
       <Card style={{ borderRadius: "1.25rem", overflow: "hidden" }}>
         <Modal

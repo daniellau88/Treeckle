@@ -16,7 +16,16 @@ class EventCreation extends React.Component {
     return (
       <Container style={{ marginTop: "1em" }}>
         <Segment placeholder>
+          <h1>
+            Create your event
+          </h1>
           <ImageUploader />
+        </Segment>
+
+        <Segment placeholder>
+          <h1>
+            Manage your events
+          </h1>
         </Segment>
       </Container>
     );
