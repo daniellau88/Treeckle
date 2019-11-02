@@ -6,21 +6,32 @@ import "../../../components/CarousellCards.css";
 import Axios from "axios";
 import { Context } from "../../../contexts/UserProvider";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
-import { Card, Container } from "semantic-ui-react";
+import { Card, Container, Label, Icon } from "semantic-ui-react";
+
+//create your forceUpdate hook
+function useForceUpdate() {
+    const [value, setValue] = useState(true); //boolean state
+    return () => setValue(!value); // toggle the state to force render
+}
+
 
 const EventsSubscription = () => {
 
     const user = useContext(Context);
 
     const [allEvents, setAllEvents] = useState([]);
+    const [categories, setCategories] = useState(new Set());
     const [isLoading, setLoading] = useState(true);
+    const [search, setSearch] = useState(new Set());
+
+    const forceUpdate = useForceUpdate();
 
 
     useEffect(() => {
-        getAllEvents()
+        getSubscriptions()
     }, []);
 
-    const getAllEvents = () => {
+    const getSubscriptions = () => {
         const headers = {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`
@@ -33,13 +44,52 @@ const EventsSubscription = () => {
                 CONSOLE_LOGGING && console.log("GET all events:", response);
                 if (response.status === 200) {
                     setAllEvents(response.data);
+                    getAllCategories(response.data);
                     setLoading(false);
+                    console.log("outside", categories);
                 }
             })
             .catch(({ response }) => {
                 CONSOLE_LOGGING && console.log("GET all events error:", response);
             });
     };
+
+    const getAllCategories = (responseData) => {
+        const temp = new Set();
+        responseData.forEach(element => {
+            console.log("inside:", element.categories);
+            element.categories.forEach(cat => temp.add(cat));
+        });
+        console.log("temp is ", temp);
+        setCategories(temp);
+        console.log(temp);
+        console.log(categories);
+
+    };
+
+    const addSearch = (cat) => {
+        console.log("adding", cat);
+        const temp = search;
+        temp.add(cat);
+        console.log("b4 new search", temp)
+        setSearch(temp);
+        const temp2 = categories;
+        temp2.delete(cat);
+        console.log("b4 new cat", temp2)
+        setCategories(temp2);
+        forceUpdate();
+    };
+
+    const removeSearch = (cat) => {
+        const temp = categories;
+        temp.add(cat);
+        setCategories(temp);
+        const temp2 = search;
+        temp2.delete(cat);
+        setSearch(temp2);
+        forceUpdate();
+    };
+
 
     const eventOne = {
         title: "Investment",
@@ -103,22 +153,57 @@ const EventsSubscription = () => {
     }
     return (
         <div>
+            <div>
+                <h3>Tags excluded</h3>
+                {[...categories].map((value, index) => {
+                    return <Label key={value} as='a' onClick={() => addSearch(value)} >
+                        <Icon name='add' />
+                        {value}
+                    </Label>
+                })}
+            </div>
+            <br />
+            <div>
+                <h3>Tags included</h3>
+                {[...search].map((value, index) => {
+                    return <Label as='a' onClick={() => removeSearch(value)} >
+                        {value}
+                        <Icon name='delete' />
+                    </Label>
+                })}
+            </div>
+
             <Container>
                 <Card.Group centered="true">
                     {allEvents.map((value, index) => {
-                        return <EventCard event={{
-                            title: value.title,
-                            desc: value.description,
-                            date: value.eventDate,
-                            location: value.venue,
-                            image: "/ftp/" + value.posterPath,
-                            categories: value.categories,
-                            eventId: value.eventId,
-                            attending: value.isUserAttendee,
-                            attendees: value.attendees
-                        }} />
+                        let canInclude = false;
+                        value.categories.forEach(cat => {
+                            if (search.has(cat)) {
+                                canInclude = true;
+                            }
+                        });
+                        if (canInclude) {
+                            return <EventCard event={{
+                                title: value.title,
+                                desc: value.description,
+                                date: value.eventDate,
+                                location: value.venue,
+                                image: "/ftp/" + value.posterPath,
+                                categories: value.categories,
+                                eventId: value.eventId,
+                                attending: value.isUserAttendee,
+                                attendees: value.attendees
+                            }} />
+                        } else {
+                            return null;
+                        }
                     })}
                 </Card.Group>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
             </Container>
         </div>
     );
