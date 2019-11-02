@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../images/treeckle_logo.png";
+import logo from "../images/Treeckle_side.PNG";
 //import sampleSVG from "../images/SampleSVGImage.svg";
 //import axios from "axios";
 import { Context } from "../contexts/UserProvider";
@@ -18,27 +18,6 @@ class NavigationBar extends React.Component {
     this.handleItemClick = this.handleItemClick.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
   }
-
-  /*
-  componentDidMount() {
-    srcToFile(sampleSVG, "test.svg", "image/svc").then(function(file) {
-      const data = new FormData();
-      data.append("profilePicture", file);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data"
-        }
-      };
-      axios.put("/api/accounts/profilePicture", data, config).catch(err => {
-        if (err.response.status === 401) {
-          console.log(err.response.status);
-          localStorage.clear();
-        }
-      });
-    });
-  }
-  */
 
   handleItemClick(event, data) {
     this.setState({ activeItem: data.name });
@@ -72,13 +51,12 @@ class NavigationBar extends React.Component {
         <Menu fixed="top" borderless size="huge">
           <Menu.Item header>
             <Image
-              size="mini"
+              size="small"
               src={logo}
               style={{ marginRight: "0.5rem" }}
               as={Link}
               to={"/dashboard"}
             />
-            Treeckle
           </Menu.Item>
           <Menu.Item
             as={Link}
@@ -141,6 +119,9 @@ class NavigationBar extends React.Component {
                 </Dropdown.Menu>
               </Dropdown>
             )}
+            <Menu.Item>
+              <b>{this.context.name}</b>
+            </Menu.Item>
             <Dropdown
               trigger={
                 <Image
