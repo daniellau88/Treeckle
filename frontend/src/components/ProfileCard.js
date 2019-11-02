@@ -10,7 +10,8 @@ import {
   Segment,
   Responsive,
   Icon,
-  Popup
+  Popup,
+  Form
 } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW, CONSOLE_LOGGING } from "../DevelopmentView";
 import { intArrayToBase64 } from "../util/EncodingUtil";
@@ -27,7 +28,8 @@ class ProfileCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      file: null
+      file: null,
+      name: null
     };
   }
 
@@ -72,6 +74,10 @@ class ProfileCard extends React.Component {
           });
       };
     }
+  };
+
+  handleNameChange = newName => {
+    return;
   };
 
   render() {
@@ -127,6 +133,24 @@ class ProfileCard extends React.Component {
                   <Segment basic compact size="huge">
                     <Header size={"huge"}>{this.context.name}</Header>
                     <div style={{ fontSize: "0.75em" }}>
+                      <Popup
+                        trigger={<a>Change name</a>}
+                        content={
+                          <Form>
+                            <Form.Input
+                              placeholder="Enter new name here"
+                              type="text"
+                              onChange={(event, { value }) => {
+                                this.setState({ name: value });
+                              }}
+                            />
+                            <Button
+                              onClick={this.handleNameChange}
+                              content="Submit"
+                            />
+                          </Form>
+                        }
+                      />
                       <br />
                       <strong>Role: </strong>
                       {this.context.role}

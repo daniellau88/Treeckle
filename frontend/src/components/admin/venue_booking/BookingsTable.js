@@ -74,10 +74,9 @@ class BookingsTable extends React.Component {
         })
       )
 
-      .catch(({ response }) => {
-        CONSOLE_LOGGING &&
-          console.log("GET all booking requests error:", response);
-        if (response.status === 401) {
+      .catch(err => {
+        CONSOLE_LOGGING && console.log("GET all booking requests error:", err);
+        if (err.response.status === 401) {
           alert("Your current session has expired. Please log in again.");
           this.context.resetUser();
         }

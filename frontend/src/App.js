@@ -5,7 +5,10 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import ReactGA from "react-ga";
 import NavigationBar from "./components/NavigationBar";
 import Dashboard from "./pages/Dashboard";
-import AdminPage from "./pages/AdminPage";
+import BookingsPage from "./pages/admin/BookingsPage";
+import UsersPage from "./pages/admin/UsersPage";
+import SettingsPage from "./pages/admin/SettingsPage";
+// import RoomsPage from "./pages/admin/RoomsPage"
 import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -42,9 +45,21 @@ class App extends React.Component {
           {token !== null && DEVELOPMENT_VIEW && (
             <Route path="/events" exact component={EventsPage} />
           )}
-          {token !== null && role === "Admin" && (
+          {/* {token !== null && role === "Admin" && (
             <Route path="/admin" exact component={AdminPage} />
+          )} */}
+          {token !== null && role === "Admin" && (
+            <Route path="/admin/bookings" exact component={BookingsPage} />
           )}
+          {token !== null && role === "Admin" && (
+            <Route path="/admin/users" exact component={UsersPage} />
+          )}
+          {token !== null && role === "Admin" && (
+            <Route path="/admin/settings" exact component={SettingsPage} />
+          )}
+          {/* {token !== null && role === "Admin" && (
+            <Route path="/admin/rooms" exact component={RoomsPage} />
+          )} */}
           {token !== null && (
             <Route path="/profile" exact component={ProfilePage} />
           )}

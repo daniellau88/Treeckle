@@ -1,13 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../images/Treeckle_side.PNG";
-//import sampleSVG from "../images/SampleSVGImage.svg";
-//import axios from "axios";
 import { Context } from "../contexts/UserProvider";
 import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW } from "../DevelopmentView";
 import { intArrayToBase64 } from "../util/EncodingUtil";
-//import { srcToFile } from "../util/ValidationUtil";
 
 class NavigationBar extends React.Component {
   static contextType = Context;
@@ -16,11 +13,16 @@ class NavigationBar extends React.Component {
     super(props);
     this.state = {};
     this.handleItemClick = this.handleItemClick.bind(this);
+    this.handleAdminItemClick = this.handleAdminItemClick.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
   }
 
   handleItemClick(event, data) {
     this.setState({ activeItem: data.name });
+  }
+
+  handleAdminItemClick(event, data) {
+    this.setState({});
   }
 
   handleSignOut() {
@@ -44,6 +46,37 @@ class NavigationBar extends React.Component {
         icon="sign out"
         onClick={this.handleSignOut}
       />
+    ];
+
+    const adminOptions = [
+      <Dropdown.Item
+        name="bookings"
+        text="Bookings"
+        as={Link}
+        to="/admin/bookings"
+        onClick={this.handleAdminItemClick}
+      />,
+      <Dropdown.Item
+        name="users"
+        text="Users"
+        as={Link}
+        to="/admin/users"
+        onClick={this.handleAdminItemClick}
+      />,
+      <Dropdown.Item
+        name="settings"
+        text="Settings"
+        as={Link}
+        to="/admin/settings"
+        onClick={this.handleAdminItemClick}
+      />
+      // <Dropdown.Item
+      //   name="rooms"
+      //   text="Rooms"
+      //   as={Link}
+      //   to="/admin/rooms"
+      //   onClick={this.handleAdminItemClick}
+      // />
     ];
 
     return (
@@ -85,13 +118,21 @@ class NavigationBar extends React.Component {
             onClick={this.handleItemClick}
           />
           {this.context.role === "Admin" && (
-            <Menu.Item
-              as={Link}
-              to="/admin"
+            // <Menu.Item
+            //   as={Link}
+            //   to="/admin"
+            //   name="admin"
+            //   active={activeItem === "admin"}
+            //   content="Admin"
+            //   onClick={this.handleItemClick}
+            // />
+            <Dropdown
               name="admin"
-              active={activeItem === "admin"}
-              content="Admin"
-              onClick={this.handleItemClick}
+              text="Admin"
+              direction="left"
+              floating
+              className="link item"
+              options={adminOptions}
             />
           )}
           <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
