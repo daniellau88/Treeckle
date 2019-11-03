@@ -77,7 +77,8 @@ router.post('/', jsonParser, [
                 const constructedResponse = {
                     posterPath: result.posterPath,
                     creationDate: result.creationDate.getTime(),
-                    shortId: result.shortId
+                    shortId: result.shortId,
+                    eventId: result._id
                 }
                 const des = (req.body.description + " " + req.body.categories.join(' ') + " " + req.body.organisedBy + " " + req.body.venue + "\0");
                 append('Recommendation/in.csv', [
