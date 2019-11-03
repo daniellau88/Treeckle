@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, Fragment } from "react";
 import EventCard from "../../../components/EventCard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -6,7 +6,8 @@ import "../../../components/CarousellCards.css";
 import Axios from "axios";
 import { Context } from "../../../contexts/UserProvider";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
-import { Card, Container } from "semantic-ui-react";
+import { Card, Container, Placeholder } from "semantic-ui-react";
+import _ from 'lodash'
 
 const EventsRecommendation = () => {
 
@@ -26,7 +27,7 @@ const EventsRecommendation = () => {
             Authorization: `Bearer ${user.token}`
         };
         Axios.get(
-            "/api/events/gallery",
+            "/api/events/gallery/recommended",
             { headers: headers }
         )
             .then(response => {
@@ -41,60 +42,35 @@ const EventsRecommendation = () => {
             });
     };
 
-    const eventOne = {
-        title: "Investment",
-        desc:
-            "For investors paying for each dollar of a company's earnings, the P/E ratio is a significant indicator, but the price-to-book ratio (P/B) is also a reliable indication of how much investors are willing to spend on each dollar of company assets. In the process of the P/B ratio, the share price of a stock is divided by its net assets; any intangibles, such as goodwill, are not taken into account. It is a crucial factor of the price-to-book ratio, due to it indicating the actual payment for tangible assets and not the more difficult valuation of intangibles. Accordingly, the P/B could be considered a comparatively conservative metric.",
-        date: "Tues Night",
-        location: "Dining Hall",
-        image:
-            "http://www.nusinvest.com/wp-content/uploads/2016/03/General-poster.jpg",
-        categories: ["test", "cat"],
-        eventId: "123",
-        attending: false,
-        attendees: 0
-    };
-
-    const eventTwo = {
-        title: "Clubbing",
-        desc: "party",
-        date: "yesterday Night",
-        location: "zouk Hall",
-        image:
-            "https://weezevent.com/wp-content/uploads/2019/01/12145054/organiser-soiree.jpg",
-        categories: ["test", "cat"],
-        eventId: "123",
-        attending: false,
-        attendees: 0
-    };
-
-    const eventThree = {
-        title: "Reading",
-        desc: "lets read togher",
-        date: "tmr Night",
-        location: "library hall Hall",
-        image:
-            "http://www.orlandonorthsports.com/assets/images/placeholders/placeholder-event.png",
-        categories: ["test", "cat"],
-        eventId: "123",
-        attending: false,
-        attendees: 0
-    };
-
 
     if (isLoading) {
         return (
             <div>
                 <Container>
-                    <Card.Group centered="true">
-                        <EventCard event={eventOne} />
-                        <EventCard event={eventOne} />
-                        <EventCard event={eventOne} />
-                        <EventCard event={eventTwo} />
-                        <EventCard event={eventOne} />
-                        <EventCard event={eventOne} />
-                        <EventCard event={eventThree} />
-                        <EventCard event={eventOne} />
+                    <Card.Group doubling itemsPerRow={3} centered>
+                        {_.map([1, 2, 3], (card) => (
+                            <Card key={card.header}>
+                                <Placeholder>
+                                    <Placeholder.Image square />
+                                </Placeholder>
+                                <Card.Content>
+                                    <Placeholder>
+                                        <Placeholder.Header>
+                                            <Placeholder.Line length='very short' />
+                                            <Placeholder.Line length='medium' />
+                                        </Placeholder.Header>
+                                        <Placeholder.Paragraph>
+                                            <Placeholder.Line length='short' />
+                                        </Placeholder.Paragraph>
+                                    </Placeholder>
+                                    <Fragment>
+                                        <Card.Header>{card.header}</Card.Header>
+                                        <Card.Meta>{card.date}</Card.Meta>
+                                        <Card.Description>{card.description}</Card.Description>
+                                    </Fragment>
+                                </Card.Content>
+                            </Card>
+                        ))}
                     </Card.Group>
                 </Container>
             </div>
