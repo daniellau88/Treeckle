@@ -4,7 +4,6 @@ import { Context } from "../contexts/UserProvider";
 import axios from "axios";
 import {
   Grid,
-  Header,
   Image,
   Button,
   Segment,
@@ -14,6 +13,7 @@ import {
 } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW, CONSOLE_LOGGING } from "../DevelopmentView";
 import { intArrayToBase64 } from "../util/EncodingUtil";
+import UserSelfNameChanger from "./user/profile/UserSelfNameChanger";
 
 function getIntArrayBase64(str) {
   let STRING_CHAR = Array.from(atob(str));
@@ -124,8 +124,8 @@ class ProfileCard extends React.Component {
             <Grid.Column computer={12} tablet={8} stretched>
               <Grid columns={1}>
                 <Grid.Column stretched>
-                  <Segment basic compact size="huge">
-                    <Header size={"huge"}>{this.context.name}</Header>
+                  <Segment basic size="huge">
+                      <UserSelfNameChanger />
                     <div style={{ fontSize: "0.75em" }}>
                       <br />
                       <strong>Role: </strong>

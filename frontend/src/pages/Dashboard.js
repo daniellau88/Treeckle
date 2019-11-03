@@ -54,7 +54,11 @@ class Dashboard extends React.Component {
             of a ​
             <u>
               <strong>
-                <a href="https://www.cs3216.com" style={{ color: "#FDFDFD" }}>
+                <a
+                  href="https://www.cs3216.com"
+                  style={{ color: "#FDFDFD" }}
+                  target="_blank"
+                >
                   CS3216
                 </a>
               </strong>
@@ -62,7 +66,22 @@ class Dashboard extends React.Component {
             Final Project, and we are working hard towards making residential
             life better for you. If you have feedback for us and/or would like
             to have your voice heard in the future of this application, please
-            feel free to drop us an email at ​
+            fill up this{" "}
+            <u>
+              <strong>
+                <a
+                  href="https://forms.gle/pk9LXadxp1dgDaSD8"
+                  style={{ color: "#FDFDFD" }}
+                  target="_blank"
+                >
+                  form
+                </a>
+              </strong>
+            </u>
+            .
+            <br />
+            <br />
+            For urgent queries or concerns, please contact us at ​
             <u>
               <strong>
                 <a
