@@ -31,7 +31,7 @@ class UploadCsv extends React.Component {
     const config = {
       headers: {
         Authorization: `Bearer ${this.context.token}`,
-        "content-type": "multipart/form-data"
+        "Content-Type": "multipart/form-data"
       }
     };
     return post(url, formData, config);

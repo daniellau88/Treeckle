@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import {
   Segment,
   Container,
@@ -12,8 +13,16 @@ import { Context } from "../../../contexts/UserProvider";
 import ImageUploader from "../../common/ImageUploader";
 import DatePicker from "../../common/DatePicker";
 import TimePicker from "../../common/TimePicker";
+import StatusBar from "../../common/StatusBar";
 import { parseDateTime } from "../../../util/DateUtil";
 import "../../../styles/EventCreation.scss";
+import { CONSOLE_LOGGING } from "../../../DevelopmentView";
+import { UNKNOWN_ERROR } from "../../../util/Constants";
+
+const SUCCESS_MSG = "Your event has been successfully created.";
+const MISSING_FIELDS = "Compulsory fields are missing.";
+const IMAGE_UPLOAD_ERROR =
+  "Image cannot be uploaded. Please try again at the created events page.";
 
 class EventCreation extends React.Component {
   static contextType = Context;
@@ -34,7 +43,9 @@ class EventCreation extends React.Component {
       categories: [],
       organisedBy: "",
       signupsAllowed: false,
-      error: false
+      dateError: false,
+      status: null, // {success: boolean, message: string}
+      submitting: false // indicates if the submission is still processing
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -42,16 +53,98 @@ class EventCreation extends React.Component {
   }
 
   handleChange(event, { name, value }) {
-    this.setState({ [name]: value });
     console.log(name, value);
-    console.log(this.state);
+    this.setState({ [name]: value });
   }
 
   handleSubmit() {
     if (this.isValidEventPeriod()) {
-      console.log("submit");
+      const {
+        title,
+        description,
+        startDate,
+        startTime,
+        categories,
+        organisedBy,
+        signupsAllowed,
+        capacity,
+        venue,
+        image
+      } = this.state;
+      const data = {
+        title: title,
+        description: description,
+        eventDate: parseDateTime(startDate, startTime.toDate()),
+        categories: categories,
+        organisedBy: organisedBy,
+        signupsAllowed: signupsAllowed
+      };
+      if (capacity) {
+        data.capacity = parseInt(capacity);
+      }
+      if (venue) {
+        data.venue = venue;
+      }
+      CONSOLE_LOGGING && console.log("Event creation data sent:", data);
+      axios
+        .post("api/events", data, {
+          headers: { Authorization: `Bearer ${this.context.token}` }
+        })
+        .then(response => {
+          CONSOLE_LOGGING && console.log("POST create event:", response);
+          if (response.status === 200) {
+            if (image) {
+              const formData = new FormData();
+              formData.append("image", image);
+              formData.append("eventId", response.data.eventId);
+              axios
+                .patch("api/events/image", formData, {
+                  headers: {
+                    Authorization: `Bearer ${this.context.token}`,
+                    "Content-Type": "multipart/form-data"
+                  }
+                })
+                .then(response => {
+                  CONSOLE_LOGGING &&
+                    console.log("PATCH upload poster:", response);
+                  if (response.status === 200) {
+                    this.setState({
+                      status: { success: true, message: SUCCESS_MSG }
+                    });
+                  }
+                })
+                .catch(({ response }) => {
+                  CONSOLE_LOGGING &&
+                    console.log("PATCH upload poster error:", response);
+                  this.setState({
+                    status: { success: false, message: IMAGE_UPLOAD_ERROR }
+                  });
+                });
+            } else {
+              this.setState({
+                status: { success: true, message: SUCCESS_MSG }
+              });
+            }
+          }
+        })
+        .catch(({ response }) => {
+          CONSOLE_LOGGING && console.log("POST create event date:", response);
+          let msg;
+          switch (response.status) {
+            case 401:
+              alert("Your current session has expired. Please log in again.");
+              this.context.resetUser();
+              break;
+            case 422:
+              msg = MISSING_FIELDS;
+              break;
+            default:
+              msg = UNKNOWN_ERROR;
+          }
+          this.setState({ status: { success: false, message: msg } });
+        });
     } else {
-      this.setState({ error: true });
+      this.setState({ dateError: true });
     }
   }
 
@@ -77,8 +170,14 @@ class EventCreation extends React.Component {
 
   render() {
     return (
-      <Container style={{ marginTop: "1em" }}>
-        <Segment placeholder>
+      <Container>
+        {(this.state.status || this.state.submitting) && (
+          <StatusBar
+            status={this.state.status}
+            submitting={this.state.submitting}
+          />
+        )}
+        <Segment placeholder style={{ marginTop: "1em" }}>
           <Grid columns={2} stackable>
             <Grid.Column verticalAlign="middle">
               <ImageUploader
@@ -106,10 +205,10 @@ class EventCreation extends React.Component {
                 />
                 <Form.Input
                   label="Capacity"
-                  type="number"
                   name="capacity"
                   onChange={this.handleChange}
-                  value={parseInt(this.state.capacity)}
+                  type="number"
+                  value={this.state.capacity}
                 />
                 <Form.Input
                   label="Venue"
@@ -123,7 +222,7 @@ class EventCreation extends React.Component {
                     <DatePicker
                       placeholder="Select start date"
                       onDateChange={date => {
-                        this.setState({ error: false });
+                        this.setState({ dateError: false });
                         this.handleChange(null, {
                           name: "startDate",
                           value: date
@@ -136,7 +235,7 @@ class EventCreation extends React.Component {
                     <TimePicker
                       placeholder="Select start time"
                       onChange={time => {
-                        this.setState({ error: false });
+                        this.setState({ dateError: false });
                         this.handleChange(null, {
                           name: "startTime",
                           value: time
@@ -147,12 +246,12 @@ class EventCreation extends React.Component {
                   </Form.Field>
                 </Form.Group>
                 <Form.Group>
-                  <Form.Field required error={this.state.error}>
+                  <Form.Field required error={this.state.dateError}>
                     <label>End date</label>
                     <DatePicker
                       placeholder="Select end date"
                       onDateChange={date => {
-                        this.setState({ error: false });
+                        this.setState({ dateError: false });
                         this.handleChange(null, {
                           name: "endDate",
                           value: date
@@ -160,12 +259,12 @@ class EventCreation extends React.Component {
                       }}
                     />
                   </Form.Field>
-                  <Form.Field required error={this.state.error}>
+                  <Form.Field required error={this.state.dateError}>
                     <label>End time</label>
                     <TimePicker
                       placeholder="Select end time"
                       onChange={time => {
-                        this.setState({ error: false });
+                        this.setState({ dateError: false });
                         this.handleChange(null, {
                           name: "endTime",
                           value: time
@@ -175,7 +274,7 @@ class EventCreation extends React.Component {
                     />
                   </Form.Field>
                 </Form.Group>
-                {this.state.error && (
+                {this.state.dateError && (
                   <Message
                     error
                     content="End date/time cannot be earlier than start date/time."
