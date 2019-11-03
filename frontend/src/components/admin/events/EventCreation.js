@@ -5,12 +5,14 @@ import {
   Grid,
   Header,
   Form,
-  Button
+  Button,
+  Message
 } from "semantic-ui-react";
 import { Context } from "../../../contexts/UserProvider";
 import ImageUploader from "../../common/ImageUploader";
 import DatePicker from "../../common/DatePicker";
 import TimePicker from "../../common/TimePicker";
+import { parseDateTime } from "../../../util/DateUtil";
 import "../../../styles/EventCreation.scss";
 
 class EventCreation extends React.Component {
@@ -31,7 +33,8 @@ class EventCreation extends React.Component {
       description: "",
       categories: [],
       organisedBy: "",
-      signupsAllowed: false
+      signupsAllowed: false,
+      error: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -45,7 +48,11 @@ class EventCreation extends React.Component {
   }
 
   handleSubmit() {
-    console.log("submit");
+    if (this.isValidEventPeriod()) {
+      console.log("submit");
+    } else {
+      this.setState({ error: true });
+    }
   }
 
   areValidFields() {
@@ -59,6 +66,15 @@ class EventCreation extends React.Component {
     );
   }
 
+  isValidEventPeriod() {
+    const start = parseDateTime(
+      this.state.startDate,
+      this.state.startTime.toDate()
+    );
+    const end = parseDateTime(this.state.endDate, this.state.endTime.toDate());
+    return start <= end;
+  }
+
   render() {
     return (
       <Container style={{ marginTop: "1em" }}>
@@ -67,7 +83,7 @@ class EventCreation extends React.Component {
             <Grid.Column verticalAlign="middle">
               <ImageUploader
                 onChange={image =>
-                  this.handleChange(null, { image: "image", value: image })
+                  this.handleChange(null, { name: "image", value: image })
                 }
               />
             </Grid.Column>
@@ -106,55 +122,66 @@ class EventCreation extends React.Component {
                     <label>Start date</label>
                     <DatePicker
                       placeholder="Select start date"
-                      onDateChange={date =>
+                      onDateChange={date => {
+                        this.setState({ error: false });
                         this.handleChange(null, {
                           name: "startDate",
                           value: date
-                        })
-                      }
+                        });
+                      }}
                     />
                   </Form.Field>
                   <Form.Field required>
                     <label>Start time</label>
                     <TimePicker
                       placeholder="Select start time"
-                      onChange={time =>
+                      onChange={time => {
+                        this.setState({ error: false });
                         this.handleChange(null, {
                           name: "startTime",
                           value: time
-                        })
-                      }
+                        });
+                      }}
                       showInputIcon={this.state.startTime === null}
                     />
                   </Form.Field>
                 </Form.Group>
                 <Form.Group>
-                  <Form.Field required>
+                  <Form.Field required error={this.state.error}>
                     <label>End date</label>
                     <DatePicker
                       placeholder="Select end date"
-                      onDateChange={date =>
+                      onDateChange={date => {
+                        this.setState({ error: false });
                         this.handleChange(null, {
                           name: "endDate",
                           value: date
-                        })
-                      }
+                        });
+                      }}
                     />
                   </Form.Field>
-                  <Form.Field required>
+                  <Form.Field required error={this.state.error}>
                     <label>End time</label>
                     <TimePicker
                       placeholder="Select end time"
-                      onChange={time =>
+                      onChange={time => {
+                        this.setState({ error: false });
                         this.handleChange(null, {
                           name: "endTime",
                           value: time
-                        })
-                      }
+                        });
+                      }}
                       showInputIcon={this.state.endTime === null}
                     />
                   </Form.Field>
                 </Form.Group>
+                {this.state.error && (
+                  <Message
+                    error
+                    content="End date/time cannot be earlier than start date/time."
+                    style={{ display: "block", margin: "1em auto" }}
+                  />
+                )}
                 <Form.TextArea
                   rows={8}
                   label="Description"
