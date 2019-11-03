@@ -30,6 +30,28 @@ router.put('/profilePicture', upload.single('profilePicture'), async (req, res) 
     }
 });
 
+//Resident & above: Update display name
+router.patch('/profileName', jsonParser, [
+    body('newName').exists().not().isEmpty()
+], async (req, res) => {
+    const errors = validationResult(req);
+    const permitted = await isPermitted(req.user.role, constants.categories.accounts, constants.actions.updateSelf);
+
+    if (!permitted) {
+        res.sendStatus(401);
+    } else if (!errors.isEmpty()) {
+        res.status(422).json({ errors: errors.array() });
+    } else {
+        User.findByIdAndUpdate(req.user.userId, { name: req.body.newName }, {new: true})
+        .then(doc => {
+            res.json(doc.name);
+        })
+        .catch(err => {
+            res.sendStatus(500);
+        })
+    }
+});
+
 //Admin: Get all pending and created users under their RC
 router.get('/', [
     query('pending').optional().isBoolean().toBoolean(),
@@ -100,7 +122,7 @@ router.get('/', [
     }
 });
 
-//Admin: update specific created user or all pending requests under their RC - emails updates commented out
+//Admin: update specific created user or all pending requests under their RC - emails updates uncommented out
 router.patch('/', jsonParser, [
     body('email').exists().isEmail(),
     body('name').optional().isString(),
@@ -118,7 +140,7 @@ router.patch('/', jsonParser, [
         try {
             await User.updateOne({ email: req.body.email, _id : { $ne : req.user.userId }},
                 {
-                    //email: req.body.email,
+                    email: req.body.email,  //comment this out to prevent email updates
                     name: req.body.name,
                     role: req.body.role
                 }, 
@@ -126,7 +148,7 @@ router.patch('/', jsonParser, [
             
             await CreateAccount.updateMany({ email: req.body.email },
                 {
-                    //email: req.body.email,
+                    email: req.body.email, //comment this out to prevent email updates
                     role: req.body.role
                 },
                 {omitUndefined: true}).lean();       
