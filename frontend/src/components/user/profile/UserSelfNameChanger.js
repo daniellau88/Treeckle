@@ -61,7 +61,7 @@ export default function UserSelfNameChanger() {
         <Grid columns={2}>
             <Grid.Column width={14} >
                 {(state.editMode)? (
-                <Input style={{width: "50%", maxWidth: "100%"}}
+                <Input style={{minWidth: "50%", maxWidth: "80%"}}
                 action={
                     {
                         color: 'green',
