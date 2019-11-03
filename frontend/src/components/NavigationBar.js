@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../images/Treeckle_side.PNG";
 //import sampleSVG from "../images/SampleSVGImage.svg";
-//import axios from "axios";
 import { Context } from "../contexts/UserProvider";
-import { Image, Menu, Dropdown, Icon } from "semantic-ui-react";
+import { Image, Menu, Dropdown, Icon, Label } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW } from "../DevelopmentView";
 import { intArrayToBase64 } from "../util/EncodingUtil";
+import { CountsContext } from "../contexts/CountsProvider";
 //import { srcToFile } from "../util/ValidationUtil";
 
 class NavigationBar extends React.Component {
@@ -25,6 +25,10 @@ class NavigationBar extends React.Component {
 
   handleSignOut() {
     this.context.resetUser();
+  }
+
+  componentDidMount() {
+    this.props.setCounts({ updater: !this.props.counts.updater });
   }
 
   render() {
@@ -90,9 +94,16 @@ class NavigationBar extends React.Component {
               to="/admin"
               name="admin"
               active={activeItem === "admin"}
-              content="Admin"
               onClick={this.handleItemClick}
-            />
+            >
+            Admin
+            {
+              (this.props.counts.pendingRoomBookings >= 0)? 
+                    <Label text="Admin" color="red">
+                      {this.props.counts.pendingRoomBookings}
+                    </Label> : ""
+              } 
+            </Menu.Item>
           )}
           <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
             {DEVELOPMENT_VIEW && (
@@ -147,4 +158,8 @@ class NavigationBar extends React.Component {
   }
 }
 
-export default NavigationBar;
+export default (props) => (
+  <CountsContext.Consumer>
+      {({counts, setCounts}) => <NavigationBar {...props} counts={counts} setCounts={setCounts} />}
+   </CountsContext.Consumer>
+)

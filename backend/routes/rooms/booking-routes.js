@@ -66,6 +66,24 @@ router.get('/', async (req, res) => {
     }
 });
 
+//Admin: count pending requests
+router.get('/all/count', async (req, res) => {
+    const permitted = await isPermitted(req.user.role, constants.categories.bookingRequestsManagement, constants.actions.read);
+
+    if (!permitted) {
+        res.sendStatus(401);
+        return ;
+    }
+
+    RoomBooking.byTenant(req.user.residence).countDocuments({ approved: constants.approvalStates.Pending })
+    .then(result => {
+        res.json(result);
+    })
+    .catch(err => {
+        res.sendStatus(500);
+    })
+});
+
 //Admin: retrieve all requests (paginated)
 router.get('/all', [
     query("page").optional().isInt().toInt(),

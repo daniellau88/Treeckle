@@ -3,13 +3,14 @@ import axios from "axios";
 import { Context } from "../../contexts/UserProvider";
 import { Button, Popup } from "semantic-ui-react";
 import { CONSOLE_LOGGING } from "../../DevelopmentView";
+import { CountsContext } from "../../contexts/CountsProvider";
 
 class StatusButton extends React.Component {
   static contextType = Context;
 
   constructor(props) {
     super(props);
-    this.state = { isOpen: false };
+    this.state = { isOpen: false, hasUpdated: false };
 
     this.togglePopup = this.togglePopup.bind(this);
   }
@@ -64,6 +65,7 @@ class StatusButton extends React.Component {
         CONSOLE_LOGGING && console.log("PATCH update status:", response);
         if (response.status === 200) {
           this.props.updateTable();
+          this.setState({hasUpdated: true});
         }
       })
       .catch(({ response }) => {
@@ -87,6 +89,7 @@ class StatusButton extends React.Component {
         CONSOLE_LOGGING && console.log("PATCH cancel booking:", response);
         if (response.status === 200) {
           this.props.updateTable();
+          this.setState({hasUpdated: true});
         }
       })
       .catch(({ response }) => {
@@ -154,19 +157,33 @@ class StatusButton extends React.Component {
     this.setState({ isOpen: !this.state.isOpen });
   }
 
+  updateLabel(counts, setCounts) {
+    setCounts({
+      updater: !counts.updater  
+    });
+
+    this.setState({ hasUpdated: false});
+  }
+
   render() {
     return (
-      <Popup
-        trigger={this.renderStatusButton()}
-        on="click"
-        content={this.renderOptions()}
-        position="bottom center"
-        open={this.state.isOpen}
-        onOpen={this.togglePopup}
-        onClose={this.togglePopup}
-        disabled={this.props.status === 3}
-      />
-    );
+      <div>
+        <Popup
+          trigger={this.renderStatusButton()}
+          on="click"
+          content={this.renderOptions()}
+          position="bottom center"
+          open={this.state.isOpen}
+          onOpen={this.togglePopup}
+          onClose={this.togglePopup}
+          disabled={this.props.status === 3}
+        />
+          {this.state.hasUpdated && 
+          <CountsContext.Consumer>
+              {({counts, setCounts}) => {this.updateLabel(counts, setCounts)}}
+          </CountsContext.Consumer>}
+      </div>
+    )
   }
 }
 
