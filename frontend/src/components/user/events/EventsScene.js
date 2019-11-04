@@ -1,55 +1,24 @@
 import React from "react";
-import CarousellCards from "../../CarousellCards";
-import { Container } from "semantic-ui-react";
-import EventList from "../..//EventList";
+import EventsGallery from "./EventsGallery";
+import { Tab, Container } from "semantic-ui-react";
+import EventsSubscription from "./EventsSubscription";
+import EventsRecommendation from "./EventsRecommendation";
 
 const EventsScene = props => {
+
+
+  const panes = [
+    { menuItem: 'All', render: () => <Tab.Pane><EventsGallery/></Tab.Pane> },
+    { menuItem: 'Recommended', render: () => <Tab.Pane><EventsRecommendation/></Tab.Pane> },
+    { menuItem: 'Subscriptions', render: () => <Tab.Pane><EventsSubscription/></Tab.Pane> },
+  ]
+
   return (
-    <div>
-      <br />
-      <CarousellCards />
-      <br />
-      <br />
-      <br />
-      <br />
-
-      <br />
-      <br />
-      <Container>
-        <h1 style={{ color: "#FDFDFD" }}>Upcoming Events</h1>
-      </Container>
-      <br />
-      <CarousellCards />
-      <br />
-      <br />
-      <br />
-      <br />
-
-      <br />
-      <br />
-      <Container>
-        <h1 style={{ color: "#FDFDFD" }}>Signed Up Events</h1>
-      </Container>
-      <br />
-      <CarousellCards />
-      <br />
-      <br />
-      <br />
-      <br />
-
-      <br />
-      <br />
-      <Container>
-        <h1 style={{ color: "#FDFDFD" }}>Your Created Events</h1>
-        <EventList />
-      </Container>
-
-      <br />
-      <br />
-      <br />
-      <br />
-    </div>
+    <Container>
+      <Tab menu={{ attached: false }} panes={panes} />
+    </Container>
   );
 };
 
+//
 export default EventsScene;

@@ -24,7 +24,7 @@ const EventsPage = props => {
             </Button.Content>
           </Button>
           {!creating && (
-            <h1 style={{ color: "#FDFDFD" }}>Recommended Events</h1>
+            <h1 style={{ color: "#FDFDFD" }}>Events</h1>
           )}
         </Container>
       )}
