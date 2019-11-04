@@ -1,21 +1,15 @@
 import React from "react";
-import { Form, Image } from "semantic-ui-react";
+import { Image, Form } from "semantic-ui-react";
 
 class ImageUploader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      file: "",
+      file: null,
       imagePreviewUrl: ""
     };
 
     this.handleImageChange = this.handleImageChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(e) {
-    e.preventDefault();
-    // TODO: do something with -> this.state.file
   }
 
   handleImageChange(e) {
@@ -29,9 +23,9 @@ class ImageUploader extends React.Component {
         file: file,
         imagePreviewUrl: reader.result
       });
+      this.props.onChange(file);
     };
 
-    console.log(file, reader.result);
     if (file) {
       reader.readAsDataURL(file);
     }
@@ -41,18 +35,28 @@ class ImageUploader extends React.Component {
     let { imagePreviewUrl } = this.state;
 
     return (
-      <div>
-        <Form onSubmit={this._handleSubmit}>
+      <div
+        className="image-upload"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column"
+        }}
+      >
+        {imagePreviewUrl && (
+          <label htmlFor="file-input">
+            <Image src={imagePreviewUrl} />
+          </label>
+        )}
+        <Form style={imagePreviewUrl ? { display: "none" } : null}>
           <Form.Input
+            label="Select poster image"
             type="file"
             accept="image/*"
             onChange={this.handleImageChange}
+            id="file-input"
           />
-          <Form.Button type="submit" onClick={this.handleSubmit}>
-            Upload Image
-          </Form.Button>
         </Form>
-        {imagePreviewUrl && <Image src={imagePreviewUrl} />}
       </div>
     );
   }
