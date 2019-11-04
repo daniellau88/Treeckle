@@ -310,6 +310,12 @@ class EventCreation extends React.Component {
             </Grid.Column>
           </Grid>
         </Segment>
+
+        <Segment placeholder>
+          <h1>
+            Manage your events
+          </h1>
+        </Segment>
       </Container>
     );
   }
