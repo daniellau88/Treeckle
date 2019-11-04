@@ -9,7 +9,7 @@ Treeckle is a student life app for the Residential Colleges of NUS in UTown (Tem
 
 | Name                	 	| Username                                      |Role                                	|
 |-------------------------|-----------------------------------------------|-------------------------------------|
-| Sujay R Subramanian 	 	| [@rssujay](https://github.com/rssujay)        |Backend & Deployment                	|
-| Sree Subbash        	 	| [@sreesubbash](https://github.com/sreesubbash)|Backend (Algorithms) & Frontend      |
+| Sujay R Subramanian 	 	| [@rssujay](https://github.com/rssujay)        |Full Stack & Deployment              |
+| Sree Subbash        	 	| [@sreesubbash](https://github.com/sreesubbash)|Full Stack                           |
 | Jeremy Tan           	 	| [@JermyTan](https://github.com/JermyTan)      |Frontend                            	|
 | Rohan Arya Varma     	 	| [@rohan-av](https://github.com/rohan-av)      |Frontend & UI/UX Design             	|
