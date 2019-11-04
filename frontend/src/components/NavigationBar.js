@@ -16,11 +16,16 @@ class NavigationBar extends React.Component {
     super(props);
     this.state = {};
     this.handleItemClick = this.handleItemClick.bind(this);
+    this.handleAdminItemClick = this.handleAdminItemClick.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
   }
 
   handleItemClick(event, data) {
     this.setState({ activeItem: data.name });
+  }
+
+  handleAdminItemClick(event, data) {
+    this.setState({ activeItem: "admin" });
   }
 
   handleSignOut() {
@@ -48,6 +53,37 @@ class NavigationBar extends React.Component {
         icon="sign out"
         onClick={this.handleSignOut}
       />
+    ];
+
+    const adminOptions = [
+      <Dropdown.Item
+        name="bookings"
+        text="Bookings"
+        as={Link}
+        to="/admin/bookings"
+        onClick={this.handleAdminItemClick}
+      />,
+      <Dropdown.Item
+        name="users"
+        text="Users"
+        as={Link}
+        to="/admin/users"
+        onClick={this.handleAdminItemClick}
+      />,
+      <Dropdown.Item
+        name="settings"
+        text="Settings"
+        as={Link}
+        to="/admin/settings"
+        onClick={this.handleAdminItemClick}
+      />
+      // <Dropdown.Item
+      //   name="rooms"
+      //   text="Rooms"
+      //   as={Link}
+      //   to="/admin/rooms"
+      //   onClick={this.handleAdminItemClick}
+      // />
     ];
 
     return (
@@ -88,22 +124,29 @@ class NavigationBar extends React.Component {
             content="Bookings"
             onClick={this.handleItemClick}
           />
+          {/* {this.context.role === "Admin" &&
+            this.props.counts.pendingRoomBookings >= 0 && (
+              <Menu.Item name="admin" active={activeItem === "admin"}>
+                <Label text="Admin" color="red" style={{ marginRight: "0" }}>
+                  {this.props.counts.pendingRoomBookings}
+                </Label>
+              </Menu.Item>
+            )} */}
           {this.context.role === "Admin" && (
-            <Menu.Item
-              as={Link}
-              to="/admin"
+            <Dropdown
               name="admin"
-              active={activeItem === "admin"}
-              onClick={this.handleItemClick}
-            >
-            Admin
-            {
-              (this.props.counts.pendingRoomBookings >= 0)? 
-                    <Label text="Admin" color="red">
-                      {this.props.counts.pendingRoomBookings}
-                    </Label> : ""
-              } 
-            </Menu.Item>
+              text="Admin"
+              className="link item"
+              icon={
+                this.props.counts.pendingRoomBookings >= 0 ? (
+                  <Label text="Admin" color="red" style={{ marginRight: "0" }}>
+                    {this.props.counts.pendingRoomBookings}
+                  </Label>
+                ) : null
+              }
+              options={adminOptions}
+              style={{ marginLeft: "0" }}
+            />
           )}
           <Menu.Menu position="right" style={{ marginRight: "1rem" }}>
             {DEVELOPMENT_VIEW && (
@@ -149,7 +192,6 @@ class NavigationBar extends React.Component {
               className="link item"
               icon={null}
               direction="left"
-              floating
             />
           </Menu.Menu>
         </Menu>
@@ -158,8 +200,10 @@ class NavigationBar extends React.Component {
   }
 }
 
-export default (props) => (
+export default props => (
   <CountsContext.Consumer>
-      {({counts, setCounts}) => <NavigationBar {...props} counts={counts} setCounts={setCounts} />}
-   </CountsContext.Consumer>
-)
+    {({ counts, setCounts }) => (
+      <NavigationBar {...props} counts={counts} setCounts={setCounts} />
+    )}
+  </CountsContext.Consumer>
+);
