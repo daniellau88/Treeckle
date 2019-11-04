@@ -46,6 +46,8 @@ router.get('/', [
                     createdBy: { email: doc.createdBy.email, name: doc.createdBy.name },
                     posterPath: doc.posterPath,
                     eventDate: doc.eventDate.getTime(),
+                    endDate: doc.endDate.getTime(),
+                    isVisible: doc.isVisible,
                     signupsAllowed: doc.signupsAllowed,
                     shortId: doc.shortId
                 });
@@ -91,7 +93,7 @@ router.delete('/', jsonParser, [
         });
 });
 
-//Admin: Update a self-created event
+//Admin: Update any event
 router.patch('/', jsonParser, [
     body('eventId').exists(),
     body('title').optional().not().isEmpty(),
@@ -101,6 +103,8 @@ router.patch('/', jsonParser, [
     body('organisedBy').optional().not().isEmpty(),
     body('venue').optional(),
     body('eventDate').optional().isInt().toInt(),
+    body('endDate').optional().isInt().toInt(),
+    body('isVisble').optional().isBoolean().toBoolean(),
     body('signupsAllowed').optional().isBoolean().toBoolean().isIn([true])
 ], async (req, res) => {
     const permitted = await isPermitted(req.user.role, constants.categories.eventInstances, constants.actions.update);
@@ -121,6 +125,8 @@ router.patch('/', jsonParser, [
         if (req.body.organisedBy) updateObject.organisedBy = req.body.organisedBy;
         if (req.body.venue) updateObject.venue = req.body.venue;
         if (req.body.eventDate) updateObject.eventDate = req.body.eventDate;
+        if (req.body.endDate) updateObject.endDate = req.body.endDate;
+        if (req.body.isVisible === false || req.body.isVisible === true) updateObject.isVisible = req.body.isVisible;
         if (req.body.signupsAllowed) updateObject.signupsAllowed = req.body.signupsAllowed;
 
         Event.byTenant(req.user.residence).findOneAndUpdate({ _id: req.body.eventId },
@@ -143,6 +149,8 @@ router.patch('/', jsonParser, [
                         createdBy: { email: doc.createdBy.email, name: doc.createdBy.name },
                         posterPath: doc.posterPath,
                         eventDate: doc.eventDate.getTime(),
+                        endDate: doc.endDate.getTime(),
+                        isVisible: doc.isVisible,
                         signupsAllowed: doc.signupsAllowed,
                         shortId: doc.shortId
                     });

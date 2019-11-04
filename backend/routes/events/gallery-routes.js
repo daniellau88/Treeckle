@@ -28,7 +28,7 @@ router.get('/', [
     }
 
     //const filter = (req.query.historical)? {} : { eventDate : { $gte : Date.now() }};
-    const filter = { eventDate: { $gte: Date.now() } };
+    const filter = { eventDate: { $gte: Date.now() }, isVisible: true };
     const sortOrder = (req.query.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
 
     Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder).lean()
@@ -53,6 +53,7 @@ router.get('/', [
                     organisedBy: doc.organisedBy,
                     posterPath: doc.posterPath,
                     eventDate: doc.eventDate.getTime(),
+                    endDate: doc.endDate.getTime(),
                     signupsAllowed: doc.signupsAllowed,
                     shortId: doc.shortId
                 });
@@ -81,7 +82,7 @@ router.get('/recommended', [
         return;
     }
 
-    const filter = { eventDate: { $gte: Date.now() } };
+    const filter = { eventDate: { $gte: Date.now() }, isVisible: true  };
     const sortOrder = (req.query.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
 
 
@@ -127,6 +128,7 @@ router.get('/recommended', [
                                         organisedBy: doc.organisedBy,
                                         posterPath: doc.posterPath,
                                         eventDate: doc.eventDate.getTime(),
+                                        endDate: doc.endDate.getTime(),
                                         signupsAllowed: doc.signupsAllowed,
                                         shortId: doc.shortId
                                     });
@@ -250,7 +252,7 @@ router.post('/categories', jsonParser, [
         return;
     }
 
-    const filter = { eventDate: { $gte: Date.now() }, categories: { $in: req.body.filterCategories } };
+    const filter = { eventDate: { $gte: Date.now() }, categories: { $in: req.body.filterCategories }, isVisible: true  };
     const sortOrder = (req.body.latestFirst) ? { sort: { eventDate: -1 } } : { sort: { eventDate: 1 } };
 
     Event.byTenant(req.user.residence).find(filter, '-creationDate -createdBy -__v -tenantId', sortOrder).lean()
@@ -269,6 +271,7 @@ router.post('/categories', jsonParser, [
                     organisedBy: doc.organisedBy,
                     posterPath: doc.posterPath,
                     eventDate: doc.eventDate.getTime(),
+                    endDate: doc.endDate.getTime(),
                     signupsAllowed: doc.signupsAllowed,
                     shortId: doc.shortId
                 });

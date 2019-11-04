@@ -55,7 +55,17 @@ const eventSchema = new schema({
         type: Date,
         required: true,
         unique: false,
+    },
+    endDate: {
+        type: Date,
+        required: true,
+        unique: false,
         index: { expires: '400 days' }
+    },
+    isVisible: {
+        type: Boolean,
+        required: true,
+        unique: false
     },
     signupsAllowed: {
         type: Boolean,
