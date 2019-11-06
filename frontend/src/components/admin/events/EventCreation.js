@@ -18,6 +18,7 @@ import { parseDateTime } from "../../../util/DateUtil";
 import "../../../styles/EventCreation.scss";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
 import { UNKNOWN_ERROR } from "../../../util/Constants";
+import EventsTable from "./EventsTable";
 
 const SUCCESS_MSG = "Your event has been successfully created.";
 const MISSING_FIELDS = "Compulsory fields are missing.";
@@ -310,12 +311,19 @@ class EventCreation extends React.Component {
             </Grid.Column>
           </Grid>
         </Segment>
+        <br />
+        <br />
+        <br />
 
-        <Segment placeholder>
-          <h1>
-            Manage your events
-          </h1>
-        </Segment>
+        <h1 style={{ color: "#FDFDFD" }}>
+          Manage your created events
+        </h1>
+
+        <EventsTable />
+
+        <br />
+        <br />
+        <br />
       </Container>
     );
   }
