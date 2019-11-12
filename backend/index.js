@@ -47,6 +47,8 @@ app.use(express.static(path.join(__dirname, "../frontend/build")));
 
 app.use('/ftp', express.static('public'), serveIndex('public', {'icons': true}));
 
+app.use('/about', express.static("../frontend/landing"));
+
 //Catch GET requests to invalid URIs and redirect to home page
 app.get("/*", (req, res) => {
  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
