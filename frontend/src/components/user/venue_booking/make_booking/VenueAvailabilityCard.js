@@ -203,7 +203,11 @@ class VenueAvailabilityCard extends React.Component {
                       <Icon
                         link
                         name="cancel"
-                        onClick={() => this.setState({ startDateTime: null })}
+                        onClick={() =>
+                          this.onStartDateTimeChange(null).then(
+                            this.updateAvailabilityOptions
+                          )
+                        }
                       />
                     )
                   }
