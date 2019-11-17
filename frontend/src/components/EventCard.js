@@ -8,17 +8,13 @@ import {
   Modal,
   Grid,
   Label,
-  Container,
-  GridRow
+  Container
 } from "semantic-ui-react";
 import Axios from "axios";
 import { Context } from "../contexts/UserProvider";
 import { CONSOLE_LOGGING } from "../DevelopmentView";
 
 const EventCard = props => {
-
-
-
   const curr = props.event;
   const user = useContext(Context);
   const [modal, setModal] = useState(false);
@@ -28,19 +24,19 @@ const EventCard = props => {
   const [isCreator, setCreator] = useState(false);
 
   useEffect(() => {
-    checkImage()
+    checkImage();
   }, []);
 
   const checkImage = () => {
     Axios.get(props.event.image)
-    .then(response => {
-      if (response.headers["content-type"] == "text/html; charset=UTF-8") {
+      .then(response => {
+        if (response.headers["content-type"] == "text/html; charset=UTF-8") {
           setImgSrc("/ftp/EventPoster.png");
-      }
-    })
-    .catch(({ response }) => {
-      console.log(response)
-    });
+        }
+      })
+      .catch(({ response }) => {
+        console.log(response);
+      });
   };
 
   const signup = () => {
@@ -114,9 +110,11 @@ const EventCard = props => {
             <p>{curr.desc}</p>
             <h5>
               {curr.categories.map((value, index) => {
-                return <Label color='teal' tag>
-                  {value}
-                </Label>
+                return (
+                  <Label color="teal" tag>
+                    {value}
+                  </Label>
+                );
               })}
             </h5>
           </Modal.Content>
@@ -129,7 +127,11 @@ const EventCard = props => {
                 <Card.Meta>
                   <Icon name="calendar" />
                   <br />
-                  <span className="date">{new Date(curr.date).toLocaleString("en-US", { timeZone: "Asia/Singapore" })}</span>
+                  <span className="date">
+                    {new Date(curr.date).toLocaleString("en-US", {
+                      timeZone: "Asia/Singapore"
+                    })}
+                  </span>
                 </Card.Meta>
               </Grid.Column>
               <Grid.Column>
@@ -166,33 +168,33 @@ const EventCard = props => {
               </Label>
             </Button>
           ) : (
+            <Button
+              fluid="true"
+              as="div"
+              labelPosition="right"
+              onClick={signup}
+            >
               <Button
+                attached="bottom"
+                color="red"
                 fluid="true"
-                as="div"
-                labelPosition="right"
-                onClick={signup}
+                stule={{
+                  "border-top-left-radius": "1.1rem"
+                }}
               >
-                <Button
-                  attached="bottom"
-                  color="red"
-                  fluid="true"
-                  stule={{
-                    "border-top-left-radius": "1.1rem"
-                  }}
-                >
-                  <Icon name="heart" />
-                  Sign up
+                <Icon name="heart" />
+                Sign up
               </Button>
-                <Label
-                  basic
-                  color="red"
-                  pointing="left"
-                  style={{ "border-bottom-right-radius": "1.1rem" }}
-                >
-                  {pax}
-                </Label>
-              </Button>
-            )}
+              <Label
+                basic
+                color="red"
+                pointing="left"
+                style={{ "border-bottom-right-radius": "1.1rem" }}
+              >
+                {pax}
+              </Label>
+            </Button>
+          )}
         </Card.Content>
       </Card>
     </Container>
