@@ -24,7 +24,7 @@ class AdminConfig extends React.Component {
 
   componentDidMount() {
     axios
-      .get("/api/emails", {
+      .get("../api/emails", {
         headers: { Authorization: `Bearer ${this.context.token}` }
       })
       .then(response => {
@@ -58,7 +58,7 @@ class AdminConfig extends React.Component {
   handleSubmit() {
     axios
       .put(
-        "/api/emails",
+        "../api/emails",
         {
           email: this.state.email
         },

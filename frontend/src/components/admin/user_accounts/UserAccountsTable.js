@@ -27,7 +27,7 @@ class UserAccountsTable extends React.Component {
 
   retrieveAccounts() {
     axios
-      .get("api/accounts", {
+      .get("../api/accounts", {
         headers: { Authorization: `Bearer ${this.context.token}` }
       })
       .then(response => {
