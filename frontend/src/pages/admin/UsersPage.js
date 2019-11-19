@@ -30,6 +30,9 @@ class UsersPage extends React.Component {
           <h1 style={{ color: "#FDFDFD" }}>User Accounts</h1>
           <UserAccountsTable />
         </Container>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }
