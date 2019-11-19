@@ -21,6 +21,9 @@ class RoomsPage extends React.Component {
           <h1 style={{ color: "#FDFDFD" }}>Configure Rooms</h1>
           {/* <RoomConfig /> */}
         </Container>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }

@@ -22,6 +22,9 @@ class BookingsPage extends React.Component {
           <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
           <BookingsTable />
         </Container>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }

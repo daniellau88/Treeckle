@@ -22,6 +22,9 @@ class SettingsPage extends React.Component {
           <h1 style={{ color: "#FDFDFD" }}>Configure CC Email</h1>
           <AdminConfig />
         </Container>
+        <br />
+        <br />
+        <br />
       </main>
     );
   }
