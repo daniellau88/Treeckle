@@ -31,7 +31,7 @@ class AccountCreation extends React.Component {
     };
     axios
       .post(
-        "/auth/newAccountRequest",
+        "../auth/newAccountRequest",
         {
           email: this.state.email
         },

@@ -35,6 +35,12 @@ router.get('/', [
         .then(resp => {
             const sendToUser = [];
             resp.forEach(doc => {
+                let userAttended = false;
+                doc.attendees.forEach(x => {
+                    if (x == req.user.userId) {
+                        userAttended = true;
+                    }
+                });
                 sendToUser.push({
                     eventId: doc._id,
                     title: doc.title,
@@ -43,7 +49,7 @@ router.get('/', [
                     venue: doc.venue,
                     capacity: doc.capacity,
                     attendees: doc.attendees.length,
-                    isUserAttendee: doc.attendees.includes(req.user.userId),
+                    isUserAttendee: userAttended,
                     organisedBy: doc.organisedBy,
                     posterPath: doc.posterPath,
                     eventDate: doc.eventDate.getTime(),
@@ -103,6 +109,12 @@ router.get('/recommended', [
                                     });
                                 }
                                 if (canInclude) {
+                                    let userAttended = false;
+                                    doc.attendees.forEach(x => {
+                                        if (x == req.user.userId) {
+                                            userAttended = true;
+                                        }
+                                    });
                                     sendToUser.push({
                                         eventId: doc._id,
                                         title: doc.title,
@@ -111,7 +123,7 @@ router.get('/recommended', [
                                         venue: doc.venue,
                                         capacity: doc.capacity,
                                         attendees: doc.attendees.length,
-                                        isUserAttendee: doc.attendees.includes(req.user.userId),
+                                        isUserAttendee: userAttended,
                                         organisedBy: doc.organisedBy,
                                         posterPath: doc.posterPath,
                                         eventDate: doc.eventDate.getTime(),
