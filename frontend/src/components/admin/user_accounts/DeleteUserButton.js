@@ -20,7 +20,7 @@ class DeleteUserButton extends React.Component {
       email: this.props.email
     };
     axios
-      .delete("api/accounts", {
+      .delete("../api/accounts", {
         data: data,
         headers: { Authorization: `Bearer ${this.context.token}` }
       })

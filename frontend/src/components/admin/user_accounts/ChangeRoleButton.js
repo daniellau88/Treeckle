@@ -21,7 +21,7 @@ class ChangeRoleButton extends React.Component {
       role: newRole
     };
     axios
-      .patch("api/accounts", data, {
+      .patch("../api/accounts", data, {
         headers: { Authorization: `Bearer ${this.context.token}` }
       })
       .then(response => {

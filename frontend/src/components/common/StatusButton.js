@@ -58,14 +58,14 @@ class StatusButton extends React.Component {
       approved: newStatus
     };
     axios
-      .patch("api/rooms/bookings/manage", data, {
+      .patch("../api/rooms/bookings/manage", data, {
         headers: { Authorization: `Bearer ${this.context.token}` }
       })
       .then(response => {
         CONSOLE_LOGGING && console.log("PATCH update status:", response);
         if (response.status === 200) {
           this.props.updateTable();
-          this.setState({hasUpdated: true});
+          this.setState({ hasUpdated: true });
         }
       })
       .catch(({ response }) => {
@@ -89,7 +89,7 @@ class StatusButton extends React.Component {
         CONSOLE_LOGGING && console.log("PATCH cancel booking:", response);
         if (response.status === 200) {
           this.props.updateTable();
-          this.setState({hasUpdated: true});
+          this.setState({ hasUpdated: true });
         }
       })
       .catch(({ response }) => {
@@ -159,10 +159,10 @@ class StatusButton extends React.Component {
 
   updateLabel(counts, setCounts) {
     setCounts({
-      updater: !counts.updater  
+      updater: !counts.updater
     });
 
-    this.setState({ hasUpdated: false});
+    this.setState({ hasUpdated: false });
   }
 
   render() {
@@ -178,12 +178,15 @@ class StatusButton extends React.Component {
           onClose={this.togglePopup}
           disabled={this.props.status === 3}
         />
-          {this.state.hasUpdated && 
+        {this.state.hasUpdated && (
           <CountsContext.Consumer>
-              {({counts, setCounts}) => {this.updateLabel(counts, setCounts)}}
-          </CountsContext.Consumer>}
+            {({ counts, setCounts }) => {
+              this.updateLabel(counts, setCounts);
+            }}
+          </CountsContext.Consumer>
+        )}
       </div>
-    )
+    );
   }
 }
 
