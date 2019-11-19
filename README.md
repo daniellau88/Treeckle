@@ -1,6 +1,6 @@
 <img src="./Treeckle_poster.png" />
 
-<img src="https://treeckle.com/static/media/treeckle_startup.5a66fc67.png" width="300"  />
+<img src="./Treeckle.png" width="300"  />
 
 *Currently in development.*
 
