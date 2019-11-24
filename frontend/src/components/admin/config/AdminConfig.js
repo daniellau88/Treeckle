@@ -35,13 +35,19 @@ class AdminConfig extends React.Component {
       })
       .catch(({ response }) => {
         CONSOLE_LOGGING && console.log("GET CC email error:", response);
-        if (response.status === 500) {
-          this.setState({
-            errorMsg: "An unknown error has occurred.",
-            isLoading: false
-          });
-        } else {
-          this.setState({ isLoading: false });
+        switch (response.status) {
+          case 401:
+            alert("Your current session has expired. Please log in again.");
+            this.context.resetUser();
+            break;
+          case 404:
+            this.setState({ isLoading: false });
+            break;
+          default:
+            this.setState({
+              errorMsg: "An unknown error has occurred.",
+              isLoading: false
+            });
         }
       });
   }

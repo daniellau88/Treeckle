@@ -31,12 +31,23 @@ class UserAccountsTable extends React.Component {
         headers: { Authorization: `Bearer ${this.context.token}` }
       })
       .then(response => {
-        CONSOLE_LOGGING && console.log("GET all accounts", response);
+        CONSOLE_LOGGING && console.log("GET all accounts:", response);
         if (response.status === 200) {
           this.setState({
             allAccounts: response.data,
             isLoading: false
           });
+        }
+      })
+      .catch(({ response }) => {
+        CONSOLE_LOGGING && console.log("GET all accounts error:", response);
+        switch (response.status) {
+          case 401:
+            alert("Your current session has expired. Please log in again.");
+            this.context.resetUser();
+            break;
+          default:
+            alert("An unknown error has occurred. Please log try again.");
         }
       });
   }
