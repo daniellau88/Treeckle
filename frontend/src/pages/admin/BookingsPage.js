@@ -1,7 +1,7 @@
 import React from "react";
 import ReactGA from "react-ga";
 import { Context } from "../../contexts/UserProvider";
-import { Container, Menu } from "semantic-ui-react";
+import { Container, Menu, Button } from "semantic-ui-react";
 import BookingsTable from "../../components/admin/venue_booking/BookingsTable";
 
 class BookingsPage extends React.Component {
@@ -19,7 +19,12 @@ class BookingsPage extends React.Component {
         <br />
         <br />
         <Container>
-          <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
+            <span>
+              <Button>Manage</Button>
+            </span>
+          </div>
           <BookingsTable />
         </Container>
         <br />
