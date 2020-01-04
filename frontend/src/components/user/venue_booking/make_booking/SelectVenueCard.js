@@ -53,6 +53,7 @@ class SelectVenueCard extends React.Component {
   handleOnCategoryClick(event, { active, content }) {
     if (!active) {
       const selectedCategory = content;
+      console.log(`api/rooms/categories/${selectedCategory}`);
       axios
         .get(`api/rooms/categories/${selectedCategory}`, {
           headers: { Authorization: `Bearer ${this.context.token}` }

@@ -76,14 +76,14 @@ class NavigationBar extends React.Component {
         as={Link}
         to="/admin/settings"
         onClick={this.handleAdminItemClick}
+      />,
+      <Dropdown.Item
+         name="rooms"
+         text="Rooms"
+         as={Link}
+         to="/admin/rooms"
+         onClick={this.handleAdminItemClick}
       />
-      // <Dropdown.Item
-      //   name="rooms"
-      //   text="Rooms"
-      //   as={Link}
-      //   to="/admin/rooms"
-      //   onClick={this.handleAdminItemClick}
-      // />
     ];
 
     return (

@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import BookingsPage from "./pages/admin/BookingsPage";
 import UsersPage from "./pages/admin/UsersPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import RoomsPage from "./pages/admin/RoomsPage";
 import EventsPage from "./pages/EventsPage";
 import VenueBookingPage from "./pages/VenueBookingPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -59,9 +60,9 @@ class App extends React.Component {
             {token !== null && role === "Admin" && (
               <Route path="/admin/settings" exact component={SettingsPage} />
             )}
-            {/* {token !== null && role === "Admin" && (
+            {token !== null && role === "Admin" && (
             <Route path="/admin/rooms" exact component={RoomsPage} />
-          )} */}
+            )}
             {token !== null && (
               <Route path="/profile" exact component={ProfilePage} />
             )}
