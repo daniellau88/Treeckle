@@ -1,3 +1,7 @@
+/****
+ * TODO: CHECK FOR POSSIBLE NAME / CATEGORY COLLISIONS
+ */
+
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import {Container, Button, Checkbox, Form, Confirm} from 'semantic-ui-react';
@@ -14,18 +18,17 @@ function RoomCreationForm(props) {
   const {token, name, profilePic, role, setUser, resetUser} = useContext(
     Context,
   );
-
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [success, setSuccess] = useState(false);
   const [options, setOptions] = useState(null);
 
-  const [roomName, setRoomName] = useState(null);
+  const [roomName, setRoomName] = useState('');
   const [roomCategory, setRoomCategory] = useState(null);
-  const [roomNewCategory, setRoomNewCategory] = useState(null);
-  const [roomRecommendedCapacity, setRoomRecommendedCapacity] = useState(null);
-  const [roomContactEmail, setRoomContactEmail] = useState(null);
+  const [roomNewCategory, setRoomNewCategory] = useState('');
+  const [roomRecommendedCapacity, setRoomRecommendedCapacity] = useState(-1);
+  const [roomContactEmail, setRoomContactEmail] = useState('');
 
   useEffect(() => {
     axios
@@ -33,6 +36,8 @@ function RoomCreationForm(props) {
         headers: {Authorization: `Bearer ${token}`},
       })
       .then(res => {
+        CONSOLE_LOGGING &&
+          console.log(`GET req to /api/rooms/categories: `, res.data);
         const categories = res.data.categories;
         const newOptions = [];
         categories.forEach(cat => {
@@ -53,11 +58,11 @@ function RoomCreationForm(props) {
     setSubmitting(false);
     setConfirming(false);
     setSuccess(false);
-    setRoomName(null);
+    setRoomName('');
     setRoomCategory(null);
-    setOptions(null);
-    setRoomNewCategory(null);
-    setRoomContactEmail(null);
+    setRoomNewCategory('');
+    setRoomRecommendedCapacity(-1);
+    setRoomContactEmail('');
   }
 
   // all fields cannot be empty
@@ -90,6 +95,7 @@ function RoomCreationForm(props) {
           recommendedCapacity: roomRecommendedCapacity,
           contactEmail: roomContactEmail,
         };
+        console.log(data);
         axios
           .post('../api/rooms', data, {
             headers: {Authorization: `Bearer ${token}`},
@@ -120,6 +126,7 @@ function RoomCreationForm(props) {
           });
       })
       .then(() => {
+        resetState();
         toggleStatusBar(false);
       });
   }
@@ -160,7 +167,7 @@ function RoomCreationForm(props) {
         <Form.Select
           options={options}
           label="Room Category"
-          onChange={(e,data) => setRoomCategory(data.value)}
+          onChange={(e, data) => setRoomCategory(data.value)}
           required
           name="roomCategory"
         />

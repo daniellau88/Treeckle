@@ -6,6 +6,9 @@ import DeleteRoomButton from './DeleteRoomButton';
 import {CONSOLE_LOGGING} from '../../../DevelopmentView';
 import '../../../styles/ScrollableTable.scss';
 
+const OVERLAP_CONFLICT_MSG = 'This room is has been created already.';
+const UNKNOWN_ERROR_MSG = 'An unknown error has occurred. Please try again.';
+
 function RoomConfig(props) {
   const {token, name, profilePic, role, setUser, resetUser} = useContext(
     Context,
@@ -25,14 +28,39 @@ function RoomConfig(props) {
           const newAllCategories = [];
           axios.all([getRoomsData(categoriesArr, newAllCategories)]).then(
             axios.spread(res => {
-              allCategories.sort();
+              newAllCategories.sort((first, second) => {
+                if (first.category > second.category) {
+                  return 1;
+                } else if (first.category < second.category) {
+                  return -1;
+                } else if (first.name > second.name) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
               setAllCategories(newAllCategories);
               setIsLoading(false);
             }),
           );
         }),
       )
-      .catch(err => console.log(err));
+      .catch(err => {
+        const response = err.response;
+        CONSOLE_LOGGING && console.log('POST form submission error:', response);
+        let msg;
+        switch (response.status) {
+          case 400:
+            alert(OVERLAP_CONFLICT_MSG);
+            break;
+          case 401:
+            alert('Your current session has expired. Please log in again.');
+            resetUser();
+            break;
+          default:
+            alert(UNKNOWN_ERROR_MSG);
+        }
+      });
   }
 
   function getAllCategories() {
@@ -42,7 +70,7 @@ function RoomConfig(props) {
       })
       .then(res => {
         CONSOLE_LOGGING &&
-          console.log(`GET request to /api/rooms/categories: ${res}`);
+          console.log(`GET request to /api/rooms/categories:`, res);
         return res.data.categories;
       })
       .catch(err => console.log(err));
@@ -59,12 +87,12 @@ function RoomConfig(props) {
           .then(rooms => {
             CONSOLE_LOGGING &&
               console.log(
-                `GET request to /api/rooms/categories/${cat}: ${rooms}`,
+                `GET request to /api/rooms/categories/${cat}:`,
+                rooms,
               );
             const roomsData = rooms.data;
             roomsData.map(room => {
               const {roomId, name, recommendedCapacity, contactEmail} = room;
-
               resArr.push({
                 category: cat,
                 roomId,
@@ -86,6 +114,7 @@ function RoomConfig(props) {
       <Table.Row>
         <Table.Cell>{category}</Table.Cell>
         <Table.Cell>{name}</Table.Cell>
+        <Table.Cell>{recommendedCapacity}</Table.Cell>
         <Table.Cell>{contactEmail}</Table.Cell>
         <Table.Cell>
           <DeleteRoomButton id={roomId} updateTable={updateAllCategories} />
@@ -104,6 +133,7 @@ function RoomConfig(props) {
             <Table.Row>
               <Table.HeaderCell>Category</Table.HeaderCell>
               <Table.HeaderCell>Room Name</Table.HeaderCell>
+              <Table.HeaderCell>Recommended Capacity</Table.HeaderCell>
               <Table.HeaderCell>Contact Email</Table.HeaderCell>
               <Table.HeaderCell>Actions</Table.HeaderCell>
             </Table.Row>
