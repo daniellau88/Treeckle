@@ -3,6 +3,7 @@ import ReactGA from "react-ga";
 import { Context } from "../../contexts/UserProvider";
 import { Container, Menu, Button } from "semantic-ui-react";
 import BookingsTable from "../../components/admin/venue_booking/BookingsTable";
+import { DEVELOPMENT_VIEW } from "../../DevelopmentView";
 
 class BookingsPage extends React.Component {
   static contextType = Context;
@@ -19,12 +20,7 @@ class BookingsPage extends React.Component {
         <br />
         <br />
         <Container>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
-            <span>
-              <Button>Manage</Button>
-            </span>
-          </div>
+          <h1 style={{ color: "#FDFDFD" }}>Booking Requests</h1>
           <BookingsTable />
         </Container>
         <br />
