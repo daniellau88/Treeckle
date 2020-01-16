@@ -4,6 +4,7 @@ import { Placeholder, Table } from "semantic-ui-react";
 import { Context } from "../../../contexts/UserProvider";
 import ChangeRoleButton from "./ChangeRoleButton";
 import DeleteUserButton from "./DeleteUserButton";
+import UserEmailChanger from "./UserEmailChanger";
 import { CONSOLE_LOGGING } from "../../../DevelopmentView";
 import "../../../styles/ScrollableTable.scss";
 
@@ -57,7 +58,9 @@ class UserAccountsTable extends React.Component {
     const row = (
       <Table.Row>
         <Table.Cell>{name ? name : "<Pending registration>"}</Table.Cell>
-        <Table.Cell>{email}</Table.Cell>
+        <Table.Cell>
+          <UserEmailChanger email={email} updateTable={this.retrieveAccounts} />
+        </Table.Cell>
         <Table.Cell>{role}</Table.Cell>
         <Table.Cell textAlign="right">
           <ChangeRoleButton
