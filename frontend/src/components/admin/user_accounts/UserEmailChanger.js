@@ -63,7 +63,7 @@ function UserEmailChanger(props) {
         <div>{props.email}</div>
       )}
       <Icon
-        edit
+        name="edit"
         onClick={() => {
           setEditing(!isEditing);
           setNewEmail(props.email);
