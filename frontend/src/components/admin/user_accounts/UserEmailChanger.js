@@ -59,12 +59,17 @@ function UserEmailChanger(props) {
             positive: true,
             icon: "check",
             onClick: handleEmailEdit,
-            disabled: !newEmail || !isValidEmail(newEmail)
+            disabled: !isValidEmail(newEmail)
           }}
           placeholder="Email cannot be empty"
           onChange={handleChange}
           value={newEmail}
           type="email"
+          onKeyPress={e => {
+            return e.key == "Enter" && isValidEmail(newEmail)
+              ? handleEmailEdit()
+              : null;
+          }}
         />
       ) : (
         <div>{props.email}</div>

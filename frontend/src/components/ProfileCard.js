@@ -9,11 +9,13 @@ import {
   Segment,
   Responsive,
   Icon,
-  Popup
+  Popup,
+  Modal
 } from "semantic-ui-react";
 import { DEVELOPMENT_VIEW, CONSOLE_LOGGING } from "../DevelopmentView";
 import { intArrayToBase64 } from "../util/EncodingUtil";
 import UserSelfNameChanger from "./user/profile/UserSelfNameChanger";
+import QrCodeScanner from "./common/QrCodeScanner";
 
 function getIntArrayBase64(str) {
   let STRING_CHAR = Array.from(atob(str));
@@ -125,7 +127,7 @@ class ProfileCard extends React.Component {
               <Grid columns={1}>
                 <Grid.Column stretched>
                   <Segment basic size="huge">
-                      <UserSelfNameChanger />
+                    <UserSelfNameChanger />
                     <div style={{ fontSize: "0.75em" }}>
                       <br />
                       <strong>Role: </strong>
@@ -135,6 +137,22 @@ class ProfileCard extends React.Component {
                   <Segment basic compact></Segment>
                   <Segment basic compact>
                     <Button.Group vertical>
+                      <Modal
+                        trigger={
+                          <Button
+                            content="Scan QR code"
+                            icon="qrcode"
+                            labelPosition="left"
+                          />
+                        }
+                        closeIcon
+                        size="tiny"
+                      >
+                        <Modal.Header content="Scan the registration QR code" />
+                        <Modal.Content>
+                          <QrCodeScanner />
+                        </Modal.Content>
+                      </Modal>
                       <Button
                         content="View My Bookings"
                         icon="book"
