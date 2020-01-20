@@ -137,24 +137,22 @@ class ProfileCard extends React.Component {
                   <Segment basic compact></Segment>
                   <Segment basic compact>
                     <Button.Group vertical>
-                      {DEVELOPMENT_VIEW && (
-                        <Modal
-                          trigger={
-                            <Button
-                              content="Scan QR code"
-                              icon="qrcode"
-                              labelPosition="left"
-                            />
-                          }
-                          closeIcon
-                          size="tiny"
-                        >
-                          <Modal.Header content="Scan the registration QR code" />
-                          <Modal.Content>
-                            <QrCodeScanner />
-                          </Modal.Content>
-                        </Modal>
-                      )}
+                      <Modal
+                        trigger={
+                          <Button
+                            content="Scan QR code"
+                            icon="qrcode"
+                            labelPosition="left"
+                          />
+                        }
+                        closeIcon
+                        size="tiny"
+                      >
+                        <Modal.Header content="Scan the registration QR code" />
+                        <Modal.Content>
+                          <QrCodeScanner />
+                        </Modal.Content>
+                      </Modal>
                       <Button
                         content="View My Bookings"
                         icon="book"
