@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.2.0",
     "fast-csv": "^3.4.0",
+    "googleapis": "^47.0.0",
     "image-thumbnail": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.22.0",
