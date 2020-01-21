@@ -13,7 +13,7 @@ ReactDOM.render(
   <Router>
     <UserProvider>
       <Context.Consumer>
-        {(token, name, profilePic, role, setUser, resetUser, toLoginPage) => {
+        {(token, name, profilePic, role, setUser, resetUser) => {
           return <App />;
         }}
       </Context.Consumer>
