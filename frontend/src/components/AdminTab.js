@@ -1,22 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, Accordion, Label } from "semantic-ui-react";
 import { CountsContext } from "../contexts/CountsProvider";
 
 function AdminTab(props) {
   const counts = useContext(CountsContext);
+  const [isExpanded, setExpanded] = useState(false);
 
   return (
-    <Accordion as={Menu.Item} active={props.activeTab.includes("admin")}>
+    <Accordion as={Menu.Item} fitted="vertically">
       <Accordion.Title
-        content="Admin"
-        icon={
-          counts.counts.pendingRoomBookings >= 0 && (
-            <Label color="red" content={counts.counts.pendingRoomBookings} />
-          )
-        }
-      />
-      <Accordion.Content>
+        onClick={() => setExpanded(!isExpanded)}
+        active={isExpanded}
+      >
+        Admin
+        {counts.counts.pendingRoomBookings >= 0 && (
+          <Label
+            color="red"
+            content={counts.counts.pendingRoomBookings}
+            style={{ marginLeft: "1em" }}
+            size="small"
+          />
+        )}
+      </Accordion.Title>
+      <Accordion.Content active={isExpanded}>
         <Menu.Item
           as={Link}
           to="/admin/bookings"
