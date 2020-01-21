@@ -5,9 +5,8 @@ import LogoTab from "./LogoTab";
 import DashboardTab from "./DashboardTab";
 import EventsTab from "./EventsTab";
 import BookingsTab from "./BookingsTab";
-import DesktopAdminTab from "./DesktopAdminTab";
+import AdminTab from "./AdminTab";
 import UserMenu from "./UserMenu";
-import { DEVELOPMENT_VIEW } from "../DevelopmentView";
 
 function DesktopNavigationBar(props) {
   const user = useContext(Context);
@@ -22,12 +21,10 @@ function DesktopNavigationBar(props) {
       <Menu fixed="top" borderless size="huge">
         <LogoTab onTabClick={onTabClick} />
         <DashboardTab activeTab={activeTab} onTabClick={onTabClick} />
-        {DEVELOPMENT_VIEW && (
-          <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
-        )}
+        <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
         <BookingsTab activeTab={activeTab} onTabClick={onTabClick} />
         {user.role === "Admin" && (
-          <DesktopAdminTab activeTab={activeTab} onTabClick={onTabClick} />
+          <AdminTab activeTab={activeTab} onTabClick={onTabClick} />
         )}
         <UserMenu activeTab={activeTab} onTabClick={onTabClick} />
       </Menu>

@@ -5,11 +5,9 @@ import LogoTab from "./LogoTab";
 import DashboardTab from "./DashboardTab";
 import EventsTab from "./EventsTab";
 import BookingsTab from "./BookingsTab";
-import MobileAdminTab from "./MobileAdminTab";
+import AdminTab from "./AdminTab";
 import SidebarButton from "./SidebarButton";
 import UserMenu from "./UserMenu";
-import { DEVELOPMENT_VIEW } from "../DevelopmentView";
-import "../styles/ContainerScrollBar.scss";
 
 function MobileNavigationBar(props) {
   const user = useContext(Context);
@@ -26,9 +24,6 @@ function MobileNavigationBar(props) {
       as={Sidebar.Pushable}
       getWidth={getWidth}
       maxWidth={Responsive.onlyTablet.maxWidth}
-      onUpdate={() => {
-        getWidth() > Responsive.onlyTablet.maxWidth && setSidebarOpened(false);
-      }}
     >
       <Sidebar
         as={Menu}
@@ -39,12 +34,10 @@ function MobileNavigationBar(props) {
       >
         <LogoTab onTabClick={onTabClick} />
         <DashboardTab activeTab={activeTab} onTabClick={onTabClick} />
-        {DEVELOPMENT_VIEW && (
-          <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
-        )}
+        <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
         <BookingsTab activeTab={activeTab} onTabClick={onTabClick} />
         {user.role === "Admin" && (
-          <MobileAdminTab activeTab={activeTab} onTabClick={onTabClick} />
+          <AdminTab activeTab={activeTab} onTabClick={onTabClick} />
         )}
       </Sidebar>
 
@@ -53,7 +46,7 @@ function MobileNavigationBar(props) {
           <SidebarButton openSidebar={() => setSidebarOpened(true)} />
           <UserMenu activeTab={activeTab} onTabClick={onTabClick} />
         </Menu>
-        <div style={{ height: "100vh", overflow: "auto" }}>{children}</div>
+        {children}
       </Sidebar.Pusher>
     </Responsive>
   );

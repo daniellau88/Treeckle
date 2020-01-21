@@ -9,7 +9,6 @@ function UserMenu(props) {
 
   const userOptions = [
     <Dropdown.Item
-      key="profile"
       as={Link}
       to="/profile"
       text="Profile"
@@ -18,12 +17,7 @@ function UserMenu(props) {
       onClick={props.onTabClick}
       active={props.activeTab === "profile"}
     />,
-    <Dropdown.Item
-      key="sign-out"
-      text="Sign Out"
-      icon="sign out"
-      onClick={user.resetUser}
-    />
+    <Dropdown.Item text="Sign Out" icon="sign out" onClick={user.resetUser} />
   ];
 
   return (
