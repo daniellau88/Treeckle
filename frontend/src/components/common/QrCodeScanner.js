@@ -9,22 +9,8 @@ function QrCodeScanner() {
 
   const handleScan = result => {
     console.log("Result:", result);
-    if (!result) {
-      let data = { key: "rennidkcabemoclew" };
-      console.log(user);
-      axios
-        .post("../api/sheets", data, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        })
-        .then(response => {
-          CONSOLE_LOGGING && console.log("POST qrcode submission:", response);
-          if (response.status == 200) {
-            alert("Successfully registered");
-          }
-        })
-        .catch(error => {
-          alert("An unknown error has occurred. Please try again :(");
-        });
+    if (result) {
+      console.log(result);
     }
   };
 

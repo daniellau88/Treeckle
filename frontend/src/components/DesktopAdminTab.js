@@ -8,6 +8,7 @@ function MobileAdminTab(props) {
 
   const adminOptions = [
     <Dropdown.Item
+      key="admin/bookings"
       as={Link}
       to="/admin/bookings"
       name="admin/bookings"
@@ -16,6 +17,7 @@ function MobileAdminTab(props) {
       onClick={props.onTabClick}
     />,
     <Dropdown.Item
+      key="admin/users"
       as={Link}
       to="/admin/users"
       name="admin/users"
@@ -24,6 +26,7 @@ function MobileAdminTab(props) {
       onClick={props.onTabClick}
     />,
     <Dropdown.Item
+      key="admin/settings"
       as={Link}
       to="/admin/settings"
       name="admin/settings"

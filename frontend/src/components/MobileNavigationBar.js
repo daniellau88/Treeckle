@@ -8,6 +8,7 @@ import BookingsTab from "./BookingsTab";
 import MobileAdminTab from "./MobileAdminTab";
 import SidebarButton from "./SidebarButton";
 import UserMenu from "./UserMenu";
+import { DEVELOPMENT_VIEW } from "../DevelopmentView";
 
 function MobileNavigationBar(props) {
   const user = useContext(Context);
@@ -37,7 +38,9 @@ function MobileNavigationBar(props) {
       >
         <LogoTab onTabClick={onTabClick} />
         <DashboardTab activeTab={activeTab} onTabClick={onTabClick} />
-        <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
+        {DEVELOPMENT_VIEW && (
+          <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
+        )}
         <BookingsTab activeTab={activeTab} onTabClick={onTabClick} />
         {user.role === "Admin" && (
           <MobileAdminTab activeTab={activeTab} onTabClick={onTabClick} />
