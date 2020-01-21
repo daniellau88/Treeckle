@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, Accordion, Label } from "semantic-ui-react";
 import { CountsContext } from "../contexts/CountsProvider";
 
-function AdminTab(props) {
+function MobileAdminTab(props) {
   const counts = useContext(CountsContext);
   const [isExpanded, setExpanded] = useState(false);
 
@@ -53,4 +53,4 @@ function AdminTab(props) {
   );
 }
 
-export default AdminTab;
+export default MobileAdminTab;
