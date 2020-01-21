@@ -5,7 +5,7 @@ import LogoTab from "./LogoTab";
 import DashboardTab from "./DashboardTab";
 import EventsTab from "./EventsTab";
 import BookingsTab from "./BookingsTab";
-import AdminTab from "./AdminTab";
+import MobileAdminTab from "./MobileAdminTab";
 import SidebarButton from "./SidebarButton";
 import UserMenu from "./UserMenu";
 
@@ -40,7 +40,7 @@ function MobileNavigationBar(props) {
         <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
         <BookingsTab activeTab={activeTab} onTabClick={onTabClick} />
         {user.role === "Admin" && (
-          <AdminTab activeTab={activeTab} onTabClick={onTabClick} />
+          <MobileAdminTab activeTab={activeTab} onTabClick={onTabClick} />
         )}
       </Sidebar>
 

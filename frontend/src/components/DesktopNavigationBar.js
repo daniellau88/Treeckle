@@ -5,7 +5,7 @@ import LogoTab from "./LogoTab";
 import DashboardTab from "./DashboardTab";
 import EventsTab from "./EventsTab";
 import BookingsTab from "./BookingsTab";
-import AdminTab from "./AdminTab";
+import DesktopAdminTab from "./DesktopAdminTab";
 import UserMenu from "./UserMenu";
 
 function DesktopNavigationBar(props) {
@@ -24,7 +24,7 @@ function DesktopNavigationBar(props) {
         <EventsTab activeTab={activeTab} onTabClick={onTabClick} />
         <BookingsTab activeTab={activeTab} onTabClick={onTabClick} />
         {user.role === "Admin" && (
-          <AdminTab activeTab={activeTab} onTabClick={onTabClick} />
+          <DesktopAdminTab activeTab={activeTab} onTabClick={onTabClick} />
         )}
         <UserMenu activeTab={activeTab} onTabClick={onTabClick} />
       </Menu>
