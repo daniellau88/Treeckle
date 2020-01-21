@@ -24,6 +24,9 @@ function MobileNavigationBar(props) {
       as={Sidebar.Pushable}
       getWidth={getWidth}
       maxWidth={Responsive.onlyTablet.maxWidth}
+      onUpdate={() => {
+        getWidth() > Responsive.onlyTablet.maxWidth && setSidebarOpened(false);
+      }}
     >
       <Sidebar
         as={Menu}
