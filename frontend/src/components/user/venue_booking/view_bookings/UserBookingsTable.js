@@ -58,7 +58,7 @@ class UserBookingsTable extends React.Component {
     } = data;
     const status = approved;
     const row = (
-      <Table.Row>
+      <Table.Row key={bookingId}>
         <Table.Cell>{roomName}</Table.Cell>
         <Table.Cell>{toDateTimeString(start)}</Table.Cell>
         <Table.Cell>{toDateTimeString(end)}</Table.Cell>

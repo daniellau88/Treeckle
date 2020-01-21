@@ -100,7 +100,7 @@ class BookingsTable extends React.Component {
     } = data;
     const status = approved;
     const row = (
-      <Table.Row>
+      <Table.Row key={bookingId}>
         <Table.Cell>{createdByName}</Table.Cell>
         <Table.Cell>{createdByEmail}</Table.Cell>
         <Table.Cell>{contactNumber}</Table.Cell>
