@@ -9,6 +9,7 @@ import MobileAdminTab from "./MobileAdminTab";
 import SidebarButton from "./SidebarButton";
 import UserMenu from "./UserMenu";
 import { DEVELOPMENT_VIEW } from "../DevelopmentView";
+import "../styles/ContainerScrollBar.scss";
 
 function MobileNavigationBar(props) {
   const user = useContext(Context);
@@ -52,7 +53,7 @@ function MobileNavigationBar(props) {
           <SidebarButton openSidebar={() => setSidebarOpened(true)} />
           <UserMenu activeTab={activeTab} onTabClick={onTabClick} />
         </Menu>
-        {children}
+        <div style={{ height: "100vh", overflow: "auto" }}>{children}</div>
       </Sidebar.Pusher>
     </Responsive>
   );
