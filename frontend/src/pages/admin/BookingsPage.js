@@ -16,7 +16,7 @@ class BookingsPage extends React.Component {
   render() {
     return (
       <main className="admin-bookings-page">
-        <Menu size="huge"></Menu>
+        <Menu size="huge" style={{ opacity: 0 }}></Menu>
         <br />
         <br />
         <Container>
