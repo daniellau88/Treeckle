@@ -23,9 +23,7 @@ const EventsPage = props => {
               {creating ? "Cancel event creation" : "Create new event"}
             </Button.Content>
           </Button>
-          {!creating && (
-            <h1 style={{ color: "#FDFDFD" }}>Events</h1>
-          )}
+          {!creating && <h1 style={{ color: "#FDFDFD" }}>Events</h1>}
         </Container>
       )}
       {creating ? <EventCreation /> : <EventsScene />}
