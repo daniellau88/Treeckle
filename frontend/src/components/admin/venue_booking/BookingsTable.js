@@ -25,6 +25,33 @@ class BookingsTable extends React.Component {
     this.retrieveAllRequests();
   }
 
+  retrieveRejectedRequests() {
+    return axios.get(
+      `../api/rooms/bookings/all?Approved=0&Pending=0&Cancelled=0&limit=1000`,
+      {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      }
+    );
+  }
+
+  retrieveApprovedRequests() {
+    return axios.get(
+      `../api/rooms/bookings/all?Rejected=0&Pending=0&Cancelled=0&limit=1000`,
+      {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      }
+    );
+  }
+
+  retrieveCancelledRequests() {
+    return axios.get(
+      `../api/rooms/bookings/all?Rejected=0&Pending=0&Approved=0&limit=1000`,
+      {
+        headers: { Authorization: `Bearer ${this.context.token}` }
+      }
+    );
+  }
+
   retrievePendingRequests() {
     return axios.get(
       `../api/rooms/bookings/all?Approved=0&Rejected=0&Cancelled=0&limit=1000`,
