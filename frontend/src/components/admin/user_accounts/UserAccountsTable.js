@@ -56,7 +56,7 @@ class UserAccountsTable extends React.Component {
   renderBodyRow(data, index) {
     const { name, email, role } = data;
     const row = (
-      <Table.Row>
+      <Table.Row key={email}>
         <Table.Cell>{name ? name : "<Pending registration>"}</Table.Cell>
         <Table.Cell>
           <UserEmailChanger email={email} updateTable={this.retrieveAccounts} />
