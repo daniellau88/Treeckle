@@ -3,9 +3,8 @@ import "./App.css";
 import { Context } from "./contexts/UserProvider";
 import { Route, Switch, Redirect } from "react-router-dom";
 import ReactGA from "react-ga";
-import NavigationBar from "./components/NavigationBar";
+import NavigationContainer from "./components/NavigationContainer";
 import Dashboard from "./pages/Dashboard";
-// import AdminPage from "./pages/AdminPage";
 import BookingsPage from "./pages/admin/BookingsPage";
 import UsersPage from "./pages/admin/UsersPage";
 import SettingsPage from "./pages/admin/SettingsPage";
@@ -33,51 +32,72 @@ class App extends React.Component {
     return (
       <main>
         <CountsContextProvider>
-          {token !== null && <NavigationBar />}
-          <Switch>
-            <Route path="/" exact>
-              {token !== null ? <Redirect to="/dashboard" /> : <LoginPage />}
-            </Route>
-            {token !== null && (
-              <Route path="/dashboard" exact component={Dashboard} />
-            )}
-            {token !== null && (
-              <Route path="/bookings" exact component={VenueBookingPage} />
-            )}
-            {token !== null && DEVELOPMENT_VIEW && (
-              <Route path="/events" exact component={EventsPage} />
-            )}
-            {/* {token !== null && role === "Admin" && (
-            <Route path="/admin" exact component={AdminPage} />
-          )} */}
-            {token !== null && role === "Admin" && (
-              <Route path="/admin/bookings" exact component={BookingsPage} />
-            )}
-            {token !== null && role === "Admin" && (
-              <Route path="/admin/users" exact component={UsersPage} />
-            )}
-            {token !== null && role === "Admin" && (
-              <Route path="/admin/settings" exact component={SettingsPage} />
-            )}
-            {/* {token !== null && role === "Admin" && (
-            <Route path="/admin/rooms" exact component={RoomsPage} />
-          )} */}
-            {token !== null && (
-              <Route path="/profile" exact component={ProfilePage} />
-            )}
-            <Route path="/user/create" component={DirectAccountCreationPage} />
-            <Route
-              path="/auth/newAccounts/:uniqueId"
-              component={LinkAccountCreationPage}
-            />
-            <Route
-              path="/auth/resetAttempt/:uniqueId"
-              component={ResetPasswordPage}
-            />
-            <Route>
-              <Redirect to="/" />
-            </Route>
-          </Switch>
+          {token ? (
+            <NavigationContainer>
+              <Switch>
+                <Route path="/" exact>
+                  <Redirect to="/dashboard" />
+                </Route>
+                <Route path="/dashboard" exact component={Dashboard} />
+                <Route path="/bookings" exact component={VenueBookingPage} />
+                {DEVELOPMENT_VIEW && (
+                  <Route path="/events" exact component={EventsPage} />
+                )}
+                {role === "Admin" && (
+                  <Route
+                    path="/admin/bookings"
+                    exact
+                    component={BookingsPage}
+                  />
+                )}
+                {role === "Admin" && (
+                  <Route path="/admin/users" exact component={UsersPage} />
+                )}
+                {role === "Admin" && (
+                  <Route
+                    path="/admin/settings"
+                    exact
+                    component={SettingsPage}
+                  />
+                )}
+                <Route path="/profile" exact component={ProfilePage} />
+                <Route
+                  path="/user/create"
+                  component={DirectAccountCreationPage}
+                />
+                <Route
+                  path="/auth/newAccounts/:uniqueId"
+                  component={LinkAccountCreationPage}
+                />
+                <Route
+                  path="/auth/resetAttempt/:uniqueId"
+                  component={ResetPasswordPage}
+                />
+                <Route>
+                  <Redirect to="/" />
+                </Route>
+              </Switch>
+            </NavigationContainer>
+          ) : (
+            <Switch>
+              <Route path="/" exact component={LoginPage} />
+              <Route
+                path="/user/create"
+                component={DirectAccountCreationPage}
+              />
+              <Route
+                path="/auth/newAccounts/:uniqueId"
+                component={LinkAccountCreationPage}
+              />
+              <Route
+                path="/auth/resetAttempt/:uniqueId"
+                component={ResetPasswordPage}
+              />
+              <Route>
+                <Redirect to="/" />
+              </Route>
+            </Switch>
+          )}
         </CountsContextProvider>
       </main>
     );

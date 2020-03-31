@@ -92,7 +92,6 @@ export default function UserSelfNameChanger() {
       </Grid.Column>
       <Grid.Column width={2}>
         <Icon
-          edit
           name="edit"
           onClick={handleEditActivate}
           style={{

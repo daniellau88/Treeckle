@@ -43,13 +43,13 @@ class Dashboard extends React.Component {
   render() {
     return (
       <main className="dashboard">
-        <Menu size="huge"></Menu>
+        <Menu size="huge" style={{ opacity: 0 }}></Menu>
         <br />
         <br />
         <Container style={{ color: "#FDFDFD" }}>
           <h1>Welcome, {this.context.name}!</h1>
           <h2>Head over to the "Bookings" tab to view/make bookings.</h2>
-          <text>
+          <p>
             <strong>Note:</strong> Treeckle is currently in development as part
             of a ​
             <u>
@@ -93,7 +93,7 @@ class Dashboard extends React.Component {
               </strong>
             </u>
             .
-          </text>
+          </p>
         </Container>
         <br />
         <br />

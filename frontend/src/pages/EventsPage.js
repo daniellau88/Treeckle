@@ -10,7 +10,7 @@ const EventsPage = props => {
 
   return (
     <main className="events-page">
-      <Menu size="huge"></Menu>
+      <Menu size="huge" style={{ opacity: 0 }}></Menu>
       <br />
       <br />
       {(context.role === "Organiser" || context.role === "Admin") && (
@@ -23,9 +23,7 @@ const EventsPage = props => {
               {creating ? "Cancel event creation" : "Create new event"}
             </Button.Content>
           </Button>
-          {!creating && (
-            <h1 style={{ color: "#FDFDFD" }}>Events</h1>
-          )}
+          {!creating && <h1 style={{ color: "#FDFDFD" }}>Events</h1>}
         </Container>
       )}
       {creating ? <EventCreation /> : <EventsScene />}

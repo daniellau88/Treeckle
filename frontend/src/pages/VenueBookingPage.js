@@ -10,7 +10,7 @@ const VenueBookingPage = props => {
 
   return (
     <main className="booking-page">
-      <Menu size="huge"></Menu>
+      <Menu size="huge" style={{ opacity: 0 }}></Menu>
       <br />
       <br />
       <Container>

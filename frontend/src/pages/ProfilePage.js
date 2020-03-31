@@ -16,7 +16,8 @@ class ProfilePage extends React.Component {
   render() {
     return (
       <main className="profile-page">
-        <Menu size="huge"></Menu>
+        <Menu size="huge" style={{ opacity: 0 }}></Menu>
+        <br />
         <br />
         <div style={{ margin: "2em 2em" }}>
           <ProfileCard user={this.user1} />

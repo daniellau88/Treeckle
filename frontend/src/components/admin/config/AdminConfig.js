@@ -100,7 +100,7 @@ class AdminConfig extends React.Component {
   render() {
     return (
       <Segment placeholder>
-        <Form textAlign="center" onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.handleSubmit}>
           <h4>
             The below email is assigned to receive receipts for the creation or
             change in status of all bookings.
