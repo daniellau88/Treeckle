@@ -157,8 +157,8 @@ class BookVenueForm extends React.Component {
             )}
             <Form.TextArea
               rows={8}
-              label='Zone and Booking purpose'
-              placeholder='State your zone and briefly describe the purpose for this booking...'
+              label='Zone (A/B/C/D) and Booking purpose'
+              placeholder='State your zone (A/B/C/D) and briefly describe the purpose for this booking...'
               onChange={this.onChange}
               disabled={this.state.success}
               required
