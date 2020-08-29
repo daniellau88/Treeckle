@@ -52,6 +52,7 @@ router.post('/', jsonParser, [
                 if (err.code === 11000) {
                     res.status(400).send("duplicated room name");
                 } else {
+                    console.error(err);
                     res.status(500).send("Database Error");
                 }
             } else {
@@ -100,8 +101,9 @@ router.patch('/', jsonParser, [
             } else {
                 res.sendStatus(400);
             }
-        }).catch(error => {
-            if (error.name === 'CastError') {
+        }).catch(err => {
+            console.error(err);
+            if (err.name === 'CastError') {
                 res.sendStatus(400);
             } else {
                 res.status(500).send("Database Error");
@@ -125,7 +127,10 @@ router.delete('/', jsonParser, [
     } else {
         Room.byTenant(req.user.residence).deleteOne({ _id: req.body.roomId }).lean()
         .then(doc => (doc)? res.sendStatus(200): res.sendStatus(400))
-        .catch(err => ((err.name === 'CastError')? res.sendStatus(400): res.status(500).send("Database Error")));
+        .catch(err => {
+            console.error(err);
+            (err.name === 'CastError')? res.sendStatus(400): res.status(500).send("Database Error");
+        });
     }
 });
 

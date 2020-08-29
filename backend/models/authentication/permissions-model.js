@@ -208,7 +208,7 @@ const configurePermissions = async () => {
         await organiser.save();
         await resident.save();
         console.log("Permissions updated.");
-    } catch (error) {
+    } catch (err) {
         await Permissions.deleteMany();
         await admin.save();
         await organiser.save();

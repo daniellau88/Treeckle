@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const constants = require('../../config/constants');
 const {isPermitted} = require('../../services/auth-service');
-const Rooms = require('../../models/room-booking/rooms-model');
+const Room = require('../../models/room-booking/rooms-model');
 
 //Resident and up: get list of categories
 router.get('/', async (req, res) => {
@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     if (!permitted) {
         res.sendStatus(401);
     } else {
-        Rooms.byTenant(req.user.residence).find({}).lean()
+        Room.byTenant(req.user.residence).find({}).lean()
         .then(results => {
             let uniqueCategories = new Set();
             let uniques = [];
@@ -27,9 +27,10 @@ router.get('/', async (req, res) => {
             res.json({
                 categories: uniques
             })})
-        .catch(error => {
+        .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
-            });
+        });
     }
 });
 
@@ -41,7 +42,7 @@ router.get('/:category', async (req, res) => {
         res.sendStatus(401);
     } else {
         const category = req.params.category;
-        Rooms.byTenant(req.user.residence).find({ category: category }).sort({ name : 1 }).lean()
+        Room.byTenant(req.user.residence).find({ category: category }).sort({ name : 1 }).lean()
         .then(resp => {
             const response = [];
             resp.forEach((doc) => {
@@ -59,6 +60,7 @@ router.get('/:category', async (req, res) => {
             res.send(response);
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         });
     }

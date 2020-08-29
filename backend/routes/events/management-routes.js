@@ -52,7 +52,8 @@ router.get('/', [
             });
             res.send(sendToUser);
         })
-        .catch(error => {
+        .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         })
 });
@@ -83,6 +84,7 @@ router.delete('/', jsonParser, [
             }
         })
         .catch(err => {
+            console.error(err);
             if (err.name === 'CastError') {
                 res.sendStatus(404);
             } else {
@@ -149,6 +151,7 @@ router.patch('/', jsonParser, [
                 }
             })
             .catch(err => {
+                console.error(err);
                 res.status(500).send("Database Error");
             })
     }

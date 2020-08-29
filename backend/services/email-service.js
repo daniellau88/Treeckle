@@ -9,9 +9,9 @@ const EmailReceiptsConfig = require('../models/emailReceiptsConfig-model');
 
 // Configure transport options
 const mailgunOptions = {
-auth: {
-    api_key: keys.mailgun.APIkey,
-    domain: keys.mailgun.baseURL
+    auth: {
+        api_key: keys.mailgun.APIkey,
+        domain: keys.mailgun.baseURL
     }
 }
 
@@ -100,7 +100,7 @@ constructor() {
                 carbonCopy
             };
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 
@@ -130,7 +130,7 @@ constructor() {
             );
             
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 }

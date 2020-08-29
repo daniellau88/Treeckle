@@ -30,8 +30,12 @@ mongoose.connect(
     useCreateIndex: true,
     useFindAndModify: false
   },
-  () => {
-    console.log("Connected to mongoDB");
+  err => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log("Connected to mongoDB");
+    }
   }
 );
 

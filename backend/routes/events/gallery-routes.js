@@ -60,6 +60,7 @@ router.get('/', [
             res.send(sendToUser);
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         });
 });
@@ -137,6 +138,7 @@ router.get('/recommended', [
                 })
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Why Error");
         });
 });
@@ -171,12 +173,14 @@ router.patch('/', jsonParser, [
                             counterAddition: (req.body.signUp === 1) ? (result.attendees.includes(req.user.userId)) ? 0 : 1
                                 : (result.attendees.includes(req.user.userId)) ? -1 : 0
                         });
-                    } catch {
+                    } catch (err) {
+                        console.error(err);
                         res.status(500).send("Database Error");
                     }
                 }
             })
             .catch(err => {
+                console.error(err);
                 if (err.name === 'CastError') {
                     res.sendStatus(400);
                 } else {
@@ -201,6 +205,7 @@ router.get('/categories', async (req, res) => {
             res.send(result.subscribedCategories);
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         })
 })
@@ -228,6 +233,7 @@ router.patch('/categories', jsonParser, [
             res.send(resp.subscribedCategories);
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         });
 });
@@ -276,6 +282,7 @@ router.post('/categories', jsonParser, [
             res.send(sendToUser);
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         });
 });

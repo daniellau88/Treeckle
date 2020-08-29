@@ -43,6 +43,7 @@ router.put(
           res.send(doc.profilePic);
         })
         .catch(err => {
+          console.error(err);
           res.sendStatus(500);
         });
     }
@@ -81,6 +82,7 @@ router.patch(
           res.json(doc.name);
         })
         .catch(err => {
+          console.error(err);
           res.sendStatus(500);
         });
     }
@@ -183,6 +185,7 @@ router.get(
 
         res.send(results);
       } catch (err) {
+        console.error(err);
         res.status(500).send("Database Error");
       }
     }
@@ -244,6 +247,7 @@ router.patch(
         ).lean();
         res.sendStatus(200);
       } catch (err) {
+        console.error(err);
         res.sendStatus(500);
       }
     }
@@ -298,6 +302,7 @@ router.patch(
         ).lean();
         res.sendStatus(200);
       } catch (err) {
+        console.error(err);
         res.sendStatus(500);
       }
     }
@@ -339,6 +344,7 @@ router.delete(
         await CreateAccount.deleteMany({ email: req.body.email }).lean();
         res.sendStatus(200);
       } catch (err) {
+        console.error(err);
         res.sendStatus(500);
       }
     }

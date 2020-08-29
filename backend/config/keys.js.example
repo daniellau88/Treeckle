@@ -1,0 +1,15 @@
+// Create a copy of this file
+module.exports = {
+    JWT: {
+		secretKey: "",
+		algorithms: ["HS256"],
+		expiry: 60 * 60,
+	},
+	database: {
+		devDatabaseURI: "",
+	},
+	mailgun: {
+		APIkey: "",
+		baseURL: "",
+	}
+}

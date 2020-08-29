@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
             }
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         })
     }
@@ -51,6 +52,7 @@ router.put('/', jsonParser, [
             }
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send("Database Error");
         })
     }

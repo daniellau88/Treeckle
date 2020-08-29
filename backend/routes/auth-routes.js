@@ -149,7 +149,8 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
             role: userRole
         }).save((err, product) => {
             if (err) {
-                    res.status(500).send("Database Error");
+                console.error(err);
+                res.status(500).send("Database Error");
             } else {
                 EmailService.sendText(req.body.email, 'Account Creation for Treeckle',
                     `<p>Dear User, please proceed with account creation using the following link:</p>
@@ -159,7 +160,8 @@ router.post('/newAccountRequest', passport.authenticate('jwt', { session: false 
                     <p>Treeckle Team</p>`)
                 .then(() => {
                     res.sendStatus(200);
-                }).catch(() => {
+                }).catch(err => {
+                    console.error(err);
                     res.sendStatus(503);
                 });
             }
@@ -221,6 +223,7 @@ router.post('/newAccountRequestCSV', passport.authenticate('jwt', { session: fal
                     }
                     await Promise.all(promises);
                 } catch(err) {
+                    console.error(err);
                     console.log(err);
                 }
             });
@@ -254,6 +257,7 @@ router.post('/resetAttempt', jsonParser, [
                 res.sendStatus(200);
             }
         } catch(err) {
+            console.error(err);
             res.status(500).send("Database Error");
         }
     }
@@ -271,7 +275,11 @@ router.post('/resetAccount', jsonParser, [
     }
 
     //Find user within database
-    const userFound = await User.findByUsername(req.body.email, false).catch(error => res.status(500).send("Database Error"));
+    const userFound = await User.findByUsername(req.body.email, false)
+    .catch(err => {
+        console.error(err);
+        res.status(500).send("Database Error")
+    });
 
     if (!userFound) {
         res.sendStatus(200);
@@ -286,7 +294,10 @@ router.post('/resetAccount', jsonParser, [
             expiry: Date.now() + (3600 * 1000) //Link valid for one hour
         }, {upsert: true}).lean()
         .then(result => res.sendStatus(200))
-        .catch(error => res.status(500).send("Database Error"));
+        .catch(err => {
+            console.error(err);
+            res.status(500).send("Database Error")
+        });
 
         //Send email to user
         await EmailService.sendText(req.body.email, 'Password Reset for Treeckle', 

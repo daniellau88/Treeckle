@@ -76,10 +76,12 @@ router.get("/", async (req, res) => {
           });
           res.send(sendToUser);
         } catch (err) {
+          console.error(err);
           res.status(500).send("Database Error");
         }
       })
       .catch(err => {
+        console.error(err);
         res.status(500).send("Database Error");
       });
   }
@@ -104,6 +106,7 @@ router.get("/all/count", async (req, res) => {
       res.json(result);
     })
     .catch(err => {
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -276,10 +279,12 @@ router.get(
           });
           res.send(sendToAdmin);
         } catch (err) {
+          console.error(err);
           res.status(500).send("Database Error");
         }
       })
       .catch(err => {
+        console.error(err);
         res.status(500).send("Database Error");
       });
   }
@@ -319,6 +324,7 @@ router.get("/manage/:id", async (req, res) => {
         }
       })
       .catch(err => {
+        console.error(err);
         res.sendStatus(400);
       });
   }
@@ -397,11 +403,12 @@ router.patch("/", jsonParser, [body("id").exists()], async (req, res) => {
           }
         }
       })
-      .catch(error =>
-        error.name === "CastError"
+      .catch(err => {
+        console.error(err);
+        err.name === "CastError"
           ? res.sendStatus(400)
           : res.status(500).send("Database Error")
-      );
+      });
   }
 });
 
@@ -522,17 +529,18 @@ router.patch(
                     );
                   }
                 } catch (err) {
-                  console.log(err);
+                  console.error(err);
                 }
               }
             }
           }
         })
-        .catch(error =>
-          error.name === "CastError"
+        .catch(err => {
+          console.error(err);
+          err.name === "CastError"
             ? res.sendStatus(400)
             : res.status(500).send("Database Error")
-        );
+        });
     } else if (req.body.approved === constants.approvalStates.Rejected) {
       RoomBooking.byTenant(req.user.residence)
         .findOneAndUpdate(
@@ -597,18 +605,19 @@ router.patch(
                                 <p>Treeckle Team</p>`
                 );
               } catch (err) {
-                console.log(err);
+                console.error(err);
               }
             }
           } else {
             res.sendStatus(403);
           }
         })
-        .catch(error =>
-          error.name === "CastError"
+        .catch(err => {
+          console.error(err);
+          err.name === "CastError"
             ? res.sendStatus(400)
             : res.status(500).send("Database Error")
-        );
+        });
     } else if (req.body.approved === constants.approvalStates.Pending) {
       RoomBooking.byTenant(req.user.residence)
         .findOneAndUpdate(
@@ -673,18 +682,19 @@ router.patch(
                                 <p>Treeckle Team</p>`
                 );
               } catch (err) {
-                console.log(err);
+                console.error(err);
               }
             }
           } else {
             res.sendStatus(403);
           }
         })
-        .catch(error =>
-          error.name === "CastError"
+        .catch(err => {
+          console.error(err);
+          err.name === "CastError"
             ? res.sendStatus(400)
             : res.status(500).send("Database Error")
-        );
+        });
     } else {
       res.sendStatus(403);
     }
@@ -805,6 +815,7 @@ router.post(
         const roomBookingInstance = new roomBooking(newBookingRequest);
         roomBookingInstance.save().then(async (result, error) => {
           if (error) {
+            console.error(error);
             res.status(500).send("Database Error");
           } else {
             res.sendStatus(200);
@@ -888,7 +899,10 @@ router.delete(
             res.sendStatus(404);
           }
         })
-        .catch(err => res.sendStatus(500));
+        .catch(err => {
+          console.error(err);
+          res.sendStatus(500)
+        });
     }
   }
 );

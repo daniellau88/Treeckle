@@ -22,6 +22,7 @@ const checkApprovedOverlaps = async (req, roomId, start, end) => {
             });
         });
     } catch(err) {
+        console.error(err);
         returnObject.error = 1
     }
     return returnObject;
@@ -47,6 +48,7 @@ const checkPotentialOverlaps = async (req, roomId, start, end) => {
             returnObject.overlaps.push(doc._id);
         });
     } catch(err) {
+        console.error(err);
         returnObject.error = 1
     }
     return returnObject;
@@ -81,6 +83,7 @@ const rejectOverlaps = async (req, roomId, start, end) => {
             returnObject.overlaps.push(doc._id);
         });
     } catch(err) {
+        console.error(err);
         returnObject.error = 1
     }
     return returnObject;
